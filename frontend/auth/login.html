@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <h1>Login</h1>
+    <form id="loginForm">
+        <label for="email">Email:</label>
+        <input type="email" id="email" required><br><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" required><br><br>
+
+        <button type="submit">Login</button>
+    </form>
+    <p>ยังไม่มีบัญชี? <a href="/register">Create account</a></p>
+    <div id="message" style="color: red;"></div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+            try {
+                const response = await fetch('http://127.0.0.1:5000/auth/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    localStorage.setItem('authToken', result.token);
+                    localStorage.setItem('userData', JSON.stringify(result.user));
+
+                    const role = result.user.role;
+                    if (role === 'admin') {
+                        window.location.href = 'home_admin.html';
+                    } else if (role === 'tutor') {
+                        window.location.href = 'home_tutor.html';
+                    } else {
+                        window.location.href = 'home_student.html';
+                    }
+                } else {
+                    document.getElementById('message').textContent = result.message || 'Login failed. Please try again.';
+                }
+            } catch (error) {
+                document.getElementById('message').textContent = 'Error: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
