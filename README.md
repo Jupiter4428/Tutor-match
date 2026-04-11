@@ -93,10 +93,13 @@ cd Tutor_match
 # หากมีการติดตั้ง library เพิ่มเติม
 pip freeze > requirements.txt
 
+# ถ้าอยากสร้าง Branch ใหม่
+git git checkout -b <ชื่อ-branch-ใหม่>
+
 # เช็คก่อนว่าตอนนี้อยู่ Branch ไหน
 git branch
 
-# หากขึ้นว่าอยู่ Branch อื่นที่ไม่ใช่ Branch นี้
+# หากขึ้นว่าอยู่ Branch อื่นที่ไม่ใช่ Branch นี้ก็สลับ Branch
 git checkout renovate
 
 # add file & commit ตามปกติ
