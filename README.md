@@ -41,42 +41,42 @@
 git clone -b renovate https://github.com/Jupiter4428/Tutor-match.git Tutor_match
 ```
 ### Setup Database Using terminal
-# ผ่าน terminal using MySql version 9.6
-```bash
 
-# ทดสอบ
+```bash
+# ผ่าน terminal using MySql version 9.6
+# ทดสอบก่อนว่ามี PATH MySql ในเครื่องหรือยัง
 mysql --version
-ถ้าไม่ขึ้น version ให้เพิ่ม PATH ก่อน
+# ถ้าไม่ขึ้น version ให้เพิ่ม PATH ก่อน
 
 # เพิ่ม PATH ให้ถูก version (ถ้ายังไม่มี PATH)
 $env:PATH += ";C:\Program Files\MySQL\MySQL Server 9.6\bin"
 
 # ทดสอบ
 mysql --version
-ถ้าขึ้น version ไปต่อ
+# ถ้าขึ้น version ไปต่อ
 
 # เข้าโฟล์เดอร์โปรเจคก่อน
 cd Tutor_match
 
-# สร้าง database ก่อน
+# สร้าง Database ก่อน
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS tutor_match;"
 
-# รัน schema
+# รัน Schema
 Get-Content database/schema.sql | mysql -u root -p tutor_match
-# Backend Setup
 ```
 ### Runserver
 ```bash
 # ไปที่โฟลเดอร์โปรเจกต์
-cd Tutor_match
+cd Tutor_match/backend
 
 # ติดตั้ง Library (Flask, CORS, PyMySQL, Werkzeug)
 pip install -r requirements.txt
 
-- หากมีการติดตั้ง library เพิ่มเติม → pip freeze > requirements.txt
-- ก่อนทำ → git pull
-- หลังทำ → git add . → git commit → git push
+# หากมีการติดตั้ง library เพิ่มเติม
+pip freeze > requirements.txt
 
+# รัน server
+python app.py
 ```
 
 <table align="center" style="width: 100%; border-collapse: collapse;">
