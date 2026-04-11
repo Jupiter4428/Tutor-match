@@ -1,0 +1,78 @@
+tutor-match/
+├── requirements.txt                    # flask, flask-bcrypt, flask-jwt-extended, pymysql ฯลฯ
+├── run.py                              # python run.py เพื่อเริ่ม server
+│
+├── backend/
+│   ├── app.py                          # สร้าง Flask app, register Blueprint ทุกตัว
+│   ├── config.py                       # DB_URI, SECRET_KEY, JWT config
+│   │
+│   ├── models/                         # นิยามโครงสร้างตาราง (ใช้คู่กับ PyMySQL หรือ SQLAlchemy)
+│   │   ├── __init__.py                 # import รวมทุก model ให้ app.py เรียกที่เดียว
+│   │   ├── user_model.py               # User, User_Role
+│   │   ├── student_model.py            # Student_Profile, Student_Post
+│   │   ├── tutor_model.py              # Tutor_Profile, Tutor_Experience, Tutor_Subject, Tutor_Certificate
+│   │   ├── schedule_model.py           # Tutor_Schedule, Schedule_Booking
+│   │   ├── application_model.py        # Application
+│   │   ├── payment_model.py            # Payment
+│   │   └── review_model.py             # Review
+│   │
+│   ├── services/                       # Business Logic ทั้งหมดอยู่ที่นี่ (routes ห้ามมี logic)
+│   │   ├── auth_service.py             # register, login, hash password, check duplicate email
+│   │   ├── student_service.py          # สร้าง/แก้/ปิดโพสต์, ดูรายการผู้สมัคร
+│   │   ├── tutor_service.py            # จัดการ profile, เพิ่ม/ลบ subject, certificate, experience
+│   │   ├── application_service.py      # apply งาน, accept/reject ผู้สมัคร, ป้องกัน apply ซ้ำ
+│   │   ├── schedule_service.py         # ตั้งเวลาว่าง, จองคาบเรียน, ป้องกันเวลาชนกัน
+│   │   ├── payment_service.py          # คำนวณ platform_fee (10%), บันทึกการชำระเงิน
+│   │   ├── review_service.py           # เขียนรีวิว, คำนวณ avg rating ของติวเตอร์
+│   │   └── admin_service.py            # verify ติวเตอร์, ลบโพสต์/รีวิว, ดึงข้อมูล dashboard
+│   │
+│   ├── routes/                         # รับ Request → เรียก Service → ส่ง Response (ไม่มี logic)
+│   │   ├── auth.py                     # POST /auth/register, POST /auth/login
+│   │   ├── student.py                  # GET/POST /posts, PATCH /posts/<id>/close
+│   │   ├── tutor.py                    # GET/PUT /tutor/profile, /subjects, /certificates
+│   │   ├── application.py              # POST /apply, PATCH /applications/<id>/accept|reject
+│   │   ├── schedule.py                 # POST /schedule, POST /booking, GET /schedule/<tutor_id>
+│   │   ├── payment.py                  # POST /payment, GET /payment/history
+│   │   ├── review.py                   # POST /review, GET /tutor/<id>/reviews
+│   │   └── admin.py                    # PATCH /admin/verify/<id>, GET /admin/dashboard
+│   │
+│   └── utils/
+│       ├── auth_helper.py              # decorator ตรวจ JWT, เช็ค role ก่อนเข้า route
+│       └── db.py                       # เปิด/ปิด MySQL connection, cursor helper
+│
+├── templates/                          # HTML ทุกหน้า (Jinja2 render จาก Flask)
+│   ├── base.html                       # layout หลัก navbar + footer ทุกหน้า extends ที่นี่
+│   │
+│   ├── auth/
+│   │   ├── login.html                  # หน้า login
+│   │   └── register.html              # หน้าสมัครสมาชิก เลือก role student/tutor
+│   │
+│   ├── student/
+│   │   ├── post_list.html             # กระดานโพสต์ทั้งหมด (job board)
+│   │   ├── post_create.html           # สร้างโพสต์หาติวเตอร์
+│   │   ├── post_detail.html           # รายละเอียดโพสต์ + รายชื่อคนสมัคร
+│   │   └── booking.html               # เลือกคาบเรียนจากตารางว่างของติวเตอร์
+│   │
+│   ├── tutor/
+│   │   ├── profile.html               # หน้าโปรไฟล์ติวเตอร์ (public)
+│   │   ├── profile_edit.html          # แก้ไขโปรไฟล์ตัวเอง
+│   │   ├── schedule.html              # ตั้งเวลาว่างรายสัปดาห์
+│   │   └── my_applications.html       # งานที่ตัวเองสมัครไป + สถานะ
+│   │
+│   └── admin/
+│       ├── dashboard.html             # สถิติรายได้, top วิชา, top ติวเตอร์
+│       ├── verify.html                # รายชื่อติวเตอร์รอ verify + ดูเอกสาร
+│       └── moderation.html            # จัดการโพสต์/รีวิวที่ไม่เหมาะสม
+│
+├── static/
+│   ├── css/
+│   │   └── style.css                  # stylesheet หลัก
+│   ├── js/
+│   │   └── main.js                    # JS เล็กๆ เช่น confirm dialog, preview รูป
+│   └── uploads/                       # รูป profile และ certificate ที่ user อัปโหลด
+│
+└── database/
+    ├── schema.sql                      # CREATE TABLE ทุกตาราง (ส่งงานพาร์ท 3)
+    ├── seed.sql                        # INSERT ข้อมูลตัวอย่างสำหรับ demo
+    └── migrations/
+        └── v1_add_booking_date.sql     # เก็บประวัติการแก้ schema ทีหลัง
