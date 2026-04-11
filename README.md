@@ -67,7 +67,7 @@ Get-Content database/schema.sql | mysql -u root -p tutor_match
 ### Runserver
 ```bash
 # ไปที่โฟลเดอร์โปรเจกต์
-cd Tutor_match/backend
+cd Tutor_match
 
 # ติดตั้ง Library (Flask, CORS, PyMySQL, Werkzeug)
 pip install -r requirements.txt
@@ -76,7 +76,7 @@ pip install -r requirements.txt
 pip freeze > requirements.txt
 
 # รัน server
-python app.py
+python run.py
 ```
 
 <table align="center" style="width: 100%; border-collapse: collapse;">
