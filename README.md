@@ -38,13 +38,11 @@
 ### วิธีการ clone project
 
 ```bash
-# clone project
 git clone -b renovate https://github.com/Jupiter4428/Tutor-match.git Tutor_match
 ```
 ### Setup Database Using terminal
-
-```bash
 # ผ่าน terminal using MySql version 9.6
+```bash
 
 # ทดสอบ
 mysql --version
