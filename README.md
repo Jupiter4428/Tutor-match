@@ -40,7 +40,7 @@
 ```bash
 git clone -b renovate https://github.com/Jupiter4428/Tutor-match.git Tutor_match
 ```
-### อย่าลืมใส่รหัส MySQL ของคุณในไฟล์ .env
+### ****** อย่าลืมใส่รหัส MySQL ของคุณในไฟล์ .env ******
 ### Setup Database Using terminal
 
 ```bash
