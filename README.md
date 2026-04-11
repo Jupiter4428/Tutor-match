@@ -79,7 +79,32 @@ pip freeze > requirements.txt
 # รัน server
 python run.py
 ```
+### ขั้นตอนการ push
 
+```bash
+# ไปที่โฟลเดอร์โปรเจกต์
+cd Tutor_match
+
+# เช็คก่อนว่าตอนนี้อยู่ Branch ไหน
+git branch
+
+# หากขึ้นว่าอยู่ Branch อื่นที่ไม่ใช่ Branch นี้
+git checkout renovate
+
+# add file & commit ตามปกติ
+git add <ชื่อไฟล์>
+git commit -m "commit comments"
+
+# git pull ก่อนเสมอ (update code)
+git pull origin renovate
+
+# หากเจอ Merge Conflict ก็แก้ไฟล์นั้นก่อน แล้วค่อย add & commit ทีละไฟล์
+git add <ชื่อไฟล์>
+git commit -m "Resolve merge conflict in <ชื่อไฟล์>"
+
+# gitpush
+git push origin renovate
+```
 <table align="center" style="width: 100%; border-collapse: collapse;">
 <tr style="background-color: #f8fafc;">
 <th align="center" style="padding: 10px;">บทบาท (Role)</th>
