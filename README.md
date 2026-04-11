@@ -38,13 +38,24 @@
 ### วิธีการ clone project
 
 ```bash
+# git clone
 git clone -b renovate https://github.com/Jupiter4428/Tutor-match.git Tutor_match
+
+# สร้าง venv ใหม่
+python -m venv venv
+
+# เปิดใช้งาน
+.\venv\Scripts\activate
+
+# ติดตั้ง Library 
+pip install -r requirements.txt
+
 ```
 ### ****** อย่าลืมใส่รหัส MySQL ของคุณในไฟล์ .env ******
-### Setup Database Using terminal
+### Setup Database Using PowerShell
 
 ```bash
-# ผ่าน terminal using MySql version 9.6
+# ผ่าน PowerShell using MySql version 9.6
 # ทดสอบก่อนว่ามี PATH MySql ในเครื่องหรือยัง
 mysql --version
 # ถ้าไม่ขึ้น version ให้เพิ่ม PATH ก่อน
@@ -70,12 +81,6 @@ Get-Content database/schema.sql | mysql -u root -p tutor_match
 # ไปที่โฟลเดอร์โปรเจกต์
 cd Tutor_match
 
-# ติดตั้ง Library (Flask, CORS, PyMySQL, Werkzeug)
-pip install -r requirements.txt
-
-# หากมีการติดตั้ง library เพิ่มเติม
-pip freeze > requirements.txt
-
 # รัน server
 python run.py
 ```
@@ -84,6 +89,9 @@ python run.py
 ```bash
 # ไปที่โฟลเดอร์โปรเจกต์
 cd Tutor_match
+
+# หากมีการติดตั้ง library เพิ่มเติม
+pip freeze > requirements.txt
 
 # เช็คก่อนว่าตอนนี้อยู่ Branch ไหน
 git branch
