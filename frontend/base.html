@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutor Match</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="/">Tutor Match</a>
+        <a href="/auth/login">เข้าสู่ระบบ</a>
+        <a href="/auth/register">สมัครสมาชิก</a>
+    </nav>
+
+    <main>
+        {% block content %}{% endblock %}  
+        <!-- หน้าอื่นจะเอาโค้ดมาใส่ตรงนี้ -->
+    </main>
+</body>
+</html>
