@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Home</title>
+</head>
+<body>
+    <h1>Admin Home</h1>
+    <div id="content"></div>
+    <button id="logout">Logout</button>
+    <script>
+        const userData = localStorage.getItem('userData');
+        if (!userData) {
+            window.location.href = 'login.html';
+        } else {
+            const user = JSON.parse(userData);
+            document.getElementById('content').innerText = `Welcome ${user.name} (${user.role})`;
+        }
+        document.getElementById('logout').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>
