@@ -40,6 +40,7 @@
 ```bash
 git clone -b renovate https://github.com/Jupiter4428/Tutor-match.git Tutor_match
 ```
+###อย่าลืมใส่รหัส MySQL ของคุณในไฟล์ .env
 ### Setup Database Using terminal
 
 ```bash
@@ -63,7 +64,6 @@ mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS tutor_match;"
 
 # รัน Schema
 Get-Content database/schema.sql | mysql -u root -p tutor_match
-# ใส่รหัส MySQL ของคุณในไฟล์ .env
 ```
 ### Runserver
 ```bash
