@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+</head>
+<body>
+    <h1>Register</h1>
+    <form id="registerForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" required><br><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" required><br><br>
+
+        <label for="role">Role:</label>
+        <select id="role" required>
+            <option value="student">Student</option>
+            <option value="tutor">Tutor</option>
+        </select><br><br>
+
+        <button type="submit">Create account</button>
+    </form>
+    <p>มีบัญชีแล้ว? <a href="/login">Login</a></p>
+    <div id="message" style="color: red;"></div>
+
+    <script>
+        const form = document.getElementById('registerForm');
+        const message = document.getElementById('message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            message.textContent = '';
+
+            const data = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                role: document.getElementById('role').value
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/auth/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    alert('สมัครสมาชิกสำเร็จ กรุณา login');
+                    window.location.href = 'login.html';
+                } else {
+                    message.textContent = result.message || 'Register failed. Please try again.';
+                }
+            } catch (error) {
+                message.textContent = 'Error: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
