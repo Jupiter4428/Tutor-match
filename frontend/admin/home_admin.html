@@ -12,7 +12,7 @@
     <script>
         const userData = localStorage.getItem('userData');
         if (!userData) {
-            window.location.href = 'login.html';
+            window.location.href = '/login';
         } else {
             const user = JSON.parse(userData);
             document.getElementById('content').innerText = `Welcome ${user.name} (${user.role})`;
@@ -20,7 +20,7 @@
         document.getElementById('logout').addEventListener('click', () => {
             localStorage.removeItem('authToken');
             localStorage.removeItem('userData');
-            window.location.href = 'login.html';
+            window.location.href = '/login';
         });
     </script>
 </body>
