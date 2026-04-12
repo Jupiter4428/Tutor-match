@@ -53,7 +53,7 @@
 
                 if (response.ok && result.status === 'success') {
                     alert('สมัครสมาชิกสำเร็จ กรุณา login');
-                    window.location.href = 'login.html';
+                    window.location.href = '/login';
                 } else {
                     message.textContent = result.message || 'Register failed. Please try again.';
                 }
