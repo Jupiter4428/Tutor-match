@@ -53,8 +53,8 @@ def register_user(name, email, password, role):
 
 import datetime
 import jwt
-# from backend.extensions import db  (นำเข้า db ตามที่คุณตั้งค่าไว้)
-# SECRET_KEY = "your_secret_key" (อย่าลืมตั้งค่า SECRET_KEY ของคุณด้วยนะครับ)
+# from backend.extensions import db  (นำเข้า db จามที่ได้ตั้งค่าไว้ใน extensions.py)
+# SECRET_KEY = "your_secret_key" (อย่าลืมตั้งค่า SECRET_KEY )
 
 def login_user(email, password):
     conn = get_connection()

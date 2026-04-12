@@ -1,28 +1,177 @@
 <!DOCTYPE html>
-<html lang="en">
-<head> 
+<html lang="th">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tutor Home</title>
+    <title>Tutor Home - Tutor Match</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+        .section { border: 1px solid #ddd; padding: 15px; margin-top: 20px; border-radius: 5px; background: #fafafa;}
+        .post-card { border: 1px solid #4CAF50; padding: 15px; margin-bottom: 10px; background-color: #fff; border-radius: 5px;}
+        .history-card { border: 1px solid #6c757d; padding: 10px; margin-bottom: 10px; background-color: #fff; border-radius: 5px;}
+    </style>
 </head>
 <body>
-    <h1>Tutor Home</h1>
-    <div id="content"></div>
-    <button id="logout">Logout</button>
+
+    <div class="header">
+        <h1 id="welcome-text">Tutor Home</h1>
+        <button id="logout" style="background: red; color: white; border: none; padding: 8px 15px; cursor: pointer;">Logout</button>
+    </div>
+
+    <div class="section">
+        <h2>🔍 กระดานหางานสอน (กำลังเปิดรับ)</h2>
+        <button onclick="loadFeed()" style="margin-bottom: 15px;">🔄 โหลดงานใหม่</button>
+        <div id="feed-container"></div>
+    </div>
+
+    <div class="section">
+        <h2>📜 ประวัติการสมัครสอนของฉัน</h2>
+        <button onclick="loadMyApplications()" style="margin-bottom: 15px;">🔄 โหลดประวัติ</button>
+        <div id="history-container"></div>
+    </div>
+
     <script>
+        // ----------------------------------------------------
+        // 1. จัดการเรื่อง Login และดึงข้อมูล User ปัจจุบัน
+        // ----------------------------------------------------
         const userData = localStorage.getItem('userData');
+        let currentUser = null;
+
         if (!userData) {
-            window.location.href = '/login';
+            window.location.href = '/login'; // ถ้ายังไม่ล็อกอิน เด้งกลับ
         } else {
-            const user = JSON.parse(userData);
-            const status = user.verification_status ? user.verification_status : 'pending';
-            document.getElementById('content').innerText = `Welcome ${user.name} (${user.role}) - verification_status: ${status}`;
+            currentUser = JSON.parse(userData);
+            document.getElementById('welcome-text').innerText = `Welcome ${currentUser.name} (${currentUser.role})`;
         }
+
+        // ปุ่ม Logout 
         document.getElementById('logout').addEventListener('click', () => {
             localStorage.removeItem('authToken');
             localStorage.removeItem('userData');
             window.location.href = '/login';
         });
+
+        // โหลดข้อมูลเมื่อเปิดหน้าเว็บ
+        window.onload = () => {
+            loadFeed();
+            loadMyApplications();
+        };
+
+        // ----------------------------------------------------
+        // 2. ฟังก์ชันโหลดกระดานหางาน
+        // ----------------------------------------------------
+        function loadFeed() {
+            const container = document.getElementById('feed-container');
+            container.innerHTML = 'กำลังโหลดข้อมูล...';
+            
+            fetch('http://127.0.0.1:5000/tutor/posts')
+            .then(res => res.json())
+            .then(data => {
+                container.innerHTML = ''; 
+                if (data.status === 'error') return container.innerHTML = `<p style="color:red;">${data.message}</p>`;
+                if (data.data.length === 0) return container.innerHTML = '<p>ยังไม่มีงานใหม่ในตอนนี้</p>';
+
+                data.data.forEach(post => {
+                    const card = `
+                        <div class="post-card">
+                            <h3>วิชา: ${post.subject}</h3>
+                            <p><strong>รายละเอียด:</strong> ${post.description}</p>
+                            <p><strong>งบประมาณ:</strong> ${post.budget} บาท/ชม. | <strong>นักเรียน:</strong> ${post.student_name}</p>
+                            <button onclick="applyJob(${post.post_id})" style="background-color: #4CAF50; color: white; padding: 8px 12px; border:none; cursor: pointer; border-radius: 3px;">
+                                ✋ สมัครสอนโพสต์นี้
+                            </button>
+                        </div>
+                    `;
+                    container.innerHTML += card;
+                });
+            })
+            .catch(err => console.error(err));
+        }
+
+        // ----------------------------------------------------
+        // 3. ฟังก์ชันกดสมัครสอน
+        // ----------------------------------------------------
+        function applyJob(postId) {
+            if (!currentUser) return;
+
+            // ส่งข้อมูลไปหลังบ้าน โดยใช้ user_id ของคนที่ล็อกอินอยู่
+            fetch('http://127.0.0.1:5000/tutor/apply', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    post_id: postId, 
+                    tutor_id: currentUser.user_id // ใช้ user_id เลยเดี๋ยวหลังบ้านไปหา tutor_id ให้เอง
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message); 
+                loadFeed(); // รีเฟรชหน้ากระดาน
+                loadMyApplications(); // อัปเดตประวัติด้วย
+            })
+            .catch(err => alert("Error: " + err));
+        }
+
+        // ----------------------------------------------------
+        // 4. ฟังก์ชันโหลดประวัติการสมัครของตัวเอง (เวอร์ชันแก้เวลาไทยตรงเป๊ะ)
+        // ----------------------------------------------------
+        function loadMyApplications() {
+            if (!currentUser) return;
+            const container = document.getElementById('history-container');
+            
+            // URL สำหรับเรียก API
+            const url = `http://127.0.0.1:5000/tutor/applications?tutor_id=${currentUser.user_id}`;
+            
+            console.log("Fetching from:", url);
+
+            fetch(url)
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                container.innerHTML = ''; 
+                if (!data.data || data.data.length === 0) {
+                    container.innerHTML = '<p style="color:gray; font-style:italic;">ยังไม่เคยสมัครสอน</p>';
+                    return;
+                }
+
+                data.data.forEach(app => {
+                    // 1. จัดการสีสถานะ
+                    let statusColor = "orange";
+                    if(app.application_status === "accepted") statusColor = "green";
+                    if(app.application_status === "rejected") statusColor = "red";
+                    
+                    // 2. จัดการเรื่องเวลา (แก้ปัญหา GMT+7 ล้ำหน้า)
+                    // เราใช้ 'en-GB' เพื่อดึง Format วันที่ออกมา แล้วเปลี่ยนเป็น Locale ไทยโดยระบุ timeZone เป็น UTC
+                    // เพื่อให้มัน "หยุด" การบวกเพิ่ม 7 ชั่วโมงครับ
+                    const dateObj = new Date(app.applied_at);
+                    const appTime = dateObj.toLocaleString('th-TH', { 
+                        timeZone: 'UTC', // บังคับให้อ่านเลขตรงๆ จาก DB ไม่ต้องบวกเพิ่ม
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+
+                    // 3. แสดงผล Card
+                    container.innerHTML += `
+                        <div class="history-card" style="border:1px solid #ddd; padding:15px; margin-bottom:10px; border-radius:8px; background:#fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            <h4 style="margin-top:0; color:#007bff;">วิชา: ${app.subject} (นร: ${app.student_name})</h4>
+                            <p style="margin:5px 0;"><strong>วันที่สมัคร:</strong> ${appTime}</p>
+                            <p style="margin:5px 0;"><strong>สถานะ:</strong> <span style="color:${statusColor}; font-weight:bold;">${app.application_status}</span></p>
+                        </div>
+                    `;
+                });
+            })
+            .catch(err => {
+                console.error("Error:", err);
+                container.innerHTML = `<p style="color:red;">โหลดไม่สำเร็จ (404 หรือ Server Error)</p>`;
+            });
+        }
     </script>
 </body>
 </html>
