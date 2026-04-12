@@ -35,6 +35,18 @@ def create_app():
     
     # register blueprint
     from backend.routes.auth import auth_bp
+    from backend.routes.tutor import tutor_bp
+    from backend.routes.student import student_bp
+    from backend.routes.admin import admin_bp
+    from backend.routes.application import application_bp
+    from backend.routes.payment import payment_bp
+    from backend.routes.review import review_bp
     app.register_blueprint(auth_bp)
-
+    app.register_blueprint(tutor_bp)
+    app.register_blueprint(student_bp)
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(application_bp)
+    app.register_blueprint(payment_bp)
+    app.register_blueprint(review_bp)
+    
     return app
