@@ -1,4 +1,4 @@
--- สร้าง User 4 คน (นักเรียน 2, ติวเตอร์ 2)
+-- สร้าง User 4 คน (นักเรียน 2, ติวเตอร์ 2) 
 INSERT INTO `User` (name, email, password_hash) VALUES 
 ('น้องสมชาย เรียนดี', 'somchai@example.com', 'hashed123'),
 ('น้องสมหญิง ขยันมาก', 'somying@example.com', 'hashed123'),

@@ -38,12 +38,24 @@
 ### วิธีการ clone project
 
 ```bash
+# git clone
 git clone -b renovate https://github.com/Jupiter4428/Tutor-match.git Tutor_match
+
+# สร้าง venv ใหม่
+python -m venv venv
+
+# เปิดใช้งาน
+.\venv\Scripts\activate
+
+# ติดตั้ง Library 
+pip install -r requirements.txt
+
 ```
-### Setup Database Using terminal
+### ****** อย่าลืมใส่รหัส MySQL ของคุณในไฟล์ .env ******
+### Setup Database Using PowerShell
 
 ```bash
-# ผ่าน terminal using MySql version 9.6
+# ผ่าน PowerShell using MySql version 9.6
 # ทดสอบก่อนว่ามี PATH MySql ในเครื่องหรือยัง
 mysql --version
 # ถ้าไม่ขึ้น version ให้เพิ่ม PATH ก่อน
@@ -69,16 +81,41 @@ Get-Content database/schema.sql | mysql -u root -p tutor_match
 # ไปที่โฟลเดอร์โปรเจกต์
 cd Tutor_match
 
-# ติดตั้ง Library (Flask, CORS, PyMySQL, Werkzeug)
-pip install -r requirements.txt
+# รัน server
+python run.py
+```
+### ขั้นตอนการ push
+
+```bash
+# ไปที่โฟลเดอร์โปรเจกต์
+cd Tutor_match
 
 # หากมีการติดตั้ง library เพิ่มเติม
 pip freeze > requirements.txt
 
-# รัน server
-python run.py
-```
+# ถ้าอยากสร้าง Branch ใหม่
+git checkout -b <ชื่อ-branch-ใหม่>
 
+# เช็คก่อนว่าตอนนี้อยู่ Branch ไหน
+git branch
+
+# หากขึ้นว่าอยู่ Branch อื่นที่ไม่ใช่ Branch นี้ก็สลับ Branch
+git checkout renovate
+
+# add file & commit ตามปกติ
+git add <ชื่อไฟล์>
+git commit -m "commit comments"
+
+# git pull ก่อนเสมอ (update code)
+git pull origin renovate
+
+# หากเจอ Merge Conflict ก็แก้ไฟล์นั้นก่อน แล้วค่อย add & commit ทีละไฟล์
+git add <ชื่อไฟล์>
+git commit -m "Resolve merge conflict in <ชื่อไฟล์>"
+
+# gitpush
+git push origin renovate
+```
 <table align="center" style="width: 100%; border-collapse: collapse;">
 <tr style="background-color: #f8fafc;">
 <th align="center" style="padding: 10px;">บทบาท (Role)</th>
@@ -107,5 +144,5 @@ python run.py
 </tr>
 </table>
 
-<p align="right"><i>Project Version 1.0 | Updated: April 7, 2026</i></p>
+<p align="right"><i>Project Version 1.0 | Updated: April 12, 2026</i></p>
 
