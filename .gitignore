@@ -1,5 +1,50 @@
-venv/
+# 🔐 Environment variables
 .env
+.env.*
+!.env.example
+
+# Python
 __pycache__/
-*.pyc 
-static/uploads/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env/
+.venv/
+
+# Packages
+*.egg-info/
+dist/
+build/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite3
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Flask specific
+instance/
+.webassets-cache
+
+# Secrets
+*.pem
+*.key
+
+# Misc
+*.swp
