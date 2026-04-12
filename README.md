@@ -35,7 +35,7 @@
 
 ---
 
-### วิธีการ clone project
+### วิธีการ Clone Project Using PowerShell
 
 ```bash
 # git clone
