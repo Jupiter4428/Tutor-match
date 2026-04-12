@@ -61,7 +61,7 @@ copy .env.example .env
 ```
 ### ****** ต้องทำการติดตั้ง MySQL version 9.6 ก่อนการทดสอบระบบ ******
 ### ****** สามารถติดตั้ง MySQL Workbench แทนการใช้งาน MySQL แบบ PowerShell ได้ ******
-### ****** อย่าลืมใส่ข้อมูล MySQL ของคุณในไฟล์ .env.example ******
+### ****** อย่าลืมใส่ข้อมูล MySQL ของคุณในไฟล์ .env ******
 ### Setup Database Using PowerShell
 
 ```bash
