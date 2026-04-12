@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from backend.services.student_service import create_student_post, respond_to_application, get_post_applications
+from backend.services.student_service import create_student_post, respond_to_application, get_post_applications, get_student_post_history
 student_bp = Blueprint('student', __name__)
 
 @student_bp.route('/post', methods=['POST'])
@@ -48,3 +48,19 @@ def view_applications(post_id):
         return jsonify(result), 200
     else:
         return jsonify(result), 403
+    
+# Route สำหรับให้นักเรียนดูประวัติโพสต์ของตัวเอง
+@student_bp.route('/my-posts', methods=['GET'])
+def view_my_posts():
+    # ดึง student_id จาก URL เช่น ?student_id=1
+    student_id = request.args.get('student_id')
+    
+    if not student_id:
+        return jsonify({"status": "error", "message": "กรุณาระบุ student_id"}), 400
+        
+    result = get_student_post_history(student_id)
+    
+    if result["status"] == "success":
+        return jsonify(result), 200
+    else:
+        return jsonify(result), 500

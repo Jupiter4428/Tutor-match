@@ -32,7 +32,7 @@ def respond_to_application(app_id, student_id, action):
 
             if not app_data:
                 return {"status": "error", "message": "ไม่พบใบสมัครนี้ในระบบ"}
-            if app_data['student_id'] != student_id:
+            if app_data['student_id'] != int(student_id):
                 return {"status": "error", "message": "คุณไม่มีสิทธิ์จัดการใบสมัครนี้ (ไม่ใช่โพสต์ของคุณ)"}
             if app_data['status'] != 'pending':
                 return {"status": "error", "message": "ใบสมัครนี้ถูกตัดสินไปแล้ว"}
@@ -90,6 +90,37 @@ def get_post_applications(post_id, student_id):
                 "status": "success", 
                 "message": "ดึงข้อมูลผู้สมัครสำเร็จ", 
                 "data": applications
+            }
+            
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+def get_student_post_history(student_id):
+    """ฟังก์ชันสำหรับนักเรียนดูประวัติโพสต์ทั้งหมดของตัวเอง"""
+    try:
+        connection = db.get_connection()
+        with connection.cursor() as cursor:
+            # ดึงข้อมูลโพสต์ของตัวเองทั้งหมด เรียงจากใหม่ไปเก่า
+            sql = """
+                SELECT 
+                    post_id, 
+                    subject, 
+                    description, 
+                    budget, 
+                    status, 
+                    created_at 
+                FROM student_posts 
+                WHERE student_id = %s
+                ORDER BY created_at DESC
+            """
+            cursor.execute(sql, (int(student_id),))
+            posts = cursor.fetchall()
+            
+            return {
+                "status": "success", 
+                "message": "ดึงประวัติการโพสต์สำเร็จ", 
+                "data": posts
             }
             
     except Exception as e:
