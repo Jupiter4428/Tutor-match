@@ -41,11 +41,11 @@
 
                     const role = result.user.role;
                     if (role === 'admin') {
-                        window.location.href = 'home_admin.html';
+                        window.location.href = '/home/admin';
                     } else if (role === 'tutor') {
-                        window.location.href = 'home_tutor.html';
+                        window.location.href = '/home/tutor';
                     } else {
-                        window.location.href = 'home_student.html';
+                        window.location.href = '/home/student';
                     }
                 } else {
                     document.getElementById('message').textContent = result.message || 'Login failed. Please try again.';
