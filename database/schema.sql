@@ -164,7 +164,7 @@ CREATE TABLE payments (
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ==========================================
--- 6. Seed Data
+-- 6. SuperUser Creation
 -- ==========================================
 INSERT INTO users (name, email, password_hash)
 VALUES ('พี่เม่น', 'wutthisak2548@gmail.com', 'superuser');
