@@ -72,9 +72,23 @@ cd Tutor_match
 
 # สร้าง Database ก่อน
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS tutor_match;"
+# Enter password: <your password>
 
 # รัน Schema
 Get-Content database/schema.sql | mysql -u root -p tutor_match
+# Enter password: <your password>
+```
+### Using Database in PowerShell
+```bash
+# เข้าใช้งาน MySQL
+mysql -u root -p
+# Enter password: <your password>
+
+# run some sql
+USE tutor_match;
+SELECT * FROM User;
+SELECT * FROM User_role;
+
 ```
 ### Runserver
 ```bash
