@@ -1,20 +1,14 @@
-SET FOREIGN_KEY_CHECKS = 0; 
--- ==========================================
--- ล้างตารางเก่า (เรียงลำดับการลบจากตารางลูกไปตารางแม่)
--- ==========================================
-DROP TABLE IF EXISTS `Payment`;
-DROP TABLE IF EXISTS `Review`;
-DROP TABLE IF EXISTS `Schedule_Booking`;
-DROP TABLE IF EXISTS `Application`;
-DROP TABLE IF EXISTS `Student_Post`;
-DROP TABLE IF EXISTS `Tutor_Schedule`;
-DROP TABLE IF EXISTS `Tutor_Certificate`;
-DROP TABLE IF EXISTS `Tutor_Subject`;
-DROP TABLE IF EXISTS `Tutor_Experience`;
-DROP TABLE IF EXISTS `Tutor_Profile`;
-DROP TABLE IF EXISTS `Student_Profile`;
-DROP TABLE IF EXISTS `User_Role`;
-DROP TABLE IF EXISTS `User`;
+-- 1. ล้าง Database เดิมและสร้างใหม่พร้อมรองรับภาษาไทย/Emoji
+DROP DATABASE IF EXISTS tutor_match;
+CREATE DATABASE tutor_match 
+CHARACTER SET utf8mb4 
+COLLATE utf8mb4_unicode_ci;
+
+-- บอกให้ MySQL ใช้ก้อนนี้
+USE tutor_match;
+
+-- ปิดการเช็คชั่วคราวเพื่อให้สร้างตารางที่มีความสัมพันธ์กันได้ง่าย
+SET FOREIGN_KEY_CHECKS = 0;
 
 -- ==========================================
 -- 1. ตารางผู้ใช้งานและสิทธิ์
@@ -26,7 +20,7 @@ CREATE TABLE `User` (
     password_hash VARCHAR(255) NOT NULL,
     user_profile VARCHAR(512) NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+); 
 
 CREATE TABLE `User_Role` (
     user_id INT NOT NULL,
