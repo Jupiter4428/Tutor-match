@@ -97,12 +97,13 @@ SELECT * FROM User;
 SELECT * FROM User_role;
 
 # run Script sql
-# ข้างใน mysql
+# ไปที่โฟลเดอร์ที่สคริป sql อยู่
 cd project
+# ข้างใน mysql
 source file.sql
 
 # In PowerShell
-# ไปที่โฟลเดอร์โปรเจกต์
+# ไปที่โฟลเดอร์ที่สคริป sql อยู่
 cd project
 Get-Content file.sql | mysql -u root -p
 Enter password: <your password>
