@@ -1,7 +1,6 @@
 -- 1. สร้าง User 5 คน (Admin 1, Student 2, Tutor 2)
 -- หมายเหตุ: user_id จะรัน 1, 2, 3, 4, 5 ตามลำดับ
 INSERT INTO `User` (name, email, password_hash) VALUES 
-('แอดมินใจดี', 'admin@tutormatch.com', 'hashed_admin'),    -- ID: 1
 ('น้องสมชาย', 'somchai@test.com', 'hashed_student'),       -- ID: 2
 ('น้องสมหญิง', 'somying@test.com', 'hashed_student'),      -- ID: 3
 ('ติวเตอร์มานี', 'manee@test.com', 'hashed_tutor'),        -- ID: 4
@@ -9,7 +8,6 @@ INSERT INTO `User` (name, email, password_hash) VALUES
 
 -- 2. ผูก Role ให้ตรงตามโจทย์
 INSERT INTO `User_Role` (user_id, role) VALUES 
-(1, 'admin'), 
 (2, 'student'), (3, 'student'), 
 (4, 'tutor'), (5, 'tutor');
 
