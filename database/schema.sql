@@ -145,3 +145,11 @@ CREATE TABLE `Payment` (
     FOREIGN KEY (app_id) REFERENCES `Application`(app_id) ON DELETE CASCADE
 );
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ==========================================
+-- Add Admin Account
+-- ==========================================
+INSERT INTO `User` (name, email, password_hash) VALUES 
+('พี่เม่น', 'wutthisak2548@gmail.com', 'superuser');
+INSERT INTO `User_Role` (user_id, role) VALUES 
+(1, 'admin');
