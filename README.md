@@ -112,6 +112,25 @@ cd project
 Get-Content file.sql | <mysql -u root -p Schema_name>
 Enter password: <your password>
 ```
+### Some Script sql for testing in MySQL
+```bash
+# คำสั่งล้างข้อมูล (ไม่ลบ table)
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE reviews;
+TRUNCATE TABLE applications;
+TRUNCATE TABLE student_posts;
+TRUNCATE TABLE tutor_profiles;
+TRUNCATE TABLE student_profiles;
+TRUNCATE TABLE users;
+SET FOREIGN_KEY_CHECKS = 1;
+
+# add super user
+INSERT INTO users (name, email, password_hash)
+VALUES ('admin', 'wutthisak2548@gmail.com', 'superuser');
+
+INSERT INTO user_roles (user_id, role)
+VALUES (1, 'admin');
+```
 ### Runserver
 ```bash
 # ไปที่โฟลเดอร์โปรเจกต์
