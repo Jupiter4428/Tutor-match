@@ -126,8 +126,8 @@ python run.py
 cd project
 
 # pull ก่อน push เสมอ (update code)
-git pull
-git pull origin <ระบุชื่อ branch> OR
+git pull หรือ
+git pull origin <ระบุชื่อ branch>
 
 # หากเจอ Merge Conflict ก็แก้ไฟล์นั้นก่อน แล้วค่อย add & commit ทีละไฟล์
 git add <ชื่อไฟล์>
