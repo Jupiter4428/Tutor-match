@@ -61,7 +61,7 @@ copy .env.example .env
 ```
 ### ****** ต้องทำการติดตั้ง MySQL version 9.6 ก่อนการทดสอบระบบ ******
 ### ****** สามารถติดตั้ง MySQL Workbench แทนการใช้งาน MySQL แบบ PowerShell ได้ ******
-### ****** อย่าลืมใส่ข้อมูล MySQL ของคุณในไฟล์ .env.example ******
+### ****** อย่าลืมใส่ข้อมูล MySQL ของคุณในไฟล์ .env ******
 ### Setup Database Using PowerShell
 
 ```bash
@@ -125,12 +125,16 @@ python run.py
 # ไปที่โฟลเดอร์โปรเจกต์
 cd project
 
+# pull ก่อน push เสมอ (update code)
+git pull หรือ
+git pull origin <ระบุชื่อ branch>
+
+# หากเจอ Merge Conflict ก็แก้ไฟล์นั้นก่อน แล้วค่อย add & commit ทีละไฟล์
+git add <ชื่อไฟล์>
+git commit -m "Resolve merge conflict in <ชื่อไฟล์>"
+
 # หากมีการติดตั้ง library เพิ่มเติม
 pip freeze > requirements.txt
-
-# pull ก่อน push เสมอ (update code)
-git pull origin <ระบุชื่อ branch> OR
-git pull
 
 # ถ้าอยากสร้าง Branch ใหม่
 git checkout -b <Branch_Name>
@@ -145,10 +149,6 @@ git checkout renovate
 # add file & commit ตามปกติ
 git add <ชื่อไฟล์>
 git commit -m "commit comments"
-
-# หากเจอ Merge Conflict ก็แก้ไฟล์นั้นก่อน แล้วค่อย add & commit ทีละไฟล์
-git add <ชื่อไฟล์>
-git commit -m "Resolve merge conflict in <ชื่อไฟล์>"
 
 # gitpush
 git push origin renovate
