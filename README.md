@@ -136,6 +136,7 @@ git checkout -b <Branch_Name>
 git branch
 
 # หากขึ้นว่าอยู่ Branch อื่นที่ไม่ใช่ Branch นี้ก็สลับมา Branch นี (renovate)
+# หรือจะ push ขึ้น branch อื่นก็แล้วแต่เลย demo ได้อิสระ
 git checkout renovate
 
 # add file & commit ตามปกติ
