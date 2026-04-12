@@ -5,6 +5,7 @@
   <img src="https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python" alt="Python">
   <img src="https://img.shields.io/badge/Flask-3.1.3-green?style=for-the-badge&logo=flask" alt="Flask">
   <img src="https://img.shields.io/badge/MySQL-9.6-orange?style=for-the-badge&logo=mysql" alt="MySQL">
+  <img src="https://img.shields.io/badge/HTML-5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML">
 </div>
 
 ---
