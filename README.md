@@ -55,6 +55,9 @@ python -m venv venv
 # ติดตั้ง Library 
 pip install -r requirements.txt
 
+# setup .env
+copy .env.example .env
+ห้ามลืมแก้ค่าในไฟล์ .env 
 ```
 ### ****** ต้องทำการติดตั้ง MySQL version 9.6 ก่อนการทดสอบระบบ ******
 ### ****** สามารถติดตั้ง MySQL Workbench แทนการใช้งาน MySQL แบบ PowerShell ได้ ******
