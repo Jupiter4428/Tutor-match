@@ -54,7 +54,7 @@ python -m venv venv
 pip install -r requirements.txt
 
 ```
-### ****** อย่าลืมใส่รหัส MySQL ของคุณในไฟล์ .env ******
+### ****** อย่าลืมใส่ข้อมูล MySQL ของคุณในไฟล์ .env.example ******
 ### Setup Database Using PowerShell
 
 ```bash
