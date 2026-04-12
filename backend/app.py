@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask, app, send_from_directory
 from flask_cors import CORS
 from backend.config import SECRET_KEY
 
@@ -35,11 +35,11 @@ def create_app():
     
     # register blueprint
     from backend.routes.auth import auth_bp
-
-
-
-    app.register_blueprint(auth_bp)
-
+    from backend.routes.student import student_bp
+    from backend.routes.tutor import tutor_bp
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(student_bp, url_prefix='/api/student')
+    app.register_blueprint(tutor_bp, url_prefix='/api/tutor')
 
 
     
