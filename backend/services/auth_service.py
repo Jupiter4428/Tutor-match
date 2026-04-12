@@ -9,7 +9,7 @@ def register_user(name, email, password, role):
     try:
         with conn.cursor() as cursor:
             # เช็ค email ซ้ำ
-            cursor.execute("SELECT user_id FROM User WHERE email = %s", (email,))
+            cursor.execute("SELECT user_id FROM Users WHERE email = %s", (email,))
             if cursor.fetchone():
                 return {"status": "error", "message": "อีเมลนี้ถูกใช้งานแล้ว"}
 
@@ -18,26 +18,26 @@ def register_user(name, email, password, role):
 
             # สร้าง user
             cursor.execute(
-                "INSERT INTO User (name, email, password_hash) VALUES (%s, %s, %s)",
+                "INSERT INTO Users (name, email, password_hash) VALUES (%s, %s, %s)",
                 (name, email, password_hash)
             )
             user_id = cursor.lastrowid
 
             # กำหนด role
             cursor.execute(
-                "INSERT INTO User_Role (user_id, role) VALUES (%s, %s)",
+                "INSERT INTO User_Roles (user_id, role) VALUES (%s, %s)",
                 (user_id, role)
             )
 
             # สร้าง profile ตาม role
             if role == "student":
                 cursor.execute(
-                    "INSERT INTO Student_Profile (user_id) VALUES (%s)",
+                    "INSERT INTO Student_Profiles (user_id) VALUES (%s)",
                     (user_id,)
                 )
             elif role == "tutor":
                 cursor.execute(
-                    "INSERT INTO Tutor_Profile (user_id, hourly_rate) VALUES (%s, %s)",
+                    "INSERT INTO Tutor_Profiles (user_id, hourly_rate) VALUES (%s, %s)",
                     (user_id, 0)
                 )
 
@@ -57,7 +57,7 @@ def login_user(email, password):
         with conn.cursor() as cursor:
             # หา user จาก email
             cursor.execute(
-                "SELECT user_id, name, email, password_hash FROM User WHERE email = %s",
+                "SELECT user_id, name, email, password_hash FROM Users WHERE email = %s",
                 (email,)
             )
             user = cursor.fetchone()
@@ -71,7 +71,7 @@ def login_user(email, password):
 
             # ดึง role
             cursor.execute(
-                "SELECT role FROM User_Role WHERE user_id = %s",
+                "SELECT role FROM User_Roles WHERE user_id = %s",
                 (user["user_id"],)
             )
             roles = [r["role"] for r in cursor.fetchall()]
