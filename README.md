@@ -125,8 +125,12 @@ cd project
 # หากมีการติดตั้ง library เพิ่มเติม
 pip freeze > requirements.txt
 
+# pull ก่อน push เสมอ (update code)
+git pull origin <ระบุชื่อ branch> OR
+git pull
+
 # ถ้าอยากสร้าง Branch ใหม่
-git checkout -b <ชื่อ-branch-ใหม่>
+git checkout -b <Branch_Name>
 
 # เช็คก่อนว่าตอนนี้อยู่ Branch ไหน
 git branch
@@ -137,9 +141,6 @@ git checkout renovate
 # add file & commit ตามปกติ
 git add <ชื่อไฟล์>
 git commit -m "commit comments"
-
-# git pull ก่อนเสมอ (update code)
-git pull origin renovate
 
 # หากเจอ Merge Conflict ก็แก้ไฟล์นั้นก่อน แล้วค่อย add & commit ทีละไฟล์
 git add <ชื่อไฟล์>
