@@ -39,7 +39,10 @@
 
 ```bash
 # git clone
-git clone -b renovate https://github.com/Jupiter4428/Tutor-match.git Tutor_match
+git clone -b renovate https://github.com/Jupiter4428/Tutor-match.git project
+
+# ไปที่โฟลเดอร์โปรเจกต์
+cd project
 
 # สร้าง venv ใหม่
 python -m venv venv
@@ -68,13 +71,13 @@ mysql --version
 # ถ้าขึ้น version ไปต่อ
 
 # เข้าโฟล์เดอร์โปรเจคก่อน
-cd Tutor_match
+cd project
 
 # สร้าง Database ก่อน
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS tutor_match;"
 # Enter password: <your password>
 
-# รัน Schema
+# รัน Schema script
 Get-Content database/schema.sql | mysql -u root -p tutor_match
 # Enter password: <your password>
 ```
@@ -91,15 +94,19 @@ SELECT * FROM User_role;
 
 # run Script sql
 # ข้างใน mysql
+cd project
 source file.sql
 
-# PowerShell
-mysql < file.sql
+# In PowerShell
+# ไปที่โฟลเดอร์โปรเจกต์
+cd project
+Get-Content file.sql | mysql -u root -p
+Enter password: <your password>
 ```
 ### Runserver
 ```bash
 # ไปที่โฟลเดอร์โปรเจกต์
-cd Tutor_match
+cd project
 
 # รัน server
 python run.py
@@ -108,7 +115,7 @@ python run.py
 
 ```bash
 # ไปที่โฟลเดอร์โปรเจกต์
-cd Tutor_match
+cd project
 
 # หากมีการติดตั้ง library เพิ่มเติม
 pip freeze > requirements.txt
