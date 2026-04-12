@@ -105,7 +105,7 @@ source file.sql
 # In PowerShell
 # ไปที่โฟลเดอร์ที่สคริป sql อยู่
 cd project
-Get-Content file.sql | mysql -u root -p
+Get-Content file.sql | mysql -u root -p Schema_name
 Enter password: <your password>
 ```
 ### Runserver
