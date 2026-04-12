@@ -85,8 +85,9 @@ mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS tutor_match;"
 # Enter password: <your password>
 
 # รัน Schema script
-Get-Content database/schema.sql | mysql -u root -p tutor_match
+cmd /c "mysql --default-character-set=utf8mb4 -u root -p tutor_match < database/schema.sql"
 # Enter password: <your password>
+
 ```
 ### Using Database in PowerShell
 ```bash
