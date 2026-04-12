@@ -8,7 +8,7 @@ def create_app():
 
     CORS(app)
 
-    # serve frontend files
+    #register static routes
     @app.route("/")
     def index():
         return send_from_directory("../frontend/auth", "login.html")
@@ -20,7 +20,19 @@ def create_app():
     @app.route("/register")
     def register_page():
         return send_from_directory("../frontend/auth", "register.html")
+    
+    @app.route("/home/admin")
+    def admin_home():
+        return send_from_directory("../frontend/admin", "home_admin.html")
 
+    @app.route("/home/student")
+    def student_home():
+        return send_from_directory("../frontend/student", "home_student.html")
+    
+    @app.route("/home/tutor")
+    def tutor_home():
+        return send_from_directory("../frontend/tutor", "home_tutor.html")
+    
     # register blueprint
     from backend.routes.auth import auth_bp
     app.register_blueprint(auth_bp)
