@@ -4,8 +4,7 @@
 
   <img src="https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python" alt="Python">
   <img src="https://img.shields.io/badge/Flask-3.1.3-green?style=for-the-badge&logo=flask" alt="Flask">
-  <img src="https://img.shields.io/badge/MySQL-Connector-orange?style=for-the-badge&logo=mysql" alt="MySQL">
-  <img src="https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge" alt="Status">
+  <img src="https://img.shields.io/badge/MySQL-9.6-orange?style=for-the-badge&logo=mysql" alt="MySQL">
 </div>
 
 ---
