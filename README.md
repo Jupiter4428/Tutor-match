@@ -84,11 +84,17 @@ Get-Content database/schema.sql | mysql -u root -p tutor_match
 mysql -u root -p
 # Enter password: <your password>
 
-# run some sql
+# run some sql qurey
 USE tutor_match;
 SELECT * FROM User;
 SELECT * FROM User_role;
 
+# run Script sql
+# ข้างใน mysql
+source file.sql
+
+# PowerShell
+mysql < file.sql
 ```
 ### Runserver
 ```bash
