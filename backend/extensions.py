@@ -15,5 +15,4 @@ class Database:
             charset='utf8mb4'
         )
 
-# ตรวจสอบบรรทัดนี้ให้ดี ต้องชิดซ้ายสุด และสะกด db ตัวเล็กครับ!
 db = Database()

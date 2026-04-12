@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>นักเรียน: สร้างประกาศหาติวเตอร์</title>
+    <style> body { font-family: sans-serif; padding: 20px; } .form-group { margin-bottom: 15px; } </style>
+</head>
+<body>
+    <h2>📝 สร้างประกาศหาติวเตอร์ (ฝั่งนักเรียน)</h2>
+    
+    <div class="form-group">
+        <label>วิชาที่อยากเรียน:</label><br>
+        <input type="text" id="subject" placeholder="เช่น คณิตศาสตร์ ม.4" required>
+    </div>
+    <div class="form-group">
+        <label>รายละเอียด:</label><br>
+        <textarea id="description" rows="3" placeholder="เช่น อยากได้ติวเตอร์ใจดี..."></textarea>
+    </div>
+    <div class="form-group">
+        <label>งบประมาณ (บาท/ชม.):</label><br>
+        <input type="number" id="budget" placeholder="300" required>
+    </div>
+    
+    <button onclick="submitPost()">📢 ประกาศหาติวเตอร์</button>
+    <p id="message" style="color: blue;"></p>
+
+    <script>
+        function submitPost() {
+            // สมมติว่าล็อกอินเป็นสมชาย (student_id = 1)
+            const studentId = 1; 
+            
+            const postData = {
+                student_id: studentId,
+                subject: document.getElementById('subject').value,
+                description: document.getElementById('description').value,
+                budget: document.getElementById('budget').value
+            };
+
+            // ส่งข้อมูลไปที่ Backend
+            fetch('http://127.0.0.1:5000/student/post', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(postData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    document.getElementById('message').innerText = "✅ " + data.message;
+                    document.getElementById('subject').value = ''; // เคลียร์ช่อง
+                } else {
+                    document.getElementById('message').innerText = "❌ Error: " + data.message;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
