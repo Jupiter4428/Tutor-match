@@ -51,7 +51,7 @@ CREATE TABLE `Tutor_Profile` (
     user_id INT NOT NULL UNIQUE,
     bio TEXT,
     verification_status ENUM('pending', 'verified', 'rejected') DEFAULT 'pending',
-    hourly_rate DECIMAL(10,2) NOT NULL CHECK(hourly_rate > 0),
+    hourly_rate DECIMAL(10,2) NOT NULL CHECK(hourly_rate >= 0),
     FOREIGN KEY (user_id) REFERENCES `User`(user_id) ON DELETE CASCADE
 );
 

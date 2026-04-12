@@ -38,7 +38,7 @@ def register_user(name, email, password, role):
             elif role == "tutor":
                 cursor.execute(
                     "INSERT INTO Tutor_Profile (user_id, hourly_rate) VALUES (%s, %s)",
-                    (user_id, 1)
+                    (user_id, 0)
                 )
 
             conn.commit()
