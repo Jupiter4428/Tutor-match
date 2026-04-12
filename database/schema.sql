@@ -141,9 +141,18 @@ CREATE TABLE `Payment` (
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ==========================================
--- Add Admin Account
+-- Add Admin Account (Single Source of Truth)
 -- ==========================================
-INSERT INTO `User` (name, email, password_hash) VALUES 
-('พี่เม่น', 'wutthisak2548@gmail.com', 'superuser');
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- เพิ่มข้อมูล User: พี่เม่น
+-- ใช้ _utf8mb4 นำหน้าเพื่อให้ภาษาไทยถูกต้อง 100% ทุก Terminal
+INSERT INTO `User` (user_id, name, email, password_hash) VALUES 
+(1, _utf8mb4'พี่เม่น ', 'wutthisak2548@gmail.com', 'superuser');
+
+-- ผูกบทบาท Admin ให้กับ user_id = 1
 INSERT INTO `User_Role` (user_id, role) VALUES 
 (1, 'admin');
+
+SET FOREIGN_KEY_CHECKS = 1;
