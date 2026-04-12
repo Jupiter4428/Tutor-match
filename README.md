@@ -131,22 +131,22 @@ git checkout -b <ชื่อ-branch-ใหม่>
 # เช็คก่อนว่าตอนนี้อยู่ Branch ไหน
 git branch
 
-# หากขึ้นว่าอยู่ Branch อื่นที่ไม่ใช่ Branch นี้ก็สลับ Branch
-git checkout <branch_name>
+# หากขึ้นว่าอยู่ Branch อื่นที่ไม่ใช่ Branch นี้ก็สลับมา Branch นี (renovate)
+git checkout renovate
 
 # add file & commit ตามปกติ
 git add <ชื่อไฟล์>
 git commit -m "commit comments"
 
 # git pull ก่อนเสมอ (update code)
-git pull origin <branch_name>
+git pull origin renovate
 
 # หากเจอ Merge Conflict ก็แก้ไฟล์นั้นก่อน แล้วค่อย add & commit ทีละไฟล์
 git add <ชื่อไฟล์>
 git commit -m "Resolve merge conflict in <ชื่อไฟล์>"
 
 # gitpush
-git push origin <branch_name>
+git push origin renovate
 ```
 <table align="center" style="width: 100%; border-collapse: collapse;">
 <tr style="background-color: #f8fafc;">
