@@ -1,5 +1,5 @@
 # นิยามตาราง User สำหรับจัดการข้อมูลบัญชีหลัก [cite: 427]
-USER_TABLE = {
+USERs_TABLE = {
     "user_id": "INT PRIMARY KEY AUTO_INCREMENT",
     "name": "VARCHAR(50) NOT NULL",
     "email": "VARCHAR(100) UNIQUE NOT NULL",
@@ -9,7 +9,7 @@ USER_TABLE = {
 }
 
 # นิยามตาราง User_Role ตามหลัก 4NF (1 User สามารถมีได้หลาย Role) [cite: 417, 429]
-USER_ROLE_TABLE = {
+USER_ROLEs_TABLE = {
     "user_id": "INT NOT NULL (FK -> User)",
     "role": "ENUM('admin', 'student', 'tutor') NOT NULL",
     "composite_pk": "(user_id, role)"
