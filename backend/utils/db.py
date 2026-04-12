@@ -8,5 +8,7 @@ def get_connection():
         user=DB_USER,
         password=DB_PASSWORD,
         database=DB_NAME,
-        cursorclass=pymysql.cursors.DictCursor
+        charset="utf8mb4",
+        cursorclass=pymysql.cursors.DictCursor,
+        init_command="SET NAMES utf8mb4"
     )
