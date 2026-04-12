@@ -17,7 +17,7 @@ INSERT INTO `Student_Profile` (user_id, grade_level, school_name) VALUES
 (3, 'ม.6', 'โรงเรียนสตรีศึกษา');   -- student_id: 2
 
 INSERT INTO `Tutor_Profile` (user_id, bio, verification_status, hourly_rate) VALUES 
-(4, 'สอนคณิตศาสตร์ประสบการณ์ 5 ปี', 'verified', 300.00), -- tutor_id: 1
+(4, 'สอนคณิตศาสตร์ประสบการณ์ 5 ปี', 'pending', 300.00), -- tutor_id: 1
 (5, 'สอนภาษาอังกฤษ สไตล์ฝรั่ง', 'verified', 400.00);      -- tutor_id: 2
 
 -- 4. เพิ่มวิชาที่รับสอน (Tutor Subject) - อ้างอิงจาก tutor_id ในตาราง Profile
