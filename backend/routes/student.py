@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from backend.services.student_service import create_student_post
+from backend.services.student_service import create_student_post, respond_to_application
 
 student_bp = Blueprint('student', __name__)
 
@@ -17,4 +17,20 @@ def add_post():
         description=data.get('description', ''),
         budget=data['budget']
     )
+    return jsonify(result)
+
+@student_bp.route('/respond', methods=['POST'])
+def respond_application():
+    data = request.json
+    
+    # เช็คว่าส่งข้อมูลมาครบ 3 อย่างไหม
+    if not all(k in data for k in ('app_id', 'student_id', 'action')):
+        return jsonify({"status": "error", "message": "ข้อมูลไม่ครบถ้วน"}), 400
+        
+    result = respond_to_application(
+        app_id=data['app_id'],
+        student_id=data['student_id'],
+        action=data['action']
+    )
+    
     return jsonify(result)
