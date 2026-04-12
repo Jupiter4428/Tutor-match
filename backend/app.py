@@ -37,9 +37,11 @@ def create_app():
     from backend.routes.auth import auth_bp
     from backend.routes.student import student_bp
     from backend.routes.tutor import tutor_bp
-    app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    app.register_blueprint(student_bp, url_prefix='/api/student')
-    app.register_blueprint(tutor_bp, url_prefix='/api/tutor')
+    
+    # อิงตาม auth, student, tutor ตรงๆ เลย
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(student_bp, url_prefix='/student')
+    app.register_blueprint(tutor_bp, url_prefix='/tutor')
 
 
     
