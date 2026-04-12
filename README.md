@@ -57,6 +57,7 @@ pip install -r requirements.txt
 
 ```
 ### ****** อย่าลืมใส่ข้อมูล MySQL ของคุณในไฟล์ .env.example ******
+### ****** ต้องทำการติดตั้ง MySQL version 9.6 และสามารถติดตั้ง MySQL Workbench แทนการใช้งาน MySQL แบบ PowerShell ได้******
 ### Setup Database Using PowerShell
 
 ```bash
