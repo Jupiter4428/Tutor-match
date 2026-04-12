@@ -41,6 +41,7 @@ def create_app():
     from backend.routes.application import application_bp
     from backend.routes.payment import payment_bp
     from backend.routes.review import review_bp
+    from backend.routes.schedule import schedule_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(tutor_bp)
     app.register_blueprint(student_bp)
@@ -48,5 +49,7 @@ def create_app():
     app.register_blueprint(application_bp)
     app.register_blueprint(payment_bp)
     app.register_blueprint(review_bp)
+    app.register_blueprint(schedule_bp)
+    
     
     return app
