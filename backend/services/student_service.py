@@ -1,5 +1,6 @@
 from backend.extensions import db
 
+# สร้างประกาศ
 def create_student_post(user_id, subject, description, budget):
     """ฟังก์ชันสำหรับบันทึกประกาศ โดยรับ user_id แล้วไปแปลงเป็น student_id อัตโนมัติ"""
     try:
@@ -28,7 +29,8 @@ def create_student_post(user_id, subject, description, budget):
             
     except Exception as e:
         return {"status": "error", "message": str(e)}
-
+        
+# Logic การ "รับ/ปฏิเสธ" และ "ปิดโพสต์"
 def respond_to_application(app_id, user_id, action): # เปลี่ยนจาก student_id เป็น user_id
     try:
         connection = db.get_connection()
@@ -55,13 +57,19 @@ def respond_to_application(app_id, user_id, action): # เปลี่ยนจ�
             if not application:
                 return {"status": "error", "message": "คุณไม่มีสิทธิ์จัดการใบสมัครนี้"}
 
-            # 3. อัปเดตสถานะใบสมัคร (Accepted / Rejected)
+            # 3. กำหนดสถานะใหม่
             new_status = 'accepted' if action == 'accept' else 'rejected'
+            
+            # อัปเดตสถานะของใบสมัครที่ถูกกด
             cursor.execute("UPDATE applications SET status = %s WHERE app_id = %s", (new_status, app_id))
 
-            # 4. ถ้า "ยอมรับ" ให้ปิดประกาศนั้นทันที (Status = 'closed')
+            # 4. ถ้า "ยอมรับ" ให้ทำ 2 อย่างคือ: ปิดโพสต์ และ ปฏิเสธคนอื่น
             if action == 'accept':
+                # ปิดโพสต์ประกาศนั้นทันที (Status = 'closed')
                 cursor.execute("UPDATE student_posts SET status = 'closed' WHERE post_id = %s", (application['post_id'],))
+                
+                # เปลี่ยนสถานะใบสมัครอื่นๆ ในโพสต์เดียวกันเป็น rejected
+                cursor.execute("UPDATE applications SET status = 'rejected' WHERE post_id = %s AND app_id != %s", (application['post_id'], app_id))
 
             connection.commit()
             return {"status": "success", "message": f"ดำเนินการ{new_status}เรียบร้อยแล้ว"}
@@ -69,7 +77,7 @@ def respond_to_application(app_id, user_id, action): # เปลี่ยนจ�
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-
+# ดูรายชื่อคนสมัคร
 def get_post_applications(post_id, user_id): # เปลี่ยนจาก student_id เป็น user_id
     try:
         connection = db.get_connection()
@@ -111,7 +119,7 @@ def get_post_applications(post_id, user_id): # เปลี่ยนจาก st
     except Exception as e:
         return {"status": "error", "message": str(e), "data": []}
 
-
+# ดูประวัติโพสต์ของตัวเอง
 def get_student_post_history(user_id):
     try:
         connection = db.get_connection()
