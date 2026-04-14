@@ -31,7 +31,7 @@ def respond():
     # หน้าบ้านส่ง student_id มา (ซึ่งคือ user_id ของสมชาย)
     result = respond_to_application(
         app_id=data.get('app_id'),
-        user_id=data.get('student_id'), # ✅ ส่งเข้าตัวแปร user_id
+        user_id=data.get('student_id'), # ส่งเข้าตัวแปร user_id
         action=data.get('action')
     )
     return jsonify(result), 200
