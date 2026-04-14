@@ -38,7 +38,6 @@ def view_my_applications():
         return jsonify({"status": "error", "message": "กรุณาระบุ tutor_id"}), 400
         
     # 2. เรียกใช้ฟังก์ชัน "ดึงประวัติ" (get_tutor_applications) 
-    # ห้ามเรียก apply_for_job ในนี้นะครับ!
     result = get_tutor_applications(user_id=user_id)
     
     # 3. ส่งคำตอบกลับ
