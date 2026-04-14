@@ -1,5 +1,5 @@
 from backend.extensions import db
-
+# เมื่อติวเตอร์กดปุ่ม "สมัครสอนโพสต์นี้" ทำหน้าที่บันทึกใบสมัครลงในระบบ
 def apply_for_job(post_id, user_id): # เปลี่ยนจาก tutor_id เป็น user_id
     try:
         connection = db.get_connection()
@@ -27,7 +27,8 @@ def apply_for_job(post_id, user_id): # เปลี่ยนจาก tutor_id �
             return {"status": "success", "message": "ส่งคำขอสมัครสอนเรียบร้อยแล้ว!"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
-
+        
+# ดึงรายการ "ประกาศหาติวเตอร์" ของนักเรียนทั้งหมดที่ยังเปิดรับสมัครอยู่ เพื่อนำไปแสดงในหน้าฟีด
 def get_open_posts():
     """ฟังก์ชันสำหรับดึงโพสต์ประกาศหาติวเตอร์ที่ยังเปิดรับอยู่ (open)"""
     try:
@@ -59,7 +60,8 @@ def get_open_posts():
             
     except Exception as e:
         return {"status": "error", "message": str(e)}
-    
+        
+# ดึงข้อมูล "ประวัติการสมัครสอน" ของติวเตอร์คนนั้นๆ เพื่อนำไปแสดงในหน้า Dashboard ของติวเตอร์
 def get_tutor_applications(user_id):
     try:
         connection = db.get_connection()
