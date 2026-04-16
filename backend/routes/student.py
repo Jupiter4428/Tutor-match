@@ -35,8 +35,6 @@ def respond():
         action=data.get('action')
     )
     return jsonify(result), 200
-    
-    return jsonify(result)
 
 @student_bp.route('/applications/<int:post_id>', methods=['GET'])
 def view_applications(post_id):
