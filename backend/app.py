@@ -1,3 +1,4 @@
+#app.py
 from flask import Flask, send_from_directory
 from flask_cors import CORS
 from backend.config import SECRET_KEY
