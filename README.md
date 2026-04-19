@@ -50,7 +50,9 @@ cd project
 python -m venv venv
 
 # เปิดใช้งาน
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 .\venv\Scripts\activate
+
 
 # ติดตั้ง Library 
 pip install -r requirements.txt
@@ -97,8 +99,8 @@ mysql -u root -p
 
 # run some sql qurey
 USE tutor_match;
-SELECT * FROM User;
-SELECT * FROM User_role;
+SELECT * FROM user;
+SELECT * FROM user_role;
 
 # run Script sql
 # ไปที่โฟลเดอร์ที่สคริป sql อยู่
@@ -125,11 +127,15 @@ TRUNCATE TABLE users;
 SET FOREIGN_KEY_CHECKS = 1;
 
 # add super user
-INSERT INTO users (name, email, password_hash)
-VALUES ('admin', 'wutthisak2548@gmail.com', 'superuser');
-
-INSERT INTO user_roles (user_id, role)
-VALUES (1, 'admin');
+USE tutor_match;
+INSERT INTO users (name, email, password_hash, role, account_status) 
+VALUES (
+    'superuser', 
+    'admin@tutormatch.com', 
+    '$2y$10$Wz/1MRBMFauEtGdJNeaKq.5INBmig0Nip2urekRON8ekLkYesdj6i', -- bcrypt hash สำหรับรหัสผ่าน '1234'
+    'admin', 
+    'active'
+);
 ```
 ### Runserver
 ```bash
