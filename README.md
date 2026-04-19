@@ -50,7 +50,9 @@ cd project
 python -m venv venv
 
 # เปิดใช้งาน
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 .\venv\Scripts\activate
+
 
 # ติดตั้ง Library 
 pip install -r requirements.txt
