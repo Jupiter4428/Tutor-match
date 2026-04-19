@@ -60,9 +60,9 @@ def login_user(email, password):
     conn = get_connection()
     try:
         with conn.cursor() as cursor:
-            # 1. หา user จาก email
+            # 1. หา user จาก email (เพิ่มการดึงคอลัมน์ role มาพร้อมกันเลย)
             cursor.execute(
-                "SELECT user_id, name, email, password_hash FROM users WHERE email = %s",
+                "SELECT user_id, name, email, password_hash, role FROM users WHERE email = %s",
                 (email,)
             )
             user = cursor.fetchone()
@@ -70,12 +70,15 @@ def login_user(email, password):
             if not user:
                 return {"status": "error", "message": "ไม่พบอีเมลนี้ในระบบ"}
 
-            # 2. เช็ค password (⚠️ แก้ไขชั่วคราวเป็นเช็คข้อความตรงๆ เพื่อให้ผ่าน Invalid Salt)
+            # 2. เช็ค password
             db_password = user["password_hash"]
             
-            # เช็คว่ารหัสผ่านนี้ถูกเข้ารหัสด้วย bcrypt หรือยัง (มักจะขึ้นต้นด้วย $2b$ หรือ $2a$)
-            if db_password.startswith("$2b$") or db_password.startswith("$2a$"):
-                # กรณีเป็น User ใหม่ที่เข้ารหัสแล้ว (เช่น ENGR 102)
+            # เพิ่ม $2y$ เข้าไปในเงื่อนไข เพื่อให้ระบบรู้จัก Hash ตัวนี้
+            if db_password.startswith(("$2b$", "$2a$", "$2y$")):
+                # แปลง Hash ก่อนตรวจเช็ค (บางเวอร์ชันของ bcrypt ใน Python ต้องการ $2b$)
+                if db_password.startswith("$2y$"):
+                    db_password = db_password.replace("$2y$", "$2b$", 1)
+
                 if not bcrypt.checkpw(password.encode("utf-8"), db_password.encode("utf-8")):
                     return {"status": "error", "message": "รหัสผ่านไม่ถูกต้อง"}
             else:
@@ -83,17 +86,13 @@ def login_user(email, password):
                 if db_password != password:
                     return {"status": "error", "message": "รหัสผ่านไม่ถูกต้อง"}
 
-            # 3. ดึง role
-            cursor.execute(
-                "SELECT role FROM user_roles WHERE user_id = %s",
-                (user["user_id"],)
-            )
-            roles = [r["role"] for r in cursor.fetchall()]
+            # 3. ดึง role จาก user ได้เลย ไม่ต้อง Query ใหม่แล้ว
+            user_role = user["role"]
 
             # 4. สร้าง JWT token
             token = jwt.encode({
                 "user_id": user["user_id"],
-                "role": roles[0],
+                "role": user_role,
                 "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1)
             }, SECRET_KEY, algorithm="HS256")
 
@@ -105,7 +104,7 @@ def login_user(email, password):
                     "user_id": user["user_id"],
                     "name": user["name"],
                     "email": user["email"],
-                    "role": roles[0]
+                    "role": user_role
                 }
             }
 
