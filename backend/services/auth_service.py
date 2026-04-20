@@ -1,3 +1,4 @@
+# auth_service.py
 import bcrypt
 import jwt
 import datetime
@@ -5,6 +6,7 @@ from backend.utils.db import get_connection
 from backend.config import SECRET_KEY
 
 def register_user(name, email, password, role):
+    default_pic = "static/uploads/default_profile.jpg"
     conn = get_connection()
     try:
         with conn.cursor() as cursor:
@@ -16,30 +18,26 @@ def register_user(name, email, password, role):
             # hash password
             password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
-            # สร้าง user
+            # สร้าง user แก้ เพิ่ม role เข้าไปในตาราง users เลย
             cursor.execute(
-                "INSERT INTO users (name, email, password_hash) VALUES (%s, %s, %s)",
-                (name, email, password_hash)
+                "INSERT INTO users (name, email, password_hash, role) VALUES (%s, %s, %s, %s)",
+                (name, email, password_hash, role)
             )
             user_id = cursor.lastrowid
 
-            # กำหนด role
-            cursor.execute(
-                "INSERT INTO user_Roles (user_id, role) VALUES (%s, %s)",
-                (user_id, role)
-            )
-
             # สร้าง profile ตาม role
             if role == "student":
-                cursor.execute(
-                    "INSERT INTO student_Profiles (user_id) VALUES (%s)",
-                    (user_id,)
-                )
+                            # เพิ่มคอลัมน์ profile_picture_url และส่งค่า default_pic เข้าไป
+                            cursor.execute(
+                                "INSERT INTO student_Profiles (user_id, profile_picture_url) VALUES (%s, %s)",
+                                (user_id, default_pic)
+                            )
             elif role == "tutor":
-                cursor.execute(
-                    "INSERT INTO tutor_Profiles (user_id, hourly_rate) VALUES (%s, %s)",
-                    (user_id, 0)
-                )
+                            # เพิ่มคอลัมน์ profile_picture_url และส่งค่า default_pic เข้าไป
+                            cursor.execute(
+                            "INSERT INTO tutor_Profiles (user_id, hourly_rate, profile_picture_url) VALUES (%s, %s, %s)",
+                            (user_id, 1, default_pic)
+                            )      
 
             conn.commit()
             return {"status": "success", "message": "สมัครสมาชิกสำเร็จ"}
@@ -51,8 +49,6 @@ def register_user(name, email, password, role):
         conn.close()
 
 
-import datetime
-import jwt
 # from backend.extensions import db  (นำเข้า db จามที่ได้ตั้งค่าไว้ใน extensions.py)
 # SECRET_KEY = "your_secret_key" (อย่าลืมตั้งค่า SECRET_KEY )
 
