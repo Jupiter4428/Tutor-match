@@ -1,4 +1,4 @@
-#app.py
+# app.py
 from flask import Flask, send_from_directory
 from flask_cors import CORS
 from backend.config import SECRET_KEY
@@ -34,14 +34,21 @@ def create_app():
     def tutor_home():
         return send_from_directory("../frontend/tutor", "home_tutor.html")
     
+    # ฟังก์ชันสำหรับส่งหน้าเว็บแก้ไขโปรไฟล์ของนักเรียน
+    @app.route("/profile/student/edit")
+    def student_profile_edit_page():
+        return send_from_directory("../frontend/student", "edit_profile_student.html")
+    
     # register blueprint
     from backend.routes.auth import auth_bp
     from backend.routes.student import student_bp
     from backend.routes.tutor import tutor_bp
+    from backend.routes.admin import admin_bp
     
     # อิงตาม auth, student, tutor ตรงๆ
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(student_bp, url_prefix='/student')
     app.register_blueprint(tutor_bp, url_prefix='/tutor')
+    app.register_blueprint(admin_bp, url_prefix='/admin')
 
     return app
