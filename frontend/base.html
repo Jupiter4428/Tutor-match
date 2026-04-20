@@ -1,21 +1,347 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tutor Match</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Tutor Match{% endblock %}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Kanit', sans-serif;
+    }
+
+    :root {
+      --bg-main: linear-gradient(135deg, #0b1020 0%, #101938 28%, #1e1d4f 60%, #0b1228 100%);
+      --glass: rgba(255,255,255,0.08);
+      --glass-strong: rgba(255,255,255,0.12);
+      --border: rgba(255,255,255,0.14);
+      --text-main: #ffffff;
+      --text-soft: #d7dcff;
+      --text-fade: #aab4e4;
+      --purple: #8a63ff;
+      --pink: #ff4fd8;
+      --blue: #4da8ff;
+      --cyan: #39e7ff;
+      --green: #35e0a1;
+      --yellow: #ffd54a;
+      --danger: #ff5f7a;
+      --shadow: 0 20px 60px rgba(0,0,0,0.35);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg-main);
+      color: var(--text-main);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      width: 380px;
+      height: 380px;
+      border-radius: 50%;
+      filter: blur(110px);
+      opacity: 0.38;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    body::before {
+      top: -100px;
+      left: -80px;
+      background: #ff3fd2;
+    }
+
+    body::after {
+      bottom: -120px;
+      right: -90px;
+      background: #4d7dff;
+    }
+
+    .floating-glow {
+      position: fixed;
+      top: 30%;
+      left: 45%;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: #39e7ff;
+      filter: blur(140px);
+      opacity: 0.12;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .navbar {
+      width: 100%;
+      padding: 18px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 10px 35px rgba(0,0,0,0.18);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: white;
+    }
+
+    .brand-logo {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--pink), var(--purple), var(--blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 10px 28px rgba(138, 99, 255, 0.35);
+    }
+
+    .brand-text h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .brand-text p {
+      color: var(--text-fade);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: white;
+      padding: 11px 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: 0.25s ease;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .nav-link:hover {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,0.1);
+    }
+
+    .nav-link.primary {
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      border: none;
+      box-shadow: 0 10px 24px rgba(255,79,216,0.25);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 28px;
+      flex: 1;
+    }
+
+    .page-hero {
+      padding: 32px;
+      border-radius: 30px;
+      margin-bottom: 28px;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-hero::before {
+      content: "";
+      position: absolute;
+      top: -70px;
+      right: -60px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255,79,216,0.28), rgba(77,168,255,0.2));
+      filter: blur(8px);
+    }
+
+    .page-hero h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .page-hero p {
+      color: var(--text-soft);
+      line-height: 1.8;
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+    }
+
+    .glass-card {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      padding: 26px;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+      color: var(--text-fade);
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+
+    .btn {
+      border: none;
+      outline: none;
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 12px 18px;
+      font-size: 0.96rem;
+      font-weight: 600;
+      transition: 0.25s ease;
+      color: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      box-shadow: 0 10px 24px rgba(255,79,216,0.25);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ff5f7a, #ff2e63);
+      box-shadow: 0 10px 24px rgba(255,95,122,0.22);
+    }
+
+    .footer {
+      margin-top: 30px;
+      padding: 22px 28px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(16px);
+    }
+
+    .footer-inner {
+      max-width: 1500px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      color: var(--text-fade);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 18px;
+      }
+
+      .navbar {
+        padding: 16px 18px;
+      }
+
+      .page-hero {
+        padding: 24px;
+      }
+
+      .page-hero h2 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+
+  {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav>
-        <a href="/">Tutor Match</a>
-        <a href="/auth/login">เข้าสู่ระบบ</a>
-        <a href="/auth/register">สมัครสมาชิก</a>
+  <div class="floating-glow"></div>
+
+  <div class="app-shell">
+    <nav class="navbar">
+      <a href="#" class="brand">
+        <div class="brand-logo">🎓</div>
+        <div class="brand-text">
+          <h1>Tutor Match</h1>
+          <p>Beautiful Learning Platform</p>
+        </div>
+      </a>
+
+      <div class="nav-links">
+        <a href="#" class="nav-link">หน้าแรก</a>
+        <a href="#" class="nav-link">โปรไฟล์</a>
+        <a href="#" class="nav-link">ติดต่อ</a>
+        <a href="#" class="nav-link primary">Dashboard</a>
+      </div>
     </nav>
 
-    <main>
-        {% block content %}{% endblock %}  
-        <!-- หน้าอื่นจะเอาโค้ดมาใส่ตรงนี้ -->
+    <main class="container">
+      {% block content %}{% endblock %}
     </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <div>© 2026 Tutor Match. All rights reserved.</div>
+        <div>สร้างมาเพื่อระบบจับคู่นักเรียนและติวเตอร์แบบสวยจัดเต็ม ✨</div>
+      </div>
+    </footer>
+  </div>
+
+  {% block extra_js %}{% endblock %}
 </body>
 </html>
