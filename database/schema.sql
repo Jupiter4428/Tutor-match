@@ -117,6 +117,10 @@ CREATE TABLE student_posts (
     post_id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT NOT NULL,
     subject VARCHAR(100) NOT NULL,
+    grade_level VARCHAR(100) NOT NULL, -- เพิ่มใหม่
+    learning_format ENUM('online', 'onsite', 'both') NOT NULL, -- เพิ่มใหม่
+    location VARCHAR(255) NOT NULL, 
+    preferred_time VARCHAR(255) NOT NULL, -- เพิ่มใหม่
     description TEXT NULL,
     budget DECIMAL(10,2) NOT NULL,
     status ENUM('open','closed') NOT NULL DEFAULT 'open',
