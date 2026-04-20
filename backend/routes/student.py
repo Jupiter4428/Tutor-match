@@ -56,3 +56,25 @@ def get_history():
     # เรียกใช้ฟังก์ชันที่เราเพิ่งแก้ (ส่งเข้าตัวแปร user_id)
     result = get_student_post_history(user_id=user_id)
     return jsonify(result), 200
+from flask import request, jsonify
+
+# API สำหรับรับข้อมูลและอัปเดตโปรไฟล์นักเรียน
+@student_bp.route('/profile/update', methods=['POST'])
+def update_profile():
+    # 1. รับข้อมูลจากหน้าเว็บในรูปแบบ JSON
+    data = request.json
+    user_id = data.get('user_id')
+    school_name = data.get('school_name')
+    education_level = data.get('education_level')
+
+    # 2. ตรวจสอบความครบถ้วนของข้อมูลพื้นฐาน
+    if not user_id:
+        return jsonify({"status": "error", "message": "กรุณาระบุ user_id"}), 400
+
+    # 3. เรียกใช้ Service เพื่ออัปเดตข้อมูลลงฐานข้อมูล
+    from backend.services.student_service import update_student_profile
+    result = update_student_profile(user_id, school_name, education_level)
+
+    # 4. กำหนด Status Code ตามผลลัพธ์การทำงานและส่งคืน
+    status_code = 200 if result['status'] == 'success' else 400
+    return jsonify(result), status_code

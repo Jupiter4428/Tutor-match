@@ -1252,20 +1252,16 @@
     }
 
     document.getElementById("logout").addEventListener("click", function () {
-      const confirmLogout = confirm("คุณต้องการออกจากระบบใช่หรือไม่?");
-      if (!confirmLogout) return;
+        const confirmLogout = confirm("คุณต้องการออกจากระบบใช่หรือไม่?");
+        if (!confirmLogout) return;
 
-      window.location.href = "../auth/login.html";
+        // เคลียร์ Token หรือข้อมูล User ออกจากระบบ
+        localStorage.removeItem("token");
+        localStorage.removeItem("user_role");
 
-      /*
-      ถ้าเชื่อม backend จริง:
-      fetch("/auth/logout", { method: "POST" })
-        .then(() => {
-          window.location.href = "/login";
-        })
-        .catch(err => console.error(err));
-      */
-    });
+        // Redirect ไปที่ Route /login ของ Flask
+        window.location.href = "/login";
+    }); 
 
     filterUsers();
     renderActivities();
