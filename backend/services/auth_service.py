@@ -1,3 +1,4 @@
+# auth_service.py
 import bcrypt
 import jwt
 import datetime
@@ -16,18 +17,12 @@ def register_user(name, email, password, role):
             # hash password
             password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
-            # สร้าง user
+            # สร้าง user แก้ เพิ่ม role เข้าไปในตาราง users เลย
             cursor.execute(
-                "INSERT INTO users (name, email, password_hash) VALUES (%s, %s, %s)",
-                (name, email, password_hash)
+                "INSERT INTO users (name, email, password_hash, role) VALUES (%s, %s, %s, %s)",
+                (name, email, password_hash, role)
             )
             user_id = cursor.lastrowid
-
-            # กำหนด role
-            cursor.execute(
-                "INSERT INTO user_Roles (user_id, role) VALUES (%s, %s)",
-                (user_id, role)
-            )
 
             # สร้าง profile ตาม role
             if role == "student":
@@ -36,6 +31,7 @@ def register_user(name, email, password, role):
                     (user_id,)
                 )
             elif role == "tutor":
+                # สำหรับ tutor เริ่มต้นอาจจะไม่ต้องใส่ hourly_rate หรือใส่ default เป็น 0 ไว้ก่อน
                 cursor.execute(
                     "INSERT INTO tutor_Profiles (user_id, hourly_rate) VALUES (%s, %s)",
                     (user_id, 0)
@@ -51,8 +47,6 @@ def register_user(name, email, password, role):
         conn.close()
 
 
-import datetime
-import jwt
 # from backend.extensions import db  (นำเข้า db จามที่ได้ตั้งค่าไว้ใน extensions.py)
 # SECRET_KEY = "your_secret_key" (อย่าลืมตั้งค่า SECRET_KEY )
 
