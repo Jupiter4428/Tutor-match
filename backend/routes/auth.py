@@ -1,3 +1,4 @@
+# routes.auth.py
 from flask import Blueprint, request, jsonify
 from backend.services.auth_service import register_user, login_user
 
@@ -36,4 +37,4 @@ def login():
     if result["status"] == "success":
         return jsonify(result), 200
     else:
-        return jsonify(result), 40
+        return jsonify(result), 401
