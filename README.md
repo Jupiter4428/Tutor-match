@@ -99,7 +99,7 @@ mysql -u root -p
 
 # run some sql qurey
 USE tutor_match;
-SELECT * FROM user;
+SELECT * FROM users;
 
 # run Script sql
 # ไปที่โฟลเดอร์ที่สคริป sql อยู่
