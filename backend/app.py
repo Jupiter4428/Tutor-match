@@ -52,3 +52,7 @@ def create_app():
     app.register_blueprint(admin_bp, url_prefix='/admin')
 
     return app
+app = create_app()
+
+if __name__ == "__main__":
+    app.run(debug=True)
