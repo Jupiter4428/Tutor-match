@@ -97,17 +97,6 @@ cmd /c "mysql --default-character-set=utf8mb4 -u root -p tutor_match < database/
 mysql -u root -p
 # Enter password: <your password>
 
-# add super user
-USE tutor_match;
-INSERT INTO users (name, email, password_hash, role, account_status) 
-VALUES (
-    'superuser', 
-    'admin@tutormatch.com', 
-    '$2y$10$Wz/1MRBMFauEtGdJNeaKq.5INBmig0Nip2urekRON8ekLkYesdj6i', -- bcrypt hash สำหรับรหัสผ่าน '1234'
-    'admin', 
-    'active'
-);
-
 # run some sql qurey
 USE tutor_match;
 SELECT * FROM user;
@@ -115,6 +104,7 @@ SELECT * FROM user;
 # run Script sql
 # ไปที่โฟลเดอร์ที่สคริป sql อยู่
 cd project
+
 # ข้างใน mysql
 source file.sql
 
@@ -135,6 +125,17 @@ TRUNCATE TABLE tutor_profiles;
 TRUNCATE TABLE student_profiles;
 TRUNCATE TABLE users;
 SET FOREIGN_KEY_CHECKS = 1;
+
+# add super user
+USE tutor_match;
+INSERT INTO users (name, email, password_hash, role, account_status) 
+VALUES (
+    'superuser', 
+    'admin@tutormatch.com', 
+    '$2y$10$Wz/1MRBMFauEtGdJNeaKq.5INBmig0Nip2urekRON8ekLkYesdj6i', -- bcrypt hash สำหรับรหัสผ่าน '1234'
+    'admin', 
+    'active'
+);
 
 ```
 ### Runserver
