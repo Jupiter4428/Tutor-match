@@ -36,4 +36,4 @@ def login():
     if result["status"] == "success":
         return jsonify(result), 200
     else:
-        return jsonify(result), 401
+        return jsonify(result), 40
