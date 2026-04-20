@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Home - Tutor Match</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Kanit', sans-serif;
+    }
+
+    :root {
+      --bg-main: linear-gradient(135deg, #0f1020 0%, #181b3a 30%, #221d4e 65%, #10162f 100%);
+      --glass: rgba(255, 255, 255, 0.08);
+      --glass-strong: rgba(255, 255, 255, 0.12);
+      --border: rgba(255, 255, 255, 0.15);
+      --text-main: #ffffff;
+      --text-soft: #d7dcff;
+      --text-fade: #aeb8e8;
+      --pink: #ff4fd8;
+      --purple: #7b61ff;
+      --blue: #4da8ff;
+      --cyan: #37e7ff;
+      --green: #35e0a1;
+      --yellow: #ffd54a;
+      --danger: #ff5f7a;
+      --shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg-main);
+      color: var(--text-main);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: 0;
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    body::before {
+      top: -120px;
+      left: -100px;
+      background: #ff3fd2;
+    }
+
+    body::after {
+      bottom: -140px;
+      right: -100px;
+      background: #4d7dff;
+    }
+
+    .floating-glow {
+      position: fixed;
+      top: 25%;
+      left: 48%;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: #37e7ff;
+      filter: blur(140px);
+      opacity: 0.12;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 1450px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 28px;
+      padding: 18px 22px;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--pink), var(--purple), var(--blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 10px 30px rgba(123, 97, 255, 0.45);
+    }
+
+    .brand-text h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+    }
+
+    .brand-text p {
+      color: var(--text-fade);
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      outline: none;
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 12px 18px;
+      font-size: 0.97rem;
+      font-weight: 600;
+      transition: 0.25s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      color: white;
+      box-shadow: 0 10px 25px rgba(255, 79, 216, 0.3);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ff5f7a, #ff2e63);
+      color: white;
+      box-shadow: 0 10px 25px rgba(255, 95, 122, 0.28);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.4fr 0.9fr;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .hero-left,
+    .hero-right,
+    .card {
+      background: var(--glass);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-left {
+      padding: 34px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left::before {
+      content: "";
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255,79,216,0.35), rgba(77,168,255,0.2));
+      filter: blur(10px);
+    }
+
+    .welcome-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: #fff;
+      margin-bottom: 18px;
+      font-size: 0.92rem;
+    }
+
+    .hero-left h2 {
+      font-size: 3rem;
+      line-height: 1.12;
+      margin-bottom: 14px;
+      font-weight: 800;
+      max-width: 760px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #ffffff, #d5d0ff, #71e6ff, #ff8df2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-left p {
+      font-size: 1.03rem;
+      color: var(--text-soft);
+      max-width: 760px;
+      line-height: 1.75;
+      margin-bottom: 24px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 26px;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .mini-stat {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .mini-stat h3 {
+      font-size: 1.7rem;
+      margin-bottom: 5px;
+      font-weight: 800;
+    }
+
+    .mini-stat p {
+      margin: 0;
+      color: var(--text-fade);
+      font-size: 0.92rem;
+    }
+
+    .hero-right {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .hero-right .title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .highlight-box {
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(123,97,255,0.24), rgba(55,231,255,0.15));
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .highlight-box strong {
+      display: block;
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+    }
+
+    .highlight-box span {
+      color: var(--text-soft);
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .quick-btn {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.25s ease;
+    }
+
+    .quick-btn:hover {
+      transform: translateY(-3px);
+      background: rgba(255,255,255,0.1);
+    }
+
+    .quick-btn .icon {
+      font-size: 1.3rem;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .card {
+      padding: 28px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .card-subtitle {
+      color: var(--text-fade);
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .form-group.full {
+      grid-column: span 2;
+    }
+
+    label {
+      color: #ffffff;
+      font-size: 0.96rem;
+      font-weight: 500;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 15px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.07);
+      color: white;
+      outline: none;
+      font-size: 0.97rem;
+      transition: 0.2s ease;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #b4bce6;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(55,231,255,0.7);
+      box-shadow: 0 0 0 4px rgba(55,231,255,0.12);
+      background: rgba(255,255,255,0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    select option {
+      color: black;
+    }
+
+    .form-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .tip-box {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255, 213, 74, 0.12);
+      border: 1px solid rgba(255, 213, 74, 0.22);
+      color: #fff1b2;
+      font-size: 0.92rem;
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .post-message {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      display: none;
+      font-weight: 500;
+    }
+
+    .post-message.success {
+      display: block;
+      background: rgba(53, 224, 161, 0.14);
+      border: 1px solid rgba(53, 224, 161, 0.28);
+      color: #a8ffd8;
+    }
+
+    .post-message.error {
+      display: block;
+      background: rgba(255, 95, 122, 0.14);
+      border: 1px solid rgba(255, 95, 122, 0.28);
+      color: #ffc0cb;
+    }
+
+    .stats-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .stat-card {
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .stat-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .stat-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    .pink { background: rgba(255,79,216,0.16); }
+    .blue { background: rgba(77,168,255,0.16); }
+    .green { background: rgba(53,224,161,0.16); }
+    .yellow { background: rgba(255,213,74,0.16); }
+
+    .stat-text h4 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .stat-text p {
+      color: var(--text-fade);
+      font-size: 0.9rem;
+    }
+
+    .stat-number {
+      font-size: 1.7rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .list-box {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: 460px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .list-box::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .list-box::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.18);
+      border-radius: 999px;
+    }
+
+    .request-card,
+    .tutor-card {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: 0.25s ease;
+    }
+
+    .request-card:hover,
+    .tutor-card:hover {
+      transform: translateY(-4px);
+      background: rgba(255,255,255,0.09);
+    }
+
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .item-title {
+      font-size: 1.08rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .item-meta {
+      color: var(--text-fade);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .badge {
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge-open {
+      background: rgba(53, 224, 161, 0.16);
+      color: #9effd4;
+      border: 1px solid rgba(53,224,161,0.24);
+    }
+
+    .badge-progress {
+      background: rgba(255, 213, 74, 0.14);
+      color: #ffe68d;
+      border: 1px solid rgba(255,213,74,0.24);
+    }
+
+    .badge-closed {
+      background: rgba(255, 95, 122, 0.14);
+      color: #ffc0cb;
+      border: 1px solid rgba(255,95,122,0.24);
+    }
+
+    .item-desc {
+      color: var(--text-soft);
+      line-height: 1.7;
+      font-size: 0.94rem;
+      margin-bottom: 14px;
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .small-btn {
+      border: none;
+      cursor: pointer;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
+
+    .small-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .view-btn {
+      background: rgba(77, 168, 255, 0.16);
+      color: #bfe1ff;
+      border: 1px solid rgba(77,168,255,0.25);
+    }
+
+    .edit-btn {
+      background: rgba(255, 213, 74, 0.14);
+      color: #ffe79f;
+      border: 1px solid rgba(255,213,74,0.22);
+    }
+
+    .delete-btn {
+      background: rgba(255, 95, 122, 0.14);
+      color: #ffc0cb;
+      border: 1px solid rgba(255,95,122,0.22);
+    }
+
+    .match-btn {
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      color: white;
+    }
+
+    .empty-state {
+      padding: 28px 18px;
+      text-align: center;
+      color: var(--text-fade);
+      border: 1px dashed rgba(255,255,255,0.18);
+      border-radius: 20px;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .footer-banner {
+      padding: 28px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, rgba(255,79,216,0.16), rgba(77,168,255,0.12), rgba(53,224,161,0.12));
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .footer-banner h3 {
+      font-size: 1.45rem;
+      margin-bottom: 6px;
+    }
+
+    .footer-banner p {
+      color: var(--text-soft);
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1200px) {
+      .hero,
+      .dashboard-grid,
+      .section-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .page {
+        padding: 18px;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .hero-left h2 {
+        font-size: 2.1rem;
+      }
+
+      .hero-stats,
+      .form-grid,
+      .quick-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .form-group.full {
+        grid-column: span 1;
+      }
+
+      .form-footer {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .item-top {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-glow"></div>
+
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">🎓</div>
+        <div class="brand-text">
+          <h1>Tutor Match Student Portal</h1>
+          <p>ระบบสำหรับนักศึกษา ค้นหาติวเตอร์ โพสต์งาน และติดตามสถานะได้แบบมือโปร</p>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="btn btn-secondary" onclick="scrollToSection('create-post-section')">➕ สร้างโพสต์</button>
+        <button class="btn btn-secondary" onclick="scrollToSection('my-posts-section')">📚 โพสต์ของฉัน</button>
+        <button class="btn btn-danger" id="logout">🚪 Logout</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-left">
+        <div class="welcome-badge">✨ Welcome back, Student</div>
+        <h2>
+          หา<span class="gradient-text">ติวเตอร์เก่ง ๆ</span> ให้ตรงวิชา
+          <br>โพสต์งานได้ง่าย ดูดี และอลังการ
+        </h2>
+        <p>
+          จัดการประกาศหาติวเตอร์ของคุณได้ในหน้าเดียว ทั้งระบุวิชา งบประมาณ รายละเอียด วันที่ต้องการเรียน
+          และติดตามสถานะการตอบรับได้แบบสวย ๆ ใช้งานง่ายสุด ๆ
+        </p>
+
+        <div class="hero-buttons">
+          <button class="btn btn-primary" onclick="scrollToSection('create-post-section')">🚀 เริ่มโพสต์หาติวเตอร์</button>
+          <button class="btn btn-secondary" onclick="scrollToSection('available-tutors-section')">👀 ดูติวเตอร์ที่แนะนำ</button>
+        </div>
+
+        <div class="hero-stats">
+          <div class="mini-stat">
+            <h3 id="totalPosts">0</h3>
+            <p>โพสต์ทั้งหมด</p>
+          </div>
+          <div class="mini-stat">
+            <h3 id="openPosts">0</h3>
+            <p>ประกาศที่เปิดอยู่</p>
+          </div>
+          <div class="mini-stat">
+            <h3 id="matchedTutors">0</h3>
+            <p>การจับคู่สำเร็จ</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div>
+          <div class="title">🌟 ไฮไลต์วันนี้</div>
+          <div class="highlight-box">
+            <strong>สร้างโพสต์ให้น่าสนใจ = ได้คนตอบไวขึ้น</strong>
+            <span>ใส่ชื่อวิชา รายละเอียดปัญหา เป้าหมายการเรียน ระดับชั้น และงบประมาณให้ครบ เพื่อช่วยให้ติวเตอร์เห็นภาพและตัดสินใจรับงานง่ายขึ้น</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="title">⚡ เมนูลัด</div>
+          <div class="quick-actions">
+            <button class="quick-btn" onclick="scrollToSection('create-post-section')">
+              <span class="icon">📝</span>
+              สร้างประกาศใหม่
+            </button>
+            <button class="quick-btn" onclick="scrollToSection('my-posts-section')">
+              <span class="icon">📌</span>
+              ดูประกาศของฉัน
+            </button>
+            <button class="quick-btn" onclick="scrollToSection('available-tutors-section')">
+              <span class="icon">👨‍🏫</span>
+              ค้นหาติวเตอร์
+            </button>
+            <button class="quick-btn" onclick="refreshDashboard()">
+              <span class="icon">🔄</span>
+              รีเฟรชข้อมูล
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-grid">
+      <div class="card" id="create-post-section">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📢 สร้างประกาศหาติวเตอร์</div>
+            <div class="card-subtitle">กรอกข้อมูลให้ครบเพื่อเพิ่มโอกาสได้ติวเตอร์ตรงสาย ตรงเวลา และตรงงบ</div>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="subject">วิชาที่ต้องการเรียน</label>
+            <input type="text" id="subject" placeholder="เช่น ฟิสิกส์ ม.4, Calculus, Java Programming">
+          </div>
+
+          <div class="form-group">
+            <label for="level">ระดับชั้น / ระดับความยาก</label>
+            <select id="level">
+              <option value="">เลือกระดับ</option>
+              <option>มัธยมต้น</option>
+              <option>มัธยมปลาย</option>
+              <option>มหาวิทยาลัย</option>
+              <option>พื้นฐาน</option>
+              <option>ระดับแข่งขัน / สอบเข้า</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="budget">งบประมาณ (บาท/ชม.)</label>
+            <input type="number" id="budget" placeholder="เช่น 300">
+          </div>
+
+          <div class="form-group">
+            <label for="mode">รูปแบบการเรียน</label>
+            <select id="mode">
+              <option value="">เลือกรูปแบบ</option>
+              <option>ออนไลน์</option>
+              <option>ออนไซต์</option>
+              <option>ได้ทั้งสองแบบ</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="location">สถานที่ / ช่องทางเรียน</label>
+            <input type="text" id="location" placeholder="เช่น Zoom, Google Meet, ม.ธรรมศาสตร์ รังสิต">
+          </div>
+
+          <div class="form-group">
+            <label for="studyTime">วันเวลาที่สะดวก</label>
+            <input type="text" id="studyTime" placeholder="เช่น เสาร์-อาทิตย์ 13:00-16:00">
+          </div>
+
+          <div class="form-group full">
+            <label for="description">รายละเอียดเพิ่มเติม</label>
+            <textarea id="description" placeholder="อธิบายสิ่งที่อยากให้ติวเตอร์ช่วย เช่น เนื้อหาที่ไม่เข้าใจ เป้าหมาย คะแนนสอบ หรือหัวข้อที่ต้องเน้น"></textarea>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <div class="tip-box">
+            💡 เคล็ดลับ: โพสต์ที่มีรายละเอียดชัดเจนมักได้การตอบกลับเร็วกว่า และมีโอกาสเจอติวเตอร์ที่ตรงความต้องการมากกว่า
+          </div>
+          <button class="btn btn-primary" onclick="submitPost()">✨ ลงประกาศหาติวเตอร์</button>
+        </div>
+
+        <div id="post-message" class="post-message"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📊 ภาพรวมสถานะของฉัน</div>
+            <div class="card-subtitle">เช็กสถานะประกาศและความเคลื่อนไหวได้ทันที</div>
+          </div>
+        </div>
+
+        <div class="stats-list">
+          <div class="stat-card">
+            <div class="stat-left">
+              <div class="stat-icon pink">📄</div>
+              <div class="stat-text">
+                <h4>ประกาศทั้งหมด</h4>
+                <p>จำนวนโพสต์ที่คุณเคยสร้างไว้</p>
+              </div>
+            </div>
+            <div class="stat-number" id="statTotalPosts">0</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-left">
+              <div class="stat-icon green">🟢</div>
+              <div class="stat-text">
+                <h4>กำลังเปิดรับ</h4>
+                <p>ยังรอติวเตอร์เข้ามาตอบรับ</p>
+              </div>
+            </div>
+            <div class="stat-number" id="statOpenPosts">0</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-left">
+              <div class="stat-icon yellow">⏳</div>
+              <div class="stat-text">
+                <h4>อยู่ระหว่างดำเนินการ</h4>
+                <p>มีการพูดคุยหรือกำลังจับคู่</p>
+              </div>
+            </div>
+            <div class="stat-number" id="statPendingPosts">0</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-left">
+              <div class="stat-icon blue">🎯</div>
+              <div class="stat-text">
+                <h4>จับคู่สำเร็จ</h4>
+                <p>ได้ติวเตอร์แล้วเรียบร้อย</p>
+              </div>
+            </div>
+            <div class="stat-number" id="statMatchedPosts">0</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-grid">
+      <div class="card" id="my-posts-section">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📚 ประกาศของฉัน</div>
+            <div class="card-subtitle">ดู แก้ไข หรือลบประกาศที่เคยสร้างไว้</div>
+          </div>
+          <button class="btn btn-secondary" onclick="loadMyPosts()">รีโหลดรายการ</button>
+        </div>
+
+        <div id="myPostsList" class="list-box">
+          <div class="empty-state">
+            ยังไม่มีประกาศของคุณในตอนนี้<br>
+            เริ่มสร้างโพสต์แรกได้เลย ✨
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="available-tutors-section">
+        <div class="card-header">
+          <div>
+            <div class="card-title">👨‍🏫 ติวเตอร์ที่แนะนำ</div>
+            <div class="card-subtitle">ตัวอย่างติวเตอร์หรือรายการที่ระบบแนะนำให้คุณ</div>
+          </div>
+          <button class="btn btn-secondary" onclick="loadTutors()">อัปเดตรายชื่อ</button>
+        </div>
+
+        <div id="tutorsList" class="list-box">
+          <div class="tutor-card">
+            <div class="item-top">
+              <div>
+                <div class="item-title">พี่มิน - คณิตศาสตร์ / ฟิสิกส์</div>
+                <div class="item-meta">⭐ 4.9 | สอนออนไลน์ | ประสบการณ์ 3 ปี</div>
+              </div>
+              <span class="badge badge-open">Available</span>
+            </div>
+            <div class="item-desc">
+              เชี่ยวชาญเนื้อหา ม.ปลาย และสอบเข้ามหาวิทยาลัย อธิบายละเอียด ใจเย็น และมีเอกสารสรุปให้
+            </div>
+            <div class="item-actions">
+              <button class="small-btn view-btn">ดูโปรไฟล์</button>
+              <button class="small-btn match-btn">ติดต่อทันที</button>
+            </div>
+          </div>
+
+          <div class="tutor-card">
+            <div class="item-top">
+              <div>
+                <div class="item-title">พี่บอส - Java / Python / Web Dev</div>
+                <div class="item-meta">⭐ 5.0 | ออนไลน์ / ออนไซต์ | ประสบการณ์ 2 ปี</div>
+              </div>
+              <span class="badge badge-progress">Popular</span>
+            </div>
+            <div class="item-desc">
+              เหมาะกับนักศึกษาที่ต้องการปูพื้นฐานเขียนโปรแกรม ทำโปรเจกต์ และเตรียมสอบวิชาเขียนโค้ด
+            </div>
+            <div class="item-actions">
+              <button class="small-btn view-btn">ดูโปรไฟล์</button>
+              <button class="small-btn match-btn">ติดต่อทันที</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="footer-banner">
+      <div>
+        <h3>🔥 พร้อมหาติวเตอร์ที่ใช่แล้วหรือยัง?</h3>
+        <p>สร้างโพสต์ของคุณให้ครบ ชัด และน่าสนใจ แล้วปล่อยให้ระบบช่วยคุณหาคนที่เหมาะที่สุด</p>
+      </div>
+      <button class="btn btn-primary" onclick="scrollToSection('create-post-section')">เริ่มเลยตอนนี้</button>
+    </section>
+  </div>
+
+  <script>
+    const postMessage = document.getElementById("post-message");
+    const myPostsList = document.getElementById("myPostsList");
+
+    let myPosts = [
+      {
+        id: 1,
+        subject: "ฟิสิกส์ ม.4",
+        level: "มัธยมปลาย",
+        budget: 300,
+        mode: "ออนไลน์",
+        location: "Google Meet",
+        studyTime: "เสาร์ 13:00 - 15:00",
+        description: "อยากเน้นเรื่องการเคลื่อนที่และแรง พื้นฐานยังไม่แน่น อยากเตรียมสอบกลางภาค",
+        status: "open"
+      },
+      {
+        id: 2,
+        subject: "Java Programming",
+        level: "มหาวิทยาลัย",
+        budget: 400,
+        mode: "ได้ทั้งสองแบบ",
+        location: "ธรรมศาสตร์ / ออนไลน์",
+        studyTime: "อาทิตย์ช่วงบ่าย",
+        description: "อยากให้ช่วยเรื่อง OOP, class, object, method overloading และทำโปรเจกต์",
+        status: "progress"
+      }
+    ];
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    function showMessage(message, type = "success") {
+      postMessage.className = "post-message " + type;
+      postMessage.textContent = message;
+    }
+
+    function clearForm() {
+      document.getElementById("subject").value = "";
+      document.getElementById("level").value = "";
+      document.getElementById("budget").value = "";
+      document.getElementById("mode").value = "";
+      document.getElementById("location").value = "";
+      document.getElementById("studyTime").value = "";
+      document.getElementById("description").value = "";
+    }
+
+    function getStatusLabel(status) {
+      if (status === "open") return '<span class="badge badge-open">เปิดรับ</span>';
+      if (status === "progress") return '<span class="badge badge-progress">กำลังดำเนินการ</span>';
+      return '<span class="badge badge-closed">ปิดแล้ว</span>';
+    }
+
+    function renderPosts() {
+      if (myPosts.length === 0) {
+        myPostsList.innerHTML = `
+          <div class="empty-state">
+            ยังไม่มีประกาศของคุณในตอนนี้<br>
+            เริ่มสร้างโพสต์แรกได้เลย ✨
+          </div>
+        `;
+        updateStats();
+        return;
+      }
+
+      myPostsList.innerHTML = myPosts.map(post => `
+        <div class="request-card">
+          <div class="item-top">
+            <div>
+              <div class="item-title">${post.subject}</div>
+              <div class="item-meta">
+                ระดับ: ${post.level || "-"}<br>
+                งบ: ${post.budget || 0} บาท/ชม. | รูปแบบ: ${post.mode || "-"}<br>
+                เวลา: ${post.studyTime || "-"}
+              </div>
+            </div>
+            ${getStatusLabel(post.status)}
+          </div>
+
+          <div class="item-desc">
+            ${post.description || "ไม่มีรายละเอียดเพิ่มเติม"}<br><br>
+            <strong>สถานที่/ช่องทาง:</strong> ${post.location || "-"}
+          </div>
+
+          <div class="item-actions">
+            <button class="small-btn view-btn" onclick="viewPost(${post.id})">ดูรายละเอียด</button>
+            <button class="small-btn edit-btn" onclick="editPost(${post.id})">แก้ไข</button>
+            <button class="small-btn delete-btn" onclick="deletePost(${post.id})">ลบ</button>
+          </div>
+        </div>
+      `).join("");
+
+      updateStats();
+    }
+
+    function updateStats() {
+      const total = myPosts.length;
+      const open = myPosts.filter(p => p.status === "open").length;
+      const progress = myPosts.filter(p => p.status === "progress").length;
+      const matched = myPosts.filter(p => p.status === "closed").length;
+
+      document.getElementById("totalPosts").textContent = total;
+      document.getElementById("openPosts").textContent = open;
+      document.getElementById("matchedTutors").textContent = matched;
+
+      document.getElementById("statTotalPosts").textContent = total;
+      document.getElementById("statOpenPosts").textContent = open;
+      document.getElementById("statPendingPosts").textContent = progress;
+      document.getElementById("statMatchedPosts").textContent = matched;
+    }
+
+    function submitPost() {
+      const subject = document.getElementById("subject").value.trim();
+      const level = document.getElementById("level").value;
+      const budget = document.getElementById("budget").value.trim();
+      const mode = document.getElementById("mode").value;
+      const location = document.getElementById("location").value.trim();
+      const studyTime = document.getElementById("studyTime").value.trim();
+      const description = document.getElementById("description").value.trim();
+
+      if (!subject || !description || !budget) {
+        showMessage("กรุณากรอกข้อมูลสำคัญให้ครบ เช่น วิชา รายละเอียด และงบประมาณ", "error");
+        return;
+      }
+
+      const newPost = {
+        id: Date.now(),
+        subject,
+        level,
+        budget,
+        mode,
+        location,
+        studyTime,
+        description,
+        status: "open"
+      };
+
+      myPosts.unshift(newPost);
+      renderPosts();
+      clearForm();
+      showMessage("ลงประกาศสำเร็จแล้ว! 🎉 ระบบได้เพิ่มโพสต์ของคุณเรียบร้อย", "success");
+      scrollToSection("my-posts-section");
+
+      /*
+      // ถ้าจะเชื่อม backend จริง ใช้แนวนี้
+      fetch("/student/create_post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(newPost)
+      })
+      .then(res => res.json())
+      .then(data => {
+        showMessage(data.message || "ลงประกาศสำเร็จ", "success");
+        loadMyPosts();
+        clearForm();
+      })
+      .catch(err => {
+        showMessage("เกิดข้อผิดพลาดในการส่งข้อมูล", "error");
+        console.error(err);
+      });
+      */
+    }
+
+    function deletePost(id) {
+      const confirmDelete = confirm("คุณต้องการลบประกาศนี้ใช่หรือไม่?");
+      if (!confirmDelete) return;
+
+      myPosts = myPosts.filter(post => post.id !== id);
+      renderPosts();
+      showMessage("ลบประกาศเรียบร้อยแล้ว", "success");
+    }
+
+    function editPost(id) {
+      const post = myPosts.find(p => p.id === id);
+      if (!post) return;
+
+      document.getElementById("subject").value = post.subject || "";
+      document.getElementById("level").value = post.level || "";
+      document.getElementById("budget").value = post.budget || "";
+      document.getElementById("mode").value = post.mode || "";
+      document.getElementById("location").value = post.location || "";
+      document.getElementById("studyTime").value = post.studyTime || "";
+      document.getElementById("description").value = post.description || "";
+
+      myPosts = myPosts.filter(p => p.id !== id);
+      renderPosts();
+      showMessage("โหลดข้อมูลโพสต์ขึ้นมาให้แก้ไขแล้ว ✏️", "success");
+      scrollToSection("create-post-section");
+    }
+
+    function viewPost(id) {
+      const post = myPosts.find(p => p.id === id);
+      if (!post) return;
+
+      alert(
+        `วิชา: ${post.subject}\n` +
+        `ระดับ: ${post.level}\n` +
+        `งบ: ${post.budget} บาท/ชม.\n` +
+        `รูปแบบ: ${post.mode}\n` +
+        `สถานที่: ${post.location}\n` +
+        `เวลา: ${post.studyTime}\n` +
+        `รายละเอียด: ${post.description}`
+      );
+    }
+
+    function loadMyPosts() {
+      renderPosts();
+      showMessage("รีโหลดรายการประกาศแล้ว", "success");
+    }
+
+    function loadTutors() {
+      showMessage("อัปเดตรายชื่อติวเตอร์แล้ว", "success");
+    }
+
+    function refreshDashboard() {
+      renderPosts();
+      showMessage("รีเฟรชข้อมูลหน้า Dashboard เรียบร้อย", "success");
+    }
+
+    document.getElementById("logout").addEventListener("click", function () {
+        const confirmLogout = confirm("คุณต้องการออกจากระบบใช่หรือไม่?");
+        if (!confirmLogout) return;
+
+        // เคลียร์ Token หรือข้อมูล User ออกจากระบบ
+        localStorage.removeItem("token");
+        localStorage.removeItem("user_role");
+
+        // Redirect ไปที่ Route /login ของ Flask
+        window.location.href = "/login";
+    }); 
+
+    renderPosts();
+  </script>
+</body>
+</html>

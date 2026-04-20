@@ -33,11 +33,19 @@ def register_user(name, email, password, role):
                                 (user_id, default_pic)
                             )
             elif role == "tutor":
+<<<<<<< HEAD
                             # เพิ่มคอลัมน์ profile_picture_url และส่งค่า default_pic เข้าไป
                             cursor.execute(
                             "INSERT INTO tutor_Profiles (user_id, hourly_rate, profile_picture_url) VALUES (%s, %s, %s)",
                             (user_id, 1, default_pic)
                             )      
+=======
+                # สำหรับ tutor เริ่มต้นอาจจะไม่ต้องใส่ hourly_rate หรือใส่ default เป็น 0 ไว้ก่อน
+                cursor.execute(
+                    "INSERT INTO tutor_Profiles (user_id, hourly_rate) VALUES (%s, %s)",
+                    (user_id, 0)
+                )
+>>>>>>> be78a0c77baf31c7e33a91127054d79e0ebcea4e
 
             conn.commit()
             return {"status": "success", "message": "สมัครสมาชิกสำเร็จ"}
