@@ -971,11 +971,16 @@
     }
 
     document.getElementById("logout").addEventListener("click", function () {
-      const confirmLogout = confirm("คุณต้องการออกจากระบบใช่หรือไม่?");
-      if (!confirmLogout) return;
+        const confirmLogout = confirm("คุณต้องการออกจากระบบใช่หรือไม่?");
+        if (!confirmLogout) return;
 
-      window.location.href = "../auth/login.html";
-    });
+        // เคลียร์ Token หรือข้อมูล User ออกจากระบบ
+        localStorage.removeItem("token");
+        localStorage.removeItem("user_role");
+
+        // Redirect ไปที่ Route /login ของ Flask
+        window.location.href = "/login";
+    }); 
 
     renderJobs();
     renderSchedules();
