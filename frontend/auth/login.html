@@ -638,8 +638,10 @@
                 const result = await response.json();
 
                 if (response.ok && result.status === 'success') {
-                    localStorage.setItem('authToken', result.token);
-                    localStorage.setItem('userData', JSON.stringify(result.user));
+                    localStorage.setItem('token',     result.token);
+                    localStorage.setItem('user_id',   String(result.user.user_id));
+                    localStorage.setItem('user_role', result.user.role);
+                    localStorage.setItem('userData',  JSON.stringify(result.user));
 
                     messageBox.textContent = 'Login successful...';
                     messageBox.className = 'success';
