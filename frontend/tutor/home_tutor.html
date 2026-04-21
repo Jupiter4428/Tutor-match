@@ -776,138 +776,128 @@
   </div>
 
   <script>
-    const jobs = [
-      {
-        id: 1,
-        subject: "ฟิสิกส์ ม.4",
-        student: "น้องเอ",
-        budget: 350,
-        mode: "ออนไลน์",
-        time: "เสาร์ 13:00 - 15:00",
-        desc: "ต้องการติวเรื่องแรง การเคลื่อนที่ และเตรียมสอบกลางภาค",
-        status: "open"
-      },
-      {
-        id: 2,
-        subject: "Java Programming",
-        student: "น้องบี",
-        budget: 450,
-        mode: "ออนไลน์ / ออนไซต์",
-        time: "อาทิตย์ช่วงบ่าย",
-        desc: "อยากเรียน OOP, class, object และทำโปรเจกต์ส่งอาจารย์",
-        status: "open"
-      },
-      {
-        id: 3,
-        subject: "คณิตศาสตร์ ม.ปลาย",
-        student: "น้องซี",
-        budget: 300,
-        mode: "ออนไลน์",
-        time: "พุธ 18:00 - 20:00",
-        desc: "ต้องการปูพื้นฐานแคลคูลัสและการแก้โจทย์สอบเข้า",
-        status: "warning"
-      }
-    ];
+    // ============================================================
+    //  ดึง user_id จาก localStorage (ตั้งค่าตอน login)
+    // ============================================================
+    const USER_ID = localStorage.getItem('user_id') || '1';
 
-    const schedules = [
-      {
-        title: "ติว Java Programming",
-        meta: "วันนี้ • 18:00 - 20:00",
-        desc: "นักเรียน: น้องบี | ช่องทาง: Google Meet",
-        status: "done"
-      },
-      {
-        title: "ติวฟิสิกส์ ม.4",
-        meta: "พรุ่งนี้ • 13:00 - 15:00",
-        desc: "นักเรียน: น้องเอ | ช่องทาง: Zoom",
-        status: "open"
-      }
-    ];
+    let jobs = [];
+    let myApplications = [];
+
+    // schedules โหลดจาก API จริง
+    let schedules = [];
 
     const reviews = [
-      {
-        title: "รีวิวจากน้องเอ",
-        meta: "⭐ 5.0 คะแนน",
-        desc: "สอนเข้าใจง่ายมาก ใจเย็น อธิบายละเอียด จากที่ไม่เข้าใจเลย ตอนนี้ทำโจทย์ได้แล้ว"
-      },
-      {
-        title: "รีวิวจากน้องบี",
-        meta: "⭐ 4.9 คะแนน",
-        desc: "พี่สอนโค้ดเข้าใจง่าย ช่วยแก้โปรเจกต์ได้เยอะมาก เป็นกันเองสุด ๆ"
-      }
+      { title: "รีวิวล่าสุด", meta: "⭐ 4.9 คะแนน", desc: "ติวเตอร์สอนดีมาก เข้าใจง่าย" }
     ];
 
+    // ---- Utility -----------------------------------------------
     function scrollToSection(id) {
       const el = document.getElementById(id);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function formatMap(val) {
+      return { online:"ออนไลน์", onsite:"ออนไซต์", both:"ออนไลน์ / ออนไซต์" }[val] || val;
     }
 
     function getJobBadge(status) {
-      if (status === "open") {
-        return '<span class="badge badge-open">เหมาะกับคุณ</span>';
-      }
-      if (status === "warning") {
-        return '<span class="badge badge-warning">ด่วน</span>';
-      }
+      if (status === "open")    return '<span class="badge badge-open">เหมาะกับคุณ</span>';
+      if (status === "warning") return '<span class="badge badge-warning">ด่วน</span>';
       return '<span class="badge badge-done">ปิดแล้ว</span>';
     }
 
     function getScheduleBadge(status) {
-      if (status === "open") return '<span class="badge badge-open">Upcoming</span>';
-      return '<span class="badge badge-done">Active</span>';
+      return status === "open"
+        ? '<span class="badge badge-open">Upcoming</span>'
+        : '<span class="badge badge-done">Active</span>';
     }
 
+    // ---- Render งาน (โพสต์ของนักเรียน) -------------------------
     function renderJobs() {
       const jobList = document.getElementById("jobList");
 
-      jobList.innerHTML = jobs.map(job => `
+      if (jobs.length === 0) {
+        jobList.innerHTML = '<div class="empty-state">ไม่มีงานสอนในขณะนี้ ลองอัปเดตรายการใหม่</div>';
+        return;
+      }
+
+      jobList.innerHTML = jobs.map(job => {
+        const applied = myApplications.some(a => a.post_id === job.post_id);
+        return `
         <div class="job-card">
           <div class="item-top">
             <div>
               <div class="item-title">${job.subject}</div>
               <div class="item-meta">
-                นักเรียน: ${job.student}<br>
-                งบประมาณ: ${job.budget} บาท/ชม. | รูปแบบ: ${job.mode}<br>
-                เวลาที่ต้องการ: ${job.time}
+                นักเรียน: ${job.student_name}<br>
+                ระดับ: ${job.grade_level || "-"} | งบ: ${job.budget} บาท/ชม.<br>
+                รูปแบบ: ${formatMap(job.learning_format)} | 📍 ${job.location}<br>
+                เวลา: ${job.preferred_time || "-"}
               </div>
             </div>
-            ${getJobBadge(job.status)}
+            ${getJobBadge(job.status || "open")}
           </div>
 
-          <div class="item-desc">${job.desc}</div>
+          <div class="item-desc">${job.description || "ไม่มีรายละเอียดเพิ่มเติม"}</div>
 
           <div class="item-actions">
-            <button class="small-btn view-btn" onclick="viewJob(${job.id})">ดูรายละเอียด</button>
-            <button class="small-btn accept-btn" onclick="acceptJob(${job.id})">รับงานนี้</button>
-            <button class="small-btn message-btn" onclick="messageStudent('${job.student}')">ส่งข้อความ</button>
+            ${applied
+              ? '<span style="color:#35e0a1;font-weight:700">✅ สมัครแล้ว</span>'
+              : `<button class="small-btn accept-btn" onclick="acceptJob(${job.post_id})">รับงานนี้</button>`
+            }
           </div>
-        </div>
-      `).join("");
+        </div>`;
+      }).join("");
     }
 
     function renderSchedules() {
-      const scheduleList = document.getElementById("scheduleList");
+      const list = document.getElementById("scheduleList");
 
-      scheduleList.innerHTML = schedules.map(item => `
+      if (schedules.length === 0) {
+        list.innerHTML = '<div class="empty-state">ยังไม่มีตารางสอน<br>รอนักเรียน accept ใบสมัครของคุณ 🎯</div>';
+        return;
+      }
+
+      const formatMode = v => ({ online:"ออนไลน์", onsite:"ออนไซต์", both:"ออนไลน์ / ออนไซต์" }[v] || v);
+
+      list.innerHTML = schedules.map(item => `
         <div class="schedule-card">
           <div class="item-top">
             <div>
-              <div class="item-title">${item.title}</div>
-              <div class="item-meta">${item.meta}</div>
+              <div class="item-title">${item.subject} ${item.grade_level ? '(' + item.grade_level + ')' : ''}</div>
+              <div class="item-meta">
+                🕐 ${item.preferred_time || "ยังไม่ระบุเวลา"}<br>
+                📍 ${item.location || "-"} | ${formatMode(item.learning_format)}<br>
+                👤 นักเรียน: ${item.student_name}
+              </div>
             </div>
-            ${getScheduleBadge(item.status)}
+            <span class="badge badge-open">Confirmed</span>
           </div>
-          <div class="item-desc">${item.desc}</div>
+          <div class="item-desc">💰 ${item.budget} บาท/ชม.</div>
         </div>
       `).join("");
     }
 
-    function renderReviews() {
-      const reviewList = document.getElementById("reviewList");
+    // โหลดตารางสอนจาก API
+    function loadSchedule() {
+      return fetch(`/tutor/schedule?tutor_id=${USER_ID}`)
+        .then(res => res.json())
+        .then(data => {
+          schedules = data.data || [];
+          renderSchedules();
+          // อัปเดต stat "กำลังสอนอยู่"
+          document.getElementById("statTeachingNow").textContent = schedules.length;
+          document.getElementById("heroClasses").textContent = schedules.length;
+        })
+        .catch(() => {
+          document.getElementById("scheduleList").innerHTML =
+            '<div class="empty-state">โหลดตารางสอนไม่สำเร็จ</div>';
+        });
+    }
 
-      reviewList.innerHTML = reviews.map(item => `
+    function renderReviews() {
+      document.getElementById("reviewList").innerHTML = reviews.map(item => `
         <div class="review-card">
           <div class="item-top">
             <div>
@@ -921,71 +911,100 @@
       `).join("");
     }
 
-    function updateStats() {
-      document.getElementById("heroJobs").textContent = jobs.length;
-      document.getElementById("heroClasses").textContent = schedules.length;
-      document.getElementById("heroIncome").textContent = "8,500";
-      document.getElementById("heroRating").textContent = "4.9";
+    function updateStats(dashData) {
+      const availableJobs  = dashData?.available_jobs  ?? jobs.length;
+      const teachingNow    = dashData?.teaching_now    ?? 0;
+      const avgRating      = dashData?.avg_rating       ?? 0.0;
+      const monthlyIncome  = dashData?.monthly_income   ?? 0;
+      const incomeDisplay  = monthlyIncome > 0
+        ? monthlyIncome.toLocaleString('th-TH') + " ฿"
+        : "-";
 
-      document.getElementById("statAvailableJobs").textContent = jobs.length;
-      document.getElementById("statTeachingNow").textContent = schedules.length;
-      document.getElementById("statIncome").textContent = "8,500";
-      document.getElementById("statRating").textContent = "4.9";
+      document.getElementById("heroJobs").textContent    = availableJobs;
+      document.getElementById("heroClasses").textContent = teachingNow;
+      document.getElementById("heroIncome").textContent  = incomeDisplay;
+      document.getElementById("heroRating").textContent  = avgRating || "-";
+
+      document.getElementById("statAvailableJobs").textContent = availableJobs;
+      document.getElementById("statTeachingNow").textContent   = teachingNow;
+      document.getElementById("statIncome").textContent        = incomeDisplay;
+      document.getElementById("statRating").textContent        = avgRating || "-";
     }
 
-    function viewJob(id) {
-      const job = jobs.find(j => j.id === id);
-      if (!job) return;
+    // ---- โหลดงานสอน → GET /tutor/posts -------------------------
+    function loadJobs(subjectFilter) {
+      let url = "/tutor/posts";
+      if (subjectFilter) url += `?subject=${encodeURIComponent(subjectFilter)}`;
 
-      alert(
-        `วิชา: ${job.subject}\n` +
-        `นักเรียน: ${job.student}\n` +
-        `งบประมาณ: ${job.budget} บาท/ชม.\n` +
-        `รูปแบบ: ${job.mode}\n` +
-        `เวลา: ${job.time}\n` +
-        `รายละเอียด: ${job.desc}`
-      );
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          jobs = data.data || [];
+          renderJobs();
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById("jobList").innerHTML =
+            '<div class="empty-state">โหลดข้อมูลไม่สำเร็จ</div>';
+        });
     }
 
-    function acceptJob(id) {
-      const job = jobs.find(j => j.id === id);
-      if (!job) return;
-      alert(`รับงาน "${job.subject}" ของ ${job.student} เรียบร้อยแล้ว`);
+    // ---- โหลดใบสมัครของตัวเอง → GET /tutor/my-applications ----
+    function loadMyApplications() {
+      return fetch(`/tutor/my-applications?tutor_id=${USER_ID}`)
+        .then(res => res.json())
+        .then(data => { myApplications = data.data || []; });
     }
 
-    function messageStudent(name) {
-      alert(`เปิดหน้าส่งข้อความถึง ${name}`);
+    // ---- โหลด Dashboard stats → GET /tutor/dashboard -----------
+    function loadDashboard() {
+      fetch(`/tutor/dashboard?tutor_id=${USER_ID}`)
+        .then(res => res.json())
+        .then(data => updateStats(data.data || {}))
+        .catch(() => updateStats({}));
     }
 
-    function loadJobs() {
-      renderJobs();
-      alert("อัปเดตรายการงานสอนแล้ว");
+    // ---- รับงาน → POST /tutor/apply ----------------------------
+    function acceptJob(post_id) {
+      if (!confirm("ยืนยันการสมัครรับงานสอนนี้?")) return;
+
+      fetch("/tutor/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tutor_id: USER_ID, post_id })
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message || "สมัครเรียบร้อย");
+        if (data.status === "success") {
+          loadMyApplications().then(() => renderJobs());
+          loadDashboard();
+        }
+      })
+      .catch(() => alert("เกิดข้อผิดพลาด ไม่สามารถสมัครได้"));
     }
 
     function refreshDashboard() {
-      renderJobs();
-      renderSchedules();
-      renderReviews();
-      updateStats();
-      alert("รีเฟรชหน้า Tutor Dashboard เรียบร้อย");
+      Promise.all([loadMyApplications(), loadDashboard(), loadSchedule()])
+        .then(() => loadJobs())
+        .then(() => renderReviews());
     }
 
     document.getElementById("logout").addEventListener("click", function () {
-        const confirmLogout = confirm("คุณต้องการออกจากระบบใช่หรือไม่?");
-        if (!confirmLogout) return;
+      if (!confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) return;
+      localStorage.removeItem("token");
+      localStorage.removeItem("user_role");
+      localStorage.removeItem("user_id");
+      window.location.href = "/login";
+    });
 
-        // เคลียร์ Token หรือข้อมูล User ออกจากระบบ
-        localStorage.removeItem("token");
-        localStorage.removeItem("user_role");
-
-        // Redirect ไปที่ Route /login ของ Flask
-        window.location.href = "/login";
-    }); 
-
-    renderJobs();
-    renderSchedules();
-    renderReviews();
-    updateStats();
+    // ---- โหลดทุกอย่างตอนเปิดหน้า --------------------------------
+    Promise.all([loadMyApplications(), loadSchedule()])
+      .then(() => loadJobs())
+      .then(() => {
+        renderReviews();
+        loadDashboard();
+      });
   </script>
 </body>
 </html>
