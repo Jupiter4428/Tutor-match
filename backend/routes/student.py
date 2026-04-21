@@ -6,6 +6,21 @@ student_bp = Blueprint('student', __name__)
 def add_post():
     data = request.get_json()
     
+@student_bp.route('/posts', methods=['GET'])
+def get_posts():
+
+    user_id = request.args.get('student_id')
+
+    if not user_id:
+        return jsonify({
+            "status":"error",
+            "message":"Missing user_id"
+        }),400
+
+    result = get_student_post_history(user_id=user_id)
+    
+    return jsonify(result),200    
+
     # 1. หน้าบ้านส่งมาในชื่อ student_id (แต่จริงๆ ตอนนี้มันคือ user_id แล้ว)
     client_user_id = data.get('student_id') 
     subject = data.get('subject')

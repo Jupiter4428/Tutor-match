@@ -1230,9 +1230,22 @@
     }
 
     function loadMyPosts() {
+
+fetch("/student/posts?student_id=2")
+  .then(res => res.json())
+  .then(data => {
+
+      myPosts = data.data || [];
+
       renderPosts();
-      showMessage("รีโหลดรายการประกาศแล้ว", "success");
-    }
+
+  })
+  .catch(err => {
+      console.error(err);
+      showMessage("โหลดข้อมูลไม่สำเร็จ","error");
+  });
+
+}
 
     function loadTutors() {
       showMessage("อัปเดตรายชื่อติวเตอร์แล้ว", "success");
@@ -1255,7 +1268,7 @@
         window.location.href = "/login";
     }); 
 
-    renderPosts();
+    loadMyPosts();
   </script>
 </body>
 </html>
