@@ -99,12 +99,12 @@ mysql -u root -p
 
 # run some sql qurey
 USE tutor_match;
-SELECT * FROM user;
-SELECT * FROM user_role;
+SELECT * FROM users;
 
 # run Script sql
 # ไปที่โฟลเดอร์ที่สคริป sql อยู่
 cd project
+
 # ข้างใน mysql
 source file.sql
 
@@ -136,6 +136,7 @@ VALUES (
     'admin', 
     'active'
 );
+
 ```
 ### Runserver
 ```bash
