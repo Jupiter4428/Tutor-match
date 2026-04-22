@@ -1,5 +1,10 @@
 # tutor_routes.py
+from backend.services.tutor_service import (
+    get_tutor_profile,
+    update_tutor_profile
+)
 from flask import Blueprint, request, jsonify
+from backend.utils.auth_helper import token_required, role_required
 from backend.services.tutor_service import (
     get_open_posts,
     apply_to_post,
@@ -70,3 +75,32 @@ def schedule():
 
     result = get_tutor_schedule(user_id=user_id)
     return jsonify(result), 200
+
+# =========================
+# Tutor Profile API
+# =========================
+
+@tutor_bp.route("/profile", methods=["GET"])
+@token_required
+@role_required("tutor")
+def get_profile():
+    result = get_tutor_profile(request.user_id)
+    return jsonify(result)
+
+
+@tutor_bp.route("/profile", methods=["PUT"])
+@token_required
+@role_required("tutor")
+def update_profile():
+    data = request.json
+
+    bio = data.get("bio")
+    hourly_rate = data.get("hourly_rate")
+
+    result = update_tutor_profile(
+        request.user_id,
+        bio,
+        hourly_rate
+    )
+
+    return jsonify(result)

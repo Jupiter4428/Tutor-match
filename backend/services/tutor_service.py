@@ -217,3 +217,75 @@ def get_tutor_schedule(user_id):
 
     except Exception as e:
         return {"status": "error", "message": str(e), "data": []}
+    
+# Tutor Profile
+# =========================
+
+def get_tutor_profile(user_id):
+    try:
+        connection = db.get_connection()
+        with connection.cursor() as cursor:
+            sql = """
+                SELECT 
+                    tp.tutor_id,
+                    tp.bio,
+                    tp.hourly_rate,
+                    tp.verification_status,
+                    tp.profile_picture_url,
+                    u.name,
+                    u.email
+                FROM tutor_profiles tp
+                JOIN users u ON tp.user_id = u.user_id
+                WHERE tp.user_id = %s
+            """
+            cursor.execute(sql, (user_id,))
+            profile = cursor.fetchone()
+
+            if not profile:
+                return {
+                    "status": "error",
+                    "message": "ไม่พบโปรไฟล์ติวเตอร์"
+                }
+
+            return {
+                "status": "success",
+                "data": profile
+            }
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
+
+
+def update_tutor_profile(user_id, bio, hourly_rate):
+    try:
+        connection = db.get_connection()
+
+        with connection.cursor() as cursor:
+            sql = """
+                UPDATE tutor_profiles
+                SET bio = %s,
+                    hourly_rate = %s
+                WHERE user_id = %s
+            """
+
+            cursor.execute(sql, (
+                bio,
+                hourly_rate,
+                user_id
+            ))
+
+            connection.commit()
+
+            return {
+                "status": "success",
+                "message": "อัปเดตโปรไฟล์สำเร็จ"
+            }
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
