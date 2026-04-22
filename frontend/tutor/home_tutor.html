@@ -18,7 +18,6 @@
 
     :root {
       --bg-main: linear-gradient(135deg, #0c1020 0%, #101937 28%, #1a1d4e 58%, #0a1228 100%);
-      --glass: rgba(255,255,255,0.08);
       --border: rgba(255,255,255,0.14);
       --text-main: #ffffff;
       --text-soft: #d7dcff;
@@ -166,6 +165,11 @@
     .btn-danger {
       background: linear-gradient(135deg, #ff5f7a, #ff2e63);
       box-shadow: 0 10px 24px rgba(255,95,122,0.22);
+    }
+
+    .btn-edit-profile {
+      background: linear-gradient(135deg, #4da8ff, #8a63ff);
+      box-shadow: 0 10px 24px rgba(77,168,255,0.24);
     }
 
     .hero {
@@ -518,6 +522,7 @@
       border-radius: 12px;
       font-weight: 600;
       transition: 0.2s ease;
+      color: white;
     }
 
     .small-btn:hover {
@@ -540,6 +545,22 @@
       background: rgba(255,79,216,0.14);
       color: #ffc7f3;
       border: 1px solid rgba(255,79,216,0.22);
+    }
+
+    .delete-btn {
+      background: rgba(255,95,122,0.16);
+      color: #ffb9c5;
+      border: 1px solid rgba(255,95,122,0.24);
+    }
+
+    .empty-state {
+      padding: 24px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.06);
+      border: 1px dashed rgba(255,255,255,0.16);
+      color: var(--text-fade);
+      text-align: center;
+      line-height: 1.8;
     }
 
     .footer-banner {
@@ -623,6 +644,7 @@
       <div class="topbar-actions">
         <button class="btn btn-secondary" onclick="scrollToSection('job-section')">📚 งานสอน</button>
         <button class="btn btn-secondary" onclick="scrollToSection('schedule-section')">📅 ตารางสอน</button>
+        <button class="btn btn-edit-profile" onclick="goToEditProfile()">✏️ Edit Profile</button>
         <button class="btn btn-primary" onclick="refreshDashboard()">🔄 รีเฟรช</button>
         <button class="btn btn-danger" id="logout">🚪 Logout</button>
       </div>
@@ -643,6 +665,7 @@
         <div class="hero-buttons">
           <button class="btn btn-primary" onclick="scrollToSection('job-section')">🚀 ดูงานที่เปิดรับ</button>
           <button class="btn btn-secondary" onclick="scrollToSection('review-section')">⭐ ดูรีวิวของฉัน</button>
+          <button class="btn btn-edit-profile" onclick="goToEditProfile()">✏️ แก้ไขโปรไฟล์</button>
         </div>
 
         <div class="hero-stats">
@@ -685,9 +708,9 @@
               <span class="icon">📅</span>
               ตารางสอน
             </button>
-            <button class="quick-btn" onclick="scrollToSection('review-section')">
-              <span class="icon">⭐</span>
-              รีวิวของฉัน
+            <button class="quick-btn" onclick="goToEditProfile()">
+              <span class="icon">✏️</span>
+              แก้ไขโปรไฟล์
             </button>
             <button class="quick-btn" onclick="refreshDashboard()">
               <span class="icon">🔄</span>
@@ -759,6 +782,7 @@
               <div class="card-title">⭐ รีวิวล่าสุด</div>
               <div class="card-subtitle">เสียงตอบรับจากนักเรียน</div>
             </div>
+            <button class="btn btn-primary" onclick="addReview()">➕ เพิ่มรีวิว</button>
           </div>
 
           <div class="list-box" id="reviewList"></div>
@@ -776,22 +800,29 @@
   </div>
 
   <script>
-    // ============================================================
-    //  ดึง user_id จาก localStorage (ตั้งค่าตอน login)
-    // ============================================================
     const USER_ID = localStorage.getItem('user_id') || '1';
 
     let jobs = [];
     let myApplications = [];
-
-    // schedules โหลดจาก API จริง
     let schedules = [];
 
-    const reviews = [
-      { title: "รีวิวล่าสุด", meta: "⭐ 4.9 คะแนน", desc: "ติวเตอร์สอนดีมาก เข้าใจง่าย" }
+    let reviews = [
+      {
+        title: "รีวิวจากนักเรียน A",
+        meta: "⭐ 5.0 คะแนน",
+        desc: "ติวเตอร์สอนเข้าใจง่ายมาก ใจเย็น และอธิบายละเอียดสุด ๆ"
+      },
+      {
+        title: "รีวิวจากนักเรียน B",
+        meta: "⭐ 4.8 คะแนน",
+        desc: "สอนสนุก เป็นกันเอง มีเทคนิคจำที่ช่วยให้ทำโจทย์ได้เร็วขึ้น"
+      }
     ];
 
-    // ---- Utility -----------------------------------------------
+    function goToEditProfile() {
+      window.location.href = "../tutorprofile/edit.html";
+    }
+
     function scrollToSection(id) {
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -802,18 +833,11 @@
     }
 
     function getJobBadge(status) {
-      if (status === "open")    return '<span class="badge badge-open">เหมาะกับคุณ</span>';
+      if (status === "open") return '<span class="badge badge-open">เหมาะกับคุณ</span>';
       if (status === "warning") return '<span class="badge badge-warning">ด่วน</span>';
       return '<span class="badge badge-done">ปิดแล้ว</span>';
     }
 
-    function getScheduleBadge(status) {
-      return status === "open"
-        ? '<span class="badge badge-open">Upcoming</span>'
-        : '<span class="badge badge-done">Active</span>';
-    }
-
-    // ---- Render งาน (โพสต์ของนักเรียน) -------------------------
     function renderJobs() {
       const jobList = document.getElementById("jobList");
 
@@ -879,14 +903,12 @@
       `).join("");
     }
 
-    // โหลดตารางสอนจาก API
     function loadSchedule() {
       return fetch(`/tutor/schedule?tutor_id=${USER_ID}`)
         .then(res => res.json())
         .then(data => {
           schedules = data.data || [];
           renderSchedules();
-          // อัปเดต stat "กำลังสอนอยู่"
           document.getElementById("statTeachingNow").textContent = schedules.length;
           document.getElementById("heroClasses").textContent = schedules.length;
         })
@@ -897,7 +919,20 @@
     }
 
     function renderReviews() {
-      document.getElementById("reviewList").innerHTML = reviews.map(item => `
+      const reviewList = document.getElementById("reviewList");
+      if (!reviewList) return;
+
+      if (reviews.length === 0) {
+        reviewList.innerHTML = `
+          <div class="empty-state">
+            ยังไม่มีรีวิวในตอนนี้<br>
+            กดปุ่ม <strong>เพิ่มรีวิว</strong> ด้านบนเพื่อสร้างรีวิวใหม่
+          </div>
+        `;
+        return;
+      }
+
+      reviewList.innerHTML = reviews.map((item, index) => `
         <div class="review-card">
           <div class="item-top">
             <div>
@@ -906,16 +941,66 @@
             </div>
             <span class="badge badge-done">Review</span>
           </div>
+
           <div class="item-desc">${item.desc}</div>
+
+          <div class="item-actions">
+            <button class="small-btn view-btn" onclick="editReview(${index})">✏️ Edit</button>
+            <button class="small-btn delete-btn" onclick="deleteReview(${index})">🗑️ Delete</button>
+          </div>
         </div>
       `).join("");
+    }
+
+    function addReview() {
+      const title = prompt("กรอกหัวข้อรีวิว");
+      if (!title) return;
+
+      const meta = prompt("กรอกคะแนนหรือข้อมูลรอง เช่น ⭐ 5.0 คะแนน");
+      if (!meta) return;
+
+      const desc = prompt("กรอกรายละเอียดรีวิว");
+      if (!desc) return;
+
+      reviews.unshift({ title, meta, desc });
+      renderReviews();
+      alert("เพิ่มรีวิวเรียบร้อยแล้ว");
+    }
+
+    function editReview(index) {
+      const currentReview = reviews[index];
+
+      const newTitle = prompt("แก้ไขหัวข้อรีวิว", currentReview.title);
+      if (newTitle === null) return;
+
+      const newMeta = prompt("แก้ไขคะแนนหรือข้อมูลรอง", currentReview.meta);
+      if (newMeta === null) return;
+
+      const newDesc = prompt("แก้ไขรายละเอียดรีวิว", currentReview.desc);
+      if (newDesc === null) return;
+
+      reviews[index] = {
+        title: newTitle,
+        meta: newMeta,
+        desc: newDesc
+      };
+
+      renderReviews();
+      alert("แก้ไขรีวิวเรียบร้อยแล้ว");
+    }
+
+    function deleteReview(index) {
+      if (!confirm("ต้องการลบรีวิวนี้ใช่ไหม?")) return;
+      reviews.splice(index, 1);
+      renderReviews();
+      alert("ลบรีวิวเรียบร้อยแล้ว");
     }
 
     function updateStats(dashData) {
       const availableJobs  = dashData?.available_jobs  ?? jobs.length;
       const teachingNow    = dashData?.teaching_now    ?? 0;
-      const avgRating      = dashData?.avg_rating       ?? 0.0;
-      const monthlyIncome  = dashData?.monthly_income   ?? 0;
+      const avgRating      = dashData?.avg_rating      ?? 0.0;
+      const monthlyIncome  = dashData?.monthly_income  ?? 0;
       const incomeDisplay  = monthlyIncome > 0
         ? monthlyIncome.toLocaleString('th-TH') + " ฿"
         : "-";
@@ -931,7 +1016,6 @@
       document.getElementById("statRating").textContent        = avgRating || "-";
     }
 
-    // ---- โหลดงานสอน → GET /tutor/posts -------------------------
     function loadJobs(subjectFilter) {
       let url = "/tutor/posts";
       if (subjectFilter) url += `?subject=${encodeURIComponent(subjectFilter)}`;
@@ -949,22 +1033,20 @@
         });
     }
 
-    // ---- โหลดใบสมัครของตัวเอง → GET /tutor/my-applications ----
     function loadMyApplications() {
       return fetch(`/tutor/my-applications?tutor_id=${USER_ID}`)
         .then(res => res.json())
-        .then(data => { myApplications = data.data || []; });
+        .then(data => { myApplications = data.data || []; })
+        .catch(() => { myApplications = []; });
     }
 
-    // ---- โหลด Dashboard stats → GET /tutor/dashboard -----------
     function loadDashboard() {
-      fetch(`/tutor/dashboard?tutor_id=${USER_ID}`)
+      return fetch(`/tutor/dashboard?tutor_id=${USER_ID}`)
         .then(res => res.json())
         .then(data => updateStats(data.data || {}))
         .catch(() => updateStats({}));
     }
 
-    // ---- รับงาน → POST /tutor/apply ----------------------------
     function acceptJob(post_id) {
       if (!confirm("ยืนยันการสมัครรับงานสอนนี้?")) return;
 
@@ -985,7 +1067,7 @@
     }
 
     function refreshDashboard() {
-      Promise.all([loadMyApplications(), loadDashboard(), loadSchedule()])
+      Promise.allSettled([loadMyApplications(), loadDashboard(), loadSchedule(), Promise.resolve(renderReviews())])
         .then(() => loadJobs())
         .then(() => renderReviews());
     }
@@ -998,13 +1080,10 @@
       window.location.href = "/login";
     });
 
-    // ---- โหลดทุกอย่างตอนเปิดหน้า --------------------------------
-    Promise.all([loadMyApplications(), loadSchedule()])
-      .then(() => loadJobs())
-      .then(() => {
-        renderReviews();
-        loadDashboard();
-      });
+    document.addEventListener("DOMContentLoaded", function () {
+      renderReviews();
+      refreshDashboard();
+    });
   </script>
 </body>
 </html>
