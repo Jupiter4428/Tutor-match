@@ -91,6 +91,7 @@
       font-weight: 900;
       letter-spacing: 0.5px;
       background: linear-gradient(90deg, #ffffff, #d5c4ff, #8cecff);
+      background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -689,49 +690,39 @@
       }, 0);
     }
 
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
+form.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-      const hourlyRate = hourlyRateInput.value.trim();
-      const bio = document.getElementById("bio").value.trim();
+    const token = localStorage.getItem("token");
 
-      if (!hourlyRate || Number(hourlyRate) < 0) {
-        alert("กรุณากรอก Hourly Rate ให้ถูกต้อง");
-        return;
-      }
+    const hourlyRate = hourlyRateInput.value.trim();
+    const bio = document.getElementById("bio").value.trim();
 
-      if (!bio) {
-        alert("กรุณากรอก Bio");
-        return;
-      }
+    const res = await fetch(
+        "http://127.0.0.1:5000/tutor/profile",
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                bio: bio,
+                hourly_rate: hourlyRate
+            })
+        }
+    );
 
-      alert("บันทึกข้อมูลเรียบร้อยแล้ว ✨");
+    const data = await res.json();
 
-      /*
-      ตัวอย่างต่อ backend
+    if (data.status === "success") {
+        alert("อัปเดตสำเร็จ");
+        window.location.href = "/home/tutor";
+    } else {
+        alert(data.message);
+    }
+});
 
-      const formData = new FormData();
-      formData.append("hourly_rate", hourlyRate);
-      formData.append("bio", bio);
-
-      const profileFile = document.getElementById("profilePicture").files[0];
-      if (profileFile) {
-        formData.append("profile_picture", profileFile);
-      }
-
-      fetch("/update_tutor_profile", {
-        method: "POST",
-        body: formData
-      })
-      .then(res => res.json())
-      .then(data => {
-        alert("บันทึกข้อมูลเรียบร้อย");
-      })
-      .catch(err => {
-        alert("เกิดข้อผิดพลาด");
-      });
-      */
-    });
   </script>
 </body>
 </html>

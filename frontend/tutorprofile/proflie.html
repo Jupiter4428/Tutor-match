@@ -68,6 +68,7 @@
       font-weight: 800;
       letter-spacing: 1px;
       background: linear-gradient(90deg, #ffffff, #caa8ff, #7ee7ff);
+      background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-shadow: 0 0 20px rgba(255, 255, 255, 0.08);
@@ -440,7 +441,7 @@
 
         <a href="#" class="upload-btn">📸 Change Photo</a>
 
-        <div class="tutor-name">Thanakrit Phortimart</div>
+        <div class="tutor-name" id="tutorName"></div>
         <div class="tutor-role">Professional Tutor • Premium Profile</div>
 
         <div class="activated-badge">
@@ -464,7 +465,7 @@
 
             <div class="rate-box">
               <span>Hourly Rate</span>
-              <h3>฿350/hr</h3>
+              <h3 id="hourlyRate"></h3>
             </div>
           </div>
         </div>
@@ -475,14 +476,14 @@
             <div class="info-list">
               <div class="info-item">
                 <label>Tutor ID</label>
-                <p>TUT2026001</p>
+                <p id="tutorId"></p>
               </div>
 
               <div class="info-item">
                 <label>Verification Status</label>
                 <div class="status-row">
                   <!-- เปลี่ยนคลาสตามสถานะ -->
-                  <div class="status-badge status-pending">⏳ Pending</div>
+                  <div id="verifyStatus"></div>
                   <!-- ตัวอย่างอื่น -->
                   <!-- <div class="status-badge status-verified">✅ Verified</div> -->
                   <!-- <div class="status-badge status-rejected">❌ Rejected</div> -->
@@ -498,7 +499,7 @@
 
           <div class="card info-card">
             <h3>About Tutor</h3>
-            <div class="bio-box">
+            <div class="bio-box" id="tutorBio">
               สวัสดีค่ะ/ครับ ฉันเป็นติวเตอร์ที่มีความเชี่ยวชาญด้านคณิตศาสตร์ วิทยาศาสตร์
               และภาษาอังกฤษ เน้นการสอนแบบเข้าใจง่าย เป็นกันเอง
               และช่วยให้นักเรียนสามารถพัฒนาคะแนนรวมถึงความมั่นใจในการเรียนได้อย่างมีประสิทธิภาพ
@@ -527,5 +528,38 @@
       </section>
     </div>
   </div>
+  <script>
+async function loadProfile() {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch("http://127.0.0.1:5000/tutor/profile", {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    const data = await res.json();
+
+    if (data.status === "success") {
+        const profile = data.data;
+
+        document.getElementById("tutorName").innerText = profile.name;
+        document.getElementById("hourlyRate").innerText =
+            `฿${profile.hourly_rate}/hr`;
+
+        document.getElementById("tutorId").innerText =
+            profile.tutor_id;
+
+        document.getElementById("tutorBio").innerText =
+            profile.bio;
+
+        document.getElementById("verifyStatus").innerText =
+            profile.verification_status;
+    }
+}
+
+loadProfile();
+</script>
 </body>
 </html>
