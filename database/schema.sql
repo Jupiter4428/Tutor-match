@@ -61,7 +61,7 @@ CREATE TABLE tutor_profiles (
     verified_by INT NULL,
     verified_at DATETIME NULL,
     reject_reason TEXT NULL,
-    CONSTRAINT chk_tutor_profiles_hourly_rate CHECK (hourly_rate > 0),
+    CONSTRAINT chk_tutor_profiles_hourly_rate CHECK (hourly_rate >= 0),
     CONSTRAINT fk_tutor_profiles_user
         FOREIGN KEY (user_id) REFERENCES users(user_id)
         ON DELETE CASCADE,
@@ -111,12 +111,12 @@ CREATE TABLE student_posts (
     location VARCHAR(255) NOT NULL, 
     preferred_time VARCHAR(255) NOT NULL, -- เพิ่มใหม่
     description TEXT NULL,
-    budget DECIMAL(10,2) NOT NULL,
+    budget DOUBLE NOT NULL,
     status ENUM('open','closed') NOT NULL DEFAULT 'open',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_hidden BOOLEAN NOT NULL DEFAULT FALSE,
     moderation_reason TEXT NULL,
-    CONSTRAINT chk_student_posts_budget CHECK (budget > 0),
+    CONSTRAINT chk_student_posts_budget CHECK (budget >= 0),
     CONSTRAINT fk_student_posts_student
         FOREIGN KEY (student_id) REFERENCES student_profiles(student_id)
         ON DELETE CASCADE
