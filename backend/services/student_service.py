@@ -203,3 +203,115 @@ def delete_student_post(user_id, post_id):
 
     finally:
         connection.close()
+        
+# ==========================================
+# ระบบ Wallet สำหรับนักเรียน
+# ==========================================
+
+def get_student_wallet(user_id):
+    connection = db.get_connection()
+    try:
+        with connection.cursor() as cursor:
+            # 1. ค้นหากระเป๋าเงิน
+            cursor.execute("SELECT * FROM wallets WHERE user_id = %s", (user_id,))
+            wallet = cursor.fetchone()
+            
+            # 2. ถ้ายังไม่มีกระเป๋า ให้สร้างใหม่ทันที (ยอด 0 บาท)
+            if not wallet:
+                cursor.execute("INSERT INTO wallets (user_id, balance, status) VALUES (%s, 0.00, 'active')", (user_id,))
+                connection.commit()
+                cursor.execute("SELECT * FROM wallets WHERE user_id = %s", (user_id,))
+                wallet = cursor.fetchone()
+                
+            return {"status": "success", "data": wallet}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+    finally:
+        connection.close()
+
+
+def get_wallet_transactions(user_id):
+    connection = db.get_connection()
+    try:
+        with connection.cursor() as cursor:
+            # หา wallet_id ก่อน
+            cursor.execute("SELECT wallet_id FROM wallets WHERE user_id = %s", (user_id,))
+            wallet = cursor.fetchone()
+            if not wallet:
+                return {"status": "success", "data": []}
+                
+            # ดึงประวัติธุรกรรม
+            cursor.execute("""
+                SELECT transaction_id, transaction_type, amount, balance_after, description, 
+                       DATE_FORMAT(transaction_date, '%d %b %Y %H:%i') as formatted_date
+                FROM transaction_logs 
+                WHERE wallet_id = %s 
+                ORDER BY transaction_date DESC
+            """, (wallet['wallet_id'],))
+            
+            return {"status": "success", "data": cursor.fetchall()}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+    finally:
+        connection.close()
+
+
+def process_deposit(user_id, amount, note):
+    connection = db.get_connection()
+    try:
+        with connection.cursor() as cursor:
+            # ดึงข้อมูล wallet ปัจจุบัน
+            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s", (user_id,))
+            wallet = cursor.fetchone()
+            if not wallet:
+                return {"status": "error", "message": "ไม่พบกระเป๋าเงิน"}
+
+            new_balance = float(wallet['balance']) + float(amount)
+
+            # อัปเดตยอดเงิน
+            cursor.execute("UPDATE wallets SET balance = %s WHERE wallet_id = %s", (new_balance, wallet['wallet_id']))
+            
+            # บันทึกประวัติ
+            cursor.execute("""
+                INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, description)
+                VALUES (%s, 'deposit', %s, %s, %s)
+            """, (wallet['wallet_id'], amount, new_balance, note))
+            
+            connection.commit()
+            return {"status": "success", "message": "ฝากเงินสำเร็จ", "new_balance": new_balance}
+    except Exception as e:
+        connection.rollback()
+        return {"status": "error", "message": str(e)}
+    finally:
+        connection.close()
+
+
+def process_withdraw(user_id, amount, bank_name, account_number, note):
+    connection = db.get_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s", (user_id,))
+            wallet = cursor.fetchone()
+            
+            if float(wallet['balance']) < float(amount):
+                return {"status": "error", "message": "ยอดเงินคงเหลือไม่เพียงพอ"}
+
+            new_balance = float(wallet['balance']) - float(amount)
+
+            # อัปเดตยอดเงิน
+            cursor.execute("UPDATE wallets SET balance = %s WHERE wallet_id = %s", (new_balance, wallet['wallet_id']))
+            
+            # บันทึกประวัติ
+            full_note = f"ถอนเข้า {bank_name} ({account_number}) | {note}"
+            cursor.execute("""
+                INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, description)
+                VALUES (%s, 'withdrawal', %s, %s, %s)
+            """, (wallet['wallet_id'], amount, new_balance, full_note))
+            
+            connection.commit()
+            return {"status": "success", "message": "แจ้งถอนเงินสำเร็จ", "new_balance": new_balance}
+    except Exception as e:
+        connection.rollback()
+        return {"status": "error", "message": str(e)}
+    finally:
+        connection.close()
