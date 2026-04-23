@@ -549,12 +549,6 @@ body::after {
   transform: translateY(-2px);
 }
 
-.view-btn {
-  background: rgba(77, 168, 255, 0.16);
-  color: #bfe1ff;
-  border: 1px solid rgba(77, 168, 255, 0.24);
-}
-
 .accept-btn {
   background: rgba(53, 224, 161, 0.16);
   color: #a9ffdb;
@@ -586,7 +580,12 @@ body::after {
 .footer-banner {
   padding: 28px;
   border-radius: 30px;
-  background: linear-gradient(135deg, rgba(255, 79, 216, 0.16), rgba(77, 168, 255, 0.12), rgba(53, 224, 161, 0.12));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 79, 216, 0.16),
+    rgba(77, 168, 255, 0.12),
+    rgba(53, 224, 161, 0.12)
+  );
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: var(--shadow);
   display: flex;
@@ -606,8 +605,7 @@ body::after {
   line-height: 1.7;
 }
 
-@media (max-width:1280px) {
-
+@media (max-width: 1280px) {
   .hero,
   .main-grid {
     grid-template-columns: 1fr;
@@ -618,15 +616,14 @@ body::after {
   }
 }
 
-@media (max-width:900px) {
-
+@media (max-width: 900px) {
   .hero-stats,
   .quick-actions {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width:768px) {
+@media (max-width: 768px) {
   .page {
     padding: 18px;
   }
