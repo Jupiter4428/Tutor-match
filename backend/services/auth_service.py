@@ -28,17 +28,15 @@ def register_user(name, email, password, role):
 
             # สร้าง profile ตาม role
             if role == "student":
-                            # เพิ่มคอลัมน์ profile_picture_url และส่งค่า default_pic เข้าไป
-                            cursor.execute(
-                                "INSERT INTO student_Profiles (user_id, profile_picture_url) VALUES (%s, %s)",
-                                (user_id, default_pic)
-                            )
+                cursor.execute(
+                    "INSERT INTO student_Profiles (user_id, profile_picture_url) VALUES (%s, %s)",
+                    (user_id, default_pic)
+                )
             elif role == "tutor":
-                            # เพิ่มคอลัมน์ profile_picture_url และส่งค่า default_pic เข้าไป
-                            cursor.execute(
-                            "INSERT INTO tutor_Profiles (user_id, hourly_rate, profile_picture_url) VALUES (%s, %s, %s)",
-                            (user_id, 1, default_pic)
-                            )      
+                cursor.execute(
+                    "INSERT INTO tutor_Profiles (user_id, hourly_rate, profile_picture_url) VALUES (%s, %s, %s)",
+                    (user_id, 1, default_pic)
+                )      
 
             conn.commit()
             return {"status": "success", "message": "สมัครสมาชิกสำเร็จ", "data": None}

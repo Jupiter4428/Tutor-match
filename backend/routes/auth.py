@@ -7,10 +7,10 @@ auth_bp = Blueprint("auth", __name__)
 @auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
-    name     = data.get("name")
-    email    = data.get("email")
+    name = data.get("name")
+    email = data.get("email")
     password = data.get("password")
-    role     = data.get("role")
+    role = data.get("role")
 
     if not all([name, email, password, role]):
         return jsonify({"status": "error", "message": "กรอกข้อมูลไม่ครบ"}), 400
@@ -26,7 +26,7 @@ def register():
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
-    email    = data.get("email")
+    email = data.get("email")
     password = data.get("password")
 
     if not all([email, password]):
