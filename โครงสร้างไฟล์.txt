@@ -2,18 +2,19 @@ tutor-match/
 ├── requirements.txt                    # flask, flask-bcrypt, flask-jwt-extended, pymysql, flask-cors
 ├── run.py                              # python run.py เพื่อเริ่ม server
 ├── .env                                # DB config, SECRET_KEY
-├── .env.example                        # ตัวอย่าง env variables
 ├── .gitignore                          # venv/, .env, __pycache__/
 ├── README.md                           # เอกสารโปรเจกต์
+├── base.html                           # (ไฟล์กำพร้า — ยังไม่ได้ใช้งาน)
+├── create_post.html                    # (ไฟล์กำพร้า — ยังไม่ได้ใช้งาน)
 │
 ├── backend/
 │   ├── app.py                          # สร้าง Flask app, register Blueprint ทุกตัว, CORS
 │   ├── config.py                       # DB_URI, SECRET_KEY, JWT config
-│   ├── extensions.py                   # สร้าง extension instance (jwt, bcrypt ฯลฯ)
+│   ├── extensions.py                   # สร้าง database connection instance
 │   │
-│   ├── models/                         # นิยามโครงสร้างตาราง
-│   │   ├── __init__.py                 # import รวมทุก model
-│   │   ├── user_model.py               # User, User_Role
+│   ├── models/                         # นิยามโครงสร้างตาราง (ยังไม่ได้ใช้งานใน routes)
+│   │   ├── __init__.py
+│   │   ├── user_model.py               # User
 │   │   ├── student_model.py            # Student_Profile, Student_Post
 │   │   ├── tutor_model.py              # Tutor_Profile, Tutor_Experience, Tutor_Subject, Tutor_Certificate
 │   │   ├── schedule_model.py           # Tutor_Schedule, Schedule_Booking
@@ -21,57 +22,79 @@ tutor-match/
 │   │   ├── payment_model.py            # Payment
 │   │   └── review_model.py             # Review
 │   │
-│   ├── services/                       # Business Logic ทั้งหมด (routes ห้ามมี logic)
+│   ├── services/                       # Business Logic (routes ห้ามมี logic)
 │   │   ├── auth_service.py             # register, login, hash password, check duplicate email
 │   │   ├── student_service.py          # สร้าง/แก้/ปิดโพสต์, ดูรายการผู้สมัคร
 │   │   ├── tutor_service.py            # จัดการ profile, เพิ่ม/ลบ subject, certificate, experience
-│   │   ├── schedule_service.py         # ตั้งเวลาว่าง, จองคาบเรียน, ป้องกันเวลาชนกัน
-│   │   ├── payment_service.py          # คำนวณ platform_fee (10%), บันทึกการชำระเงิน
-│   │   ├── review_service.py           # เขียนรีวิว, คำนวณ avg rating ของติวเตอร์
-│   │   └── admin_service.py            # verify ติวเตอร์, ลบโพสต์/รีวิว, ดึงข้อมูล dashboard
+│   │   ├── schedule_service.py         # (ไฟล์เปล่า — รอ implement)
+│   │   ├── payment_service.py          # (ไฟล์เปล่า — รอ implement)
+│   │   ├── review_service.py           # (ไฟล์เปล่า — รอ implement)
+│   │   └── admin_service.py            # (ไฟล์เปล่า — รอ implement)
 │   │
 │   ├── routes/                         # รับ Request → เรียก Service → ส่ง JSON กลับ
 │   │   ├── auth.py                     # POST /auth/register, POST /auth/login
 │   │   ├── student.py                  # GET/POST /posts, PATCH /posts/<id>/close
 │   │   ├── tutor.py                    # GET/PUT /tutor/profile, /subjects, /certificates
-│   │   ├── schedule.py                 # POST /schedule, POST /booking, GET /schedule/<tutor_id>
-│   │   ├── payment.py                  # POST /payment, GET /payment/history
-│   │   ├── review.py                   # POST /review, GET /tutor/<id>/reviews
-│   │   └── admin.py                    # PATCH /admin/verify/<id>, GET /admin/dashboard
+│   │   ├── admin.py                    # GET /admin/stats, GET /admin/users, POST /admin/users/status
+│   │   ├── schedule.py                 # (ไฟล์เปล่า — รอ implement)
+│   │   ├── payment.py                  # (ไฟล์เปล่า — รอ implement)
+│   │   └── review.py                   # (ไฟล์เปล่า — รอ implement)
 │   │
 │   └── utils/
 │       ├── auth_helper.py              # decorator ตรวจ JWT, เช็ค role ก่อนเข้า route
 │       └── db.py                       # เปิด/ปิด MySQL connection, cursor helper
 │
-├── frontend/                           # HTML + JS ทั้งหมด (Flask serve เป็น static files)
+├── frontend/                           # HTML + CSS + JS (Flask serve เป็น static files)
 │   │
 │   ├── auth/
-│   │   ├── login.html                  # หน้า login (fetch POST /auth/login)
-│   │   └── register.html              # หน้าสมัครสมาชิก (fetch POST /auth/register)
+│   │   ├── login.html                  # หน้า login
+│   │   ├── login.css
+│   │   ├── login.js                   # fetch POST /auth/login
+│   │   ├── register.html              # หน้าสมัครสมาชิก
+│   │   ├── register.css
+│   │   └── register.js                # fetch POST /auth/register
 │   │
 │   ├── student/
 │   │   ├── home_student.html          # หน้าหลักนักเรียน (รายการโพสต์ทั้งหมด)
-│   │   ├── create_post.html           # สร้างโพสต์ (fetch POST /posts)
-│   │   └── Review.html                # หน้ารีวิวติวเตอร์ (fetch POST /review)
+│   │   ├── home_student.css
+│   │   ├── home_student.js            # fetch GET /posts, POST /posts
+│   │   ├── wallet.html                # หน้ากระเป๋าเงินนักเรียน
+│   │   ├── wallet.css
+│   │   ├── wallet.js                  # fetch deposit/withdraw
+│   │   ├── Review.html                # หน้ารีวิวติวเตอร์
+│   │   ├── Review.css
+│   │   └── Review.js                  # fetch POST /review
 │   │
 │   ├── tutor/
 │   │   ├── home_tutor.html            # หน้าหลักติวเตอร์ (งานที่สมัครไป)
-│   │   └── base.html                  # base template สำหรับหน้าติวเตอร์
+│   │   ├── home_tutor.css
+│   │   ├── home_tutor.js              # fetch GET /tutor/applications
+│   │   ├── tutor_wallet.html          # หน้ากระเป๋าเงินติวเตอร์
+│   │   ├── tutor_wallet.css
+│   │   └── tutor_wallet.js            # fetch tutor wallet
 │   │
 │   ├── tutorprofile/
-│   │   ├── profile.html               # หน้าโปรไฟล์ติวเตอร์ (fetch GET /tutor/profile)
-│   │   ├── edit.html                  # แก้ไขโปรไฟล์ (fetch PUT /tutor/profile)
-│   │   └── review.html                # รีวิวของติวเตอร์ (fetch GET /tutor/<id>/reviews)
+│   │   ├── profile.html               # หน้าโปรไฟล์ติวเตอร์
+│   │   ├── profile.css
+│   │   ├── profile.js                 # fetch GET /tutor/profile
+│   │   ├── edit.html                  # แก้ไขโปรไฟล์
+│   │   ├── edit.css
+│   │   ├── edit.js                    # fetch PUT /tutor/profile
+│   │   ├── review.html                # รีวิวของติวเตอร์
+│   │   ├── review.css
+│   │   └── review.js                  # fetch GET /tutor/<id>/reviews
 │   │
 │   └── admin/
-│       └── home_admin.html            # สถิติ + จัดการระบบ (fetch GET /admin/dashboard)
+│       ├── home_admin.html            # สถิติ + จัดการผู้ใช้
+│       ├── home_admin.css
+│       └── home_admin.js              # fetch GET /admin/stats, /admin/users
 │
 ├── static/
 │   └── uploads/                       # รูป profile และ certificate ที่ user อัปโหลด
 │       └── default_profile.jpg        # รูป profile default ของระบบ
 │
 └── database/
-    ├── schema.sql                      # CREATE TABLE ทุกตาราง
+    ├── schema.sql                      # CREATE TABLE ทุกตาราง (12 ตาราง)
     ├── seed.sql                        # INSERT ข้อมูลตัวอย่าง
     ├── add_users.sql                   # script เพิ่ม user เพิ่มเติม
     └── complex_queries.sql             # query ซับซ้อนสำหรับ report / dashboard
