@@ -12,7 +12,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- 1. users
 -- ============================================================
 INSERT INTO users (user_id, name, email, password_hash, role, account_status) VALUES
-(1,  'แอดมิน ระบบ',      'admin@tutor.com',     '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'admin',   'active'),
+(1,  'superuser',      'admin@tutormatch.com',     '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'admin',   'active'),
 (2,  'สมชาย ใจดี',        'somchai@test.com',    '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'student', 'active'),
 (3,  'สมหญิง รักเรียน',    'somying@test.com',    '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'student', 'active'),
 (4,  'มะลิ หวานใจ',       'mali@test.com',       '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'student', 'active'),
