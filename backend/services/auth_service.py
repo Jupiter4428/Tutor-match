@@ -6,72 +6,48 @@ from datetime import timezone
 
 from backend.utils.db import get_connection
 from backend.config import SECRET_KEY
-
+from backend.extensions import db
 
 def register_user(name, email, password, role):
-    """ลงทะเบียนผู้ใช้งานใหม่"""
-    default_pic = "static/uploads/default_profile.jpg"
-    conn = get_connection()
+    connection = db.get_connection()
     try:
-        with conn.cursor() as cursor:
-            # เช็ค email ซ้ำ
-            cursor.execute(
-                "SELECT user_id FROM users WHERE email = %s",
-                (email,)
-            )
+        with connection.cursor() as cursor:
+            # ตรวจสอบอีเมลซ้ำก่อน
+            cursor.execute("SELECT user_id FROM users WHERE email = %s", (email,))
             if cursor.fetchone():
                 return {"status": "error", "message": "อีเมลนี้ถูกใช้งานแล้ว"}
 
-            # hash password
-            password_hash = bcrypt.hashpw(
-                password.encode("utf-8"), 
-                bcrypt.gensalt()
-            ).decode("utf-8")
+            # ทำการ Hash รหัสผ่าน (ใช้ library เช่น bcrypt หรือ werkzeug)
+            password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
-            # กำหนดสถานะตาม role
-            user_status = "pending" if role == "tutor" else "approved"
-
-            # สร้าง user ในตาราง users
-            cursor.execute(
-                """
-                INSERT INTO users
-                (name, email, password_hash, role, status)
-                VALUES (%s, %s, %s, %s, %s)
-                """,
-                (name, email, password_hash, role, user_status)
-            )
-
-            # ดึง user_id ที่เพิ่งสร้าง
+            # บันทึกลงตาราง users (ไม่ต้องใส่ account_status เพราะมี DEFAULT 'active' อยู่แล้ว)
+            # ลำดับคอลัมน์: name, email, password_hash, role
+            sql = "INSERT INTO users (name, email, password_hash, role) VALUES (%s, %s, %s, %s)"
+            cursor.execute(sql, (name, email, password_hash, role))
+            
             user_id = cursor.lastrowid
+            
+            # สร้าง Profile ตาม Role (เพื่อป้องกัน Error เวลาเข้าหน้า Profile)
+            if role == 'student':
+                cursor.execute("INSERT INTO student_profiles (user_id) VALUES (%s)", (user_id,))
+            elif role == 'tutor':
+                # หน้า Tutor ต้องมีค่าเริ่มต้นสำหรับ hourly_rate และ profile_picture_url ตาม Schema
+                cursor.execute("""
+                    INSERT INTO tutor_profiles (user_id, hourly_rate, profile_picture_url) 
+                    VALUES (%s, 0.00, 'default_tutor.png')
+                """, (user_id,))
+            
+            # สร้าง Wallet ให้ user ใหม่ด้วย
+            cursor.execute("INSERT INTO wallets (user_id, balance) VALUES (%s, 0.00)", (user_id,))
 
-            # สร้าง profile ตาม role
-            if role == "student":
-                cursor.execute(
-                    """
-                    INSERT INTO student_Profiles 
-                    (user_id, profile_picture_url)
-                    VALUES (%s, %s)
-                    """,
-                    (user_id, default_pic)
-                )
-            elif role == "tutor":
-                cursor.execute(
-                    """
-                    INSERT INTO tutor_Profiles 
-                    (user_id, hourly_rate, profile_picture_url)
-                    VALUES (%s, %s, %s)
-                    """,
-                    (user_id, 1, default_pic)
-                )      
-
-            conn.commit()
-            return {"status": "success", "message": "สมัครสมาชิกสำเร็จ", "data": None}
-
+            connection.commit()
+            return {"status": "success", "message": "สมัครสมาชิกสำเร็จ"}
+            
     except Exception as e:
-        conn.rollback()
+        connection.rollback()
         return {"status": "error", "message": str(e)}
     finally:
-        conn.close()
+        connection.close()
 
 
 def login_user(email, password):
