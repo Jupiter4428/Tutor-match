@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Wallet Deposit - Tutor Match</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="wallet.css">
+</head>
+<body>
+  <div class="container">
+    <nav class="navbar">
+      <div class="brand">
+        <div class="brand-icon">💳</div>
+        <div>
+          <h1>Student Wallet</h1>
+          <p>ระบบฝากเงินและประวัติธุรกรรมของนักเรียน</p>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <a href="#" class="btn btn-secondary">🏠 Home Student</a>
+        <a href="#" class="btn btn-secondary">📚 My Courses</a>
+        <a href="#" class="btn btn-primary">➕ ฝากเงิน</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="card hero-left">
+        <div class="hero-tag">✨ Secure Wallet • Escrow Payment • Refund Ready</div>
+        <h2>ระบบฝากเงินของนักเรียน<br>สวย หรู ใช้งานง่าย<br>และพร้อมเชื่อม Backend</h2>
+        <p>
+          หน้านี้ใช้สำหรับจัดการกระเป๋าเงินของนักเรียนโดยเฉพาะ
+          สามารถดูยอดเงินคงเหลือ ฝากเงิน ตรวจสอบสถานะ wallet
+          ดูประวัติ transaction และติดตาม flow การจ่ายค่าเรียนแบบ escrow ได้ในหน้าเดียว
+        </p>
+
+        <div class="hero-stats">
+          <div class="stat-box">
+            <h3>฿ 2,450</h3>
+            <p>ยอดเงินคงเหลือปัจจุบัน</p>
+          </div>
+          <div class="stat-box">
+            <h3>12 รายการ</h3>
+            <p>จำนวนธุรกรรมเดือนนี้</p>
+          </div>
+          <div class="stat-box">
+            <h3>Active</h3>
+            <p>สถานะกระเป๋าเงินพร้อมใช้งาน</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card hero-right">
+        <div class="wallet-balance">
+          <span>Current Wallet Balance</span>
+          <h3>฿ 2,450.00</h3>
+          <div class="wallet-meta">
+            <div class="pill active">● Wallet Active</div>
+            <div class="pill">Wallet ID: #WLT-10024</div>
+            <div class="pill">Updated: 23 Apr 2026</div>
+          </div>
+        </div>
+
+        <div class="mini-summary">
+          <div class="mini-card">
+            <span class="label">เงินฝากล่าสุด</span>
+            <div class="value">+ ฿500</div>
+          </div>
+          <div class="mini-card">
+            <span class="label">ยอดชำระล่าสุด</span>
+            <div class="value">- ฿900</div>
+          </div>
+          <div class="mini-card">
+            <span class="label">ยอดคืนล่าสุด</span>
+            <div class="value">+ ฿600</div>
+          </div>
+          <div class="mini-card">
+            <span class="label">สถานะล่าสุด</span>
+            <div class="value">Pending</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-grid">
+      <div class="section-card">
+        <div class="section-head">
+          <div>
+            <h3>ฝากเงินเข้า Wallet</h3>
+            <p>นักเรียนสามารถเติมเงินเข้าระบบเพื่อใช้จ่ายค่าเรียนได้</p>
+          </div>
+          <div class="pill">Student Only</div>
+        </div>
+
+        <div class="quick-amounts">
+          <button class="amount-btn active">฿100</button>
+          <button class="amount-btn">฿300</button>
+          <button class="amount-btn">฿500</button>
+          <button class="amount-btn">฿1000</button>
+        </div>
+
+        <div class="input-group">
+          <label for="depositAmount">จำนวนเงินที่ต้องการฝาก</label>
+          <input id="depositAmount" type="number" placeholder="กรอกจำนวนเงิน เช่น 500">
+        </div>
+
+        <div class="input-group">
+          <label>เลือกช่องทางการฝากเงิน</label>
+          <div class="payment-methods">
+            <div class="method-card active">
+              <div class="method-left">
+                <h4>📱 Mobile Banking / QR Payment</h4>
+                <p>เหมาะสำหรับการเติมเงินเข้า wallet อย่างรวดเร็ว</p>
+              </div>
+              <div class="method-icon">⚡</div>
+            </div>
+
+            <div class="method-card">
+              <div class="method-left">
+                <h4>🏦 Bank Transfer Slip</h4>
+                <p>อัปโหลดสลิปเพื่อรอระบบหรือแอดมินตรวจสอบ</p>
+              </div>
+              <div class="method-icon">🧾</div>
+            </div>
+
+            <div class="method-card">
+              <div class="method-left">
+                <h4>💳 Card Payment</h4>
+                <p>ชำระผ่านบัตรและยอดเข้าทันทีหลังระบบยืนยัน</p>
+              </div>
+              <div class="method-icon">💠</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="depositNote">หมายเหตุรายการ</label>
+          <textarea id="depositNote" rows="4" placeholder="เช่น ฝากเงินเพื่อใช้จองคอร์สคณิตศาสตร์ ม.4"></textarea>
+        </div>
+
+        <div class="summary-box">
+          <div class="summary-row">
+            <span>จำนวนเงินฝาก</span>
+            <strong id="summaryDeposit">฿500.00</strong>
+          </div>
+          <div class="summary-row">
+            <span>ประเภทธุรกรรม</span>
+            <strong>deposit</strong>
+          </div>
+          <div class="summary-row">
+            <span>Wallet Status</span>
+            <strong>active</strong>
+          </div>
+          <div class="summary-row">
+            <span>ยอดคงเหลือหลังฝาก</span>
+            <strong id="summaryBalance">฿2,950.00</strong>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:18px;">
+          <button class="btn btn-primary" id="confirmDepositBtn">💸 Confirm Deposit</button>
+          <button class="btn btn-secondary">📤 Upload Slip</button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-head">
+          <div>
+            <h3>Escrow Payment Flow</h3>
+            <p>ขั้นตอนการจ่ายเงินค่าเรียนของนักเรียนแบบถือเงินไว้กลางระบบ</p>
+          </div>
+        </div>
+
+        <div class="flow-grid">
+          <div class="flow-card">
+            <div class="flow-step">1</div>
+            <h4>จองและจ่ายเงินเต็มจำนวน</h4>
+            <p>
+              นักเรียนกดจองคอร์ส แล้วระบบหักเงินเต็มจำนวนจาก Wallet
+              เพื่อถือไว้เป็น Escrow ก่อนเริ่มเรียน
+            </p>
+          </div>
+
+          <div class="flow-card">
+            <div class="flow-step">2</div>
+            <h4>ติวเตอร์เริ่ม-จบคลาส</h4>
+            <p>
+              ติวเตอร์กด Start Class และ End Class
+              จากนั้นนักเรียนกดยืนยันว่าเรียนครบจริงตามเวลาที่กำหนด
+            </p>
+          </div>
+
+          <div class="flow-card">
+            <div class="flow-step">3</div>
+            <h4>ระบบปล่อยเงินอัตโนมัติ</h4>
+            <p>
+              เมื่อมีการ confirm หรือ auto-confirm ระบบจะแบ่งเงินให้ติวเตอร์
+              และหัก platform fee ตามเปอร์เซ็นต์ที่ตั้งไว้
+            </p>
+          </div>
+        </div>
+
+        <div class="summary-box">
+          <div class="summary-row">
+            <span>ตัวอย่างค่าเรียน</span>
+            <strong>฿900.00</strong>
+          </div>
+          <div class="summary-row">
+            <span>เข้ากระเป๋าติวเตอร์</span>
+            <strong>฿810.00</strong>
+          </div>
+          <div class="summary-row">
+            <span>Platform Fee (10%)</span>
+            <strong>฿90.00</strong>
+          </div>
+          <div class="summary-row">
+            <span>Payment Status</span>
+            <strong>Completed</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="transaction-section">
+      <div class="transaction-toolbar">
+        <h3>Transaction Log</h3>
+        <div class="filter-pills">
+          <div class="filter-pill active">ทั้งหมด</div>
+          <div class="filter-pill">Deposit</div>
+          <div class="filter-pill">Payment</div>
+          <div class="filter-pill">Refund</div>
+          <div class="filter-pill">Withdrawal</div>
+        </div>
+      </div>
+
+      <div class="transaction-list">
+        <div class="transaction-item">
+          <div class="transaction-icon">💸</div>
+          <div class="transaction-main">
+            <h4>ฝากเงินเข้า Wallet</h4>
+            <p>อ้างอิง: deposit_slip #DPS-2001 • เติมเงินเพื่อใช้จองคอร์ส</p>
+          </div>
+          <div class="transaction-type">
+            <div class="status-chip completed">deposit</div>
+          </div>
+          <div class="transaction-balance">
+            <div class="money in">+ ฿500.00</div>
+            <div style="color:var(--muted); font-size:.86rem;">Balance After: ฿2,950.00</div>
+          </div>
+          <div class="transaction-date">
+            23 เม.ย. 2026<br><span style="color:var(--muted); font-size:.86rem;">14:40 น.</span>
+          </div>
+        </div>
+
+        <div class="transaction-item">
+          <div class="transaction-icon">📚</div>
+          <div class="transaction-main">
+            <h4>ชำระค่าเรียนคอร์สคณิตศาสตร์ ม.4</h4>
+            <p>อ้างอิง: application #APP-1142 • ระบบถือเงินแบบ escrow</p>
+          </div>
+          <div class="transaction-type">
+            <div class="status-chip pending">payment</div>
+          </div>
+          <div class="transaction-balance">
+            <div class="money out">- ฿900.00</div>
+            <div style="color:var(--muted); font-size:.86rem;">Balance After: ฿2,050.00</div>
+          </div>
+          <div class="transaction-date">
+            22 เม.ย. 2026<br><span style="color:var(--muted); font-size:.86rem;">18:10 น.</span>
+          </div>
+        </div>
+
+        <div class="transaction-item">
+          <div class="transaction-icon">↩️</div>
+          <div class="transaction-main">
+            <h4>รับเงินคืนจากคอร์สภาษาอังกฤษ</h4>
+            <p>อ้างอิง: application #APP-1098 • refund จากการยกเลิกบางส่วน</p>
+          </div>
+          <div class="transaction-type">
+            <div class="status-chip completed">refund</div>
+          </div>
+          <div class="transaction-balance">
+            <div class="money in">+ ฿600.00</div>
+            <div style="color:var(--muted); font-size:.86rem;">Balance After: ฿2,950.00</div>
+          </div>
+          <div class="transaction-date">
+            21 เม.ย. 2026<br><span style="color:var(--muted); font-size:.86rem;">09:25 น.</span>
+          </div>
+        </div>
+
+        <div class="transaction-item">
+          <div class="transaction-icon">🏦</div>
+          <div class="transaction-main">
+            <h4>ถอนเงินคงเหลือกลับบัญชี</h4>
+            <p>อ้างอิง: withdrawal_request #WDR-882 • คืนเงินส่วนที่ไม่ได้ใช้</p>
+          </div>
+          <div class="transaction-type">
+            <div class="status-chip completed">withdrawal</div>
+          </div>
+          <div class="transaction-balance">
+            <div class="money out">- ฿300.00</div>
+            <div style="color:var(--muted); font-size:.86rem;">Balance After: ฿1,750.00</div>
+          </div>
+          <div class="transaction-date">
+            18 เม.ย. 2026<br><span style="color:var(--muted); font-size:.86rem;">16:52 น.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="policy-grid">
+      <div class="policy-card">
+        <h3>นโยบายการคืนเงิน</h3>
+        <div class="policy-list">
+          <div class="policy-item">
+            <strong>ยกเลิกก่อนเริ่มเรียน:</strong> นักเรียนได้เงินคืน 100% โดยอาจหักเฉพาะค่าธรรมเนียม gateway ตามที่ระบบกำหนด
+          </div>
+          <div class="policy-item">
+            <strong>ยกเลิกกลางคัน:</strong> ระบบคำนวณคืนเงินตามจำนวนชั่วโมงที่ยังไม่ได้เรียนจริง
+          </div>
+          <div class="policy-item">
+            <strong>Refund Transaction:</strong> เงินคืนจะถูกบันทึกลง Transaction_Log และเข้ากระเป๋า Wallet ทันที
+          </div>
+        </div>
+      </div>
+
+      <div class="policy-card">
+        <h3>สิทธิ์ของนักเรียนในระบบ Wallet</h3>
+        <div class="policy-list">
+          <div class="policy-item">
+            <strong>ฝากเงินได้:</strong> เติมเงินเข้า Wallet เพื่อจ่ายค่าเรียน
+          </div>
+          <div class="policy-item">
+            <strong>ถอนเงินได้:</strong> ถอนยอดคงเหลือที่ยังไม่ได้ใช้กลับออกจากระบบ
+          </div>
+          <div class="policy-item">
+            <strong>ดูประวัติได้:</strong> ตรวจสอบรายการเงินเข้า-ออกย้อนหลังได้ตลอดเวลา
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">
+      หน้านี้เป็น Frontend สำหรับฝั่งนักเรียนก่อน โดยสามารถนำไปเชื่อมกับตาราง <strong>Wallet</strong> และ
+      <strong>Transaction_Log</strong> รวมถึง API สำหรับ deposit / refund / payment / withdrawal ได้ภายหลัง
+    </div>
+  </div>
+
+  <script src="wallet.js"></script>
+</body>
+</html>
