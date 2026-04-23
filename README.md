@@ -93,6 +93,9 @@ $env:PATH += ";C:\Program Files\MySQL\MySQL Server 9.6\bin"
 # ลองใหม่อีกครั้ง
 mysql --version
 
+# cd เข้าโปรเจค
+cd project
+
 # สร้าง Database (ถ้ามีอยู่แล้วจะข้ามไป ไม่มี error)
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS tutor_match CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 # Enter password: <รหัสผ่าน MySQL ของคุณ>
