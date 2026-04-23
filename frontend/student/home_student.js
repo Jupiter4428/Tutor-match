@@ -327,9 +327,35 @@ const TOY_TUTORS = [
 ];
 
 function loadTutors() {
-  allTutors = TOY_TUTORS;
-  populateSubjectFilter();
-  updateMatchedTutors();
+  fetch("/tutor/list", {
+    method: "GET",
+    headers: authHeader()
+  })
+    .then(res => {
+      if (handleAuthError(res)) return null;
+      return res.json();
+    })
+    .then(data => {
+      if (!data) return;
+
+      if (data.status === "success") {
+        allTutors = data.data || [];
+      } else {
+        allTutors = [];
+      }
+
+      populateSubjectFilter();
+      updateMatchedTutors();
+    })
+    .catch(err => {
+      console.error("โหลด tutor ไม่สำเร็จ:", err);
+
+      document.getElementById("tutorsList").innerHTML = `
+        <div class="empty-state">
+          โหลดข้อมูลติวเตอร์ไม่สำเร็จ
+        </div>
+      `;
+    });
 }
 
 const SUBJECT_GROUPS = [

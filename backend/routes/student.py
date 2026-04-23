@@ -6,6 +6,7 @@ from backend.services.student_service import (
     get_post_applications,
     get_student_post_history,
     update_student_profile,
+    delete_student_post
 )
 from backend.utils.auth_helper import token_required, role_required
 
@@ -87,6 +88,14 @@ def update_profile():
     school_name     = data.get('school_name')
     education_level = data.get('education_level')
 
-    result = update_student_profile(request.user_id, school_name, education_level)
-    status_code = 200 if result['status'] == 'success' else 400
+@student_bp.route('/post/<int:post_id>', methods=['DELETE'])
+@token_required
+@role_required('student')
+def delete_post(post_id):
+    result = delete_student_post(
+        user_id=request.user_id,
+        post_id=post_id
+    )
+
+    status_code = 200 if result["status"] == "success" else 400
     return jsonify(result), status_code

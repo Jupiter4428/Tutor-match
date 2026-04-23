@@ -156,3 +156,54 @@ def update_student_profile(user_id, school_name, education_level):
         return {"status": "error", "message": str(e)}
     finally:
         connection.close()
+        
+# ลบโพสต์ของนักเรียน (ซ่อนโพสต์แทนการลบจริง)
+def delete_student_post(user_id, post_id):
+    try:
+        connection = db.get_connection()
+
+        with connection.cursor() as cursor:
+
+            # เช็คว่าโพสต์เป็นของ user นี้ไหม
+            cursor.execute("""
+                SELECT post_id
+                FROM student_posts
+                WHERE post_id = %s
+                AND student_id = %s
+            """, (post_id, user_id))
+
+            post = cursor.fetchone()
+
+            if not post:
+                return {
+                    "status": "error",
+                    "message": "ไม่พบโพสต์นี้"
+                }
+
+            # ลบ applications ก่อน
+            cursor.execute("""
+                DELETE FROM applications
+                WHERE post_id = %s
+            """, (post_id,))
+
+            # ลบ post
+            cursor.execute("""
+                DELETE FROM student_posts
+                WHERE post_id = %s
+            """, (post_id,))
+
+            connection.commit()
+
+            return {
+                "status": "success",
+                "message": "ลบโพสต์สำเร็จ"
+            }
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
+
+    finally:
+        connection.close()
