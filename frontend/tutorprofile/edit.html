@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -197,7 +198,7 @@
       padding: 14px 20px;
       border-radius: 999px;
       background: linear-gradient(135deg, rgba(122, 92, 255, 0.28), rgba(53, 216, 255, 0.18));
-      border: 1px solid rgba(255,255,255,0.14);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       font-weight: 800;
       color: #fff;
       box-shadow: 0 12px 30px rgba(90, 100, 255, 0.18);
@@ -233,7 +234,7 @@
       border-radius: 50%;
       object-fit: cover;
       display: block;
-      border: 4px solid rgba(255,255,255,0.15);
+      border: 4px solid rgba(255, 255, 255, 0.15);
       background: #1b2344;
     }
 
@@ -279,8 +280,8 @@
       padding: 14px 24px;
       border-radius: 999px;
       font-weight: 800;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
     .form-panel {
@@ -320,15 +321,15 @@
     .input,
     .textarea {
       width: 100%;
-      border: 1px solid rgba(255,255,255,0.11);
-      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      background: rgba(255, 255, 255, 0.08);
       color: #fff;
       border-radius: 18px;
       padding: 15px 16px;
       outline: none;
       font-size: 1rem;
       transition: 0.25s ease;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
     }
 
     .input:focus,
@@ -348,8 +349,8 @@
       width: 100%;
       border-radius: 18px;
       padding: 15px 16px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.05));
-      border: 1px solid rgba(255,255,255,0.10);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.05));
+      border: 1px solid rgba(255, 255, 255, 0.10);
       color: #ffffff;
       font-size: 1rem;
       font-weight: 800;
@@ -369,7 +370,7 @@
       font-weight: 800;
       color: #d7e7ff;
       background: rgba(114, 151, 255, 0.16);
-      border: 1px solid rgba(255,255,255,0.10);
+      border: 1px solid rgba(255, 255, 255, 0.10);
     }
 
     .hint {
@@ -382,8 +383,8 @@
       margin-top: 24px;
       padding: 22px;
       border-radius: 24px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .status-top {
@@ -403,7 +404,7 @@
       border-radius: 999px;
       font-weight: 800;
       font-size: 0.95rem;
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
     .pending {
@@ -450,8 +451,8 @@
     .mini-card {
       padding: 18px;
       border-radius: 22px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .mini-card span {
@@ -477,7 +478,7 @@
 
     .divider {
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.13), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.13), transparent);
       margin: 24px 0;
     }
 
@@ -527,6 +528,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="bg-orb"></div>
 
@@ -566,8 +568,8 @@
           <img id="previewImage" src="/static/uploads/default_profile.jpg" alt="Tutor profile">
         </div>
 
-        <h3>ครูพิมพ์ชนก สอนสนุก</h3>
-        <p>อัปเดตรูปโปรไฟล์ให้ดูน่าเชื่อถือและเป็นมืออาชีพมากขึ้น</p>
+        <h3 id="tutorName"></h3>
+        <p id="tutorSubtitle"></p>
 
         <label for="profilePicture" class="upload-label">📸 Upload New Photo</label>
         <input type="file" id="profilePicture" accept="image/*" onchange="previewProfileImage(event)">
@@ -592,13 +594,15 @@
 
             <div class="field">
               <label for="hourly_rate">Hourly Rate (บาท/ชั่วโมง)</label>
-              <input class="input" type="number" id="hourly_rate" name="hourly_rate" value="350" min="0" placeholder="กรอกราคาต่อชั่วโมง">
+              <input class="input" type="number" id="hourly_rate" name="hourly_rate" value="350" min="0"
+                placeholder="กรอกราคาต่อชั่วโมง">
               <div class="hint">กรอกราคาเป็นตัวเลข เช่น 350, 500, 800</div>
             </div>
 
             <div class="field full">
               <label for="bio">Bio</label>
-              <textarea class="textarea" id="bio" name="bio" placeholder="เขียนแนะนำตัว ประสบการณ์การสอน จุดเด่น หรือวิธีการสอนของคุณ">สวัสดีค่ะ ฉันเป็นติวเตอร์ที่มีความเชี่ยวชาญด้านคณิตศาสตร์ วิทยาศาสตร์ และภาษาอังกฤษ เน้นการสอนแบบเข้าใจง่าย เป็นกันเอง และช่วยให้นักเรียนพัฒนาคะแนนและความมั่นใจในการเรียนได้อย่างมีประสิทธิภาพ</textarea>
+              <textarea class="textarea" id="bio" name="bio"
+                placeholder="เขียนแนะนำตัว ประสบการณ์การสอน จุดเด่น หรือวิธีการสอนของคุณ">สวัสดีค่ะ ฉันเป็นติวเตอร์ที่มีความเชี่ยวชาญด้านคณิตศาสตร์ วิทยาศาสตร์ และภาษาอังกฤษ เน้นการสอนแบบเข้าใจง่าย เป็นกันเอง และช่วยให้นักเรียนพัฒนาคะแนนและความมั่นใจในการเรียนได้อย่างมีประสิทธิภาพ</textarea>
               <div class="hint">แนะนำให้ใส่ข้อมูลให้น่าสนใจ ชัดเจน และดูเป็นมืออาชีพ</div>
             </div>
           </div>
@@ -673,7 +677,7 @@
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         document.getElementById("previewImage").src = e.target.result;
       };
       reader.readAsDataURL(file);
@@ -690,39 +694,98 @@
       }, 0);
     }
 
-form.addEventListener("submit", async function (e) {
-    e.preventDefault();
 
-    const token = localStorage.getItem("token");
+    async function loadCurrentProfile() {
+      const token = localStorage.getItem("token");
 
-    const hourlyRate = hourlyRateInput.value.trim();
-    const bio = document.getElementById("bio").value.trim();
-
-    const res = await fetch(
+      const res = await fetch(
         "http://127.0.0.1:5000/tutor/profile",
         {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                bio: bio,
-                hourly_rate: hourlyRate
-            })
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
         }
-    );
+      );
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (data.status === "success") {
-        alert("อัปเดตสำเร็จ");
-        window.location.href = "/home/tutor";
-    } else {
+      if (data.status === "success") {
+        const profile = data.data;
+
+        // sidebar name
+        document.getElementById("tutorName").innerText =
+          profile.name;
+
+        document.getElementById("tutorSubtitle").innerText =
+          profile.email;
+
+        // form data
+        document.getElementById("hourly_rate").value =
+          profile.hourly_rate;
+
+        document.getElementById("bio").value =
+          profile.bio;
+
+        document.getElementById("previewTutorId").innerText =
+          profile.tutor_id;
+
+        document.getElementById("previewRate").innerText =
+          `฿${profile.hourly_rate} / hr`;
+
+        if (profile.profile_picture_url) {
+          document.getElementById("previewImage").src =
+            "/" + profile.profile_picture_url;
+        }
+      } else {
         alert(data.message);
+      }
     }
-});
 
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const token = localStorage.getItem("token");
+
+      const hourlyRate = hourlyRateInput.value.trim();
+      const bio = document.getElementById("bio").value.trim();
+
+      const formData = new FormData();
+
+      formData.append("bio", bio);
+      formData.append("hourly_rate", hourlyRate);
+
+      const fileInput = document.getElementById("profilePicture");
+
+      if (fileInput.files.length > 0) {
+        formData.append(
+          "profile_picture",
+          fileInput.files[0]
+        );
+      }
+
+      const res = await fetch(
+        "http://127.0.0.1:5000/tutor/profile",
+        {
+          method: "PUT",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          },
+          body: formData
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.status === "success") {
+        alert("อัปเดตโปรไฟล์สำเร็จ");
+        window.location.href = "/profile/tutor";
+      } else {
+        alert(data.message);
+      }
+    });
   </script>
 </body>
+
 </html>
