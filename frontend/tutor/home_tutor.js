@@ -91,11 +91,10 @@ function renderJobs() {
         </div>
         <div class="item-desc">${job.description || 'ไม่มีรายละเอียดเพิ่มเติม'}</div>
         <div class="item-actions">
-          ${
-            applied
-              ? '<span style="color:#35e0a1;font-weight:700">✅ สมัครแล้ว</span>'
-              : `<button class="small-btn accept-btn" onclick="acceptJob(${job.post_id})">รับงานนี้</button>`
-          }
+          ${applied
+        ? '<span style="color:#35e0a1;font-weight:700">✅ สมัครแล้ว</span>'
+        : `<button class="small-btn accept-btn" onclick="acceptJob(${job.post_id})">รับงานนี้</button>`
+      }
         </div>
       </div>
     `;
