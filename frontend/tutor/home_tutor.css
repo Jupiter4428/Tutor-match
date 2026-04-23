@@ -156,6 +156,16 @@ body::after {
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+.btn-wallet {
+  background: linear-gradient(135deg, #203a70, #2b5cff);
+  border: 1px solid rgba(121, 169, 255, 0.35);
+  box-shadow: 0 10px 24px rgba(77, 168, 255, 0.24);
+}
+
+.btn-wallet:hover {
+  box-shadow: 0 12px 28px rgba(77, 168, 255, 0.32);
+}
+
 .btn-danger {
   background: linear-gradient(135deg, #ff5f7a, #ff2e63);
   box-shadow: 0 10px 24px rgba(255, 95, 122, 0.22);

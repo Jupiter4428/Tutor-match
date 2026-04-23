@@ -674,3 +674,6 @@ document.getElementById("logout").addEventListener("click", function () {
 // โหลดโพสต์และติวเตอร์ตอนเปิดหน้า
 loadMyPosts();
 loadTutors();
+function goToWallet() {
+  window.location.href = "/student/wallet";
+}
