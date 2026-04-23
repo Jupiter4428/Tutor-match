@@ -41,6 +41,10 @@ function goToEditProfile() {
   window.location.href = '/profile/tutor/edit';
 }
 
+function goToWallet() {
+  window.location.href = '/tutor/wallet';
+}
+
 function scrollToSection(id) {
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
