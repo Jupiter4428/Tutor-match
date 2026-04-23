@@ -157,19 +157,20 @@ def update_student_profile(user_id, school_name, education_level):
     finally:
         connection.close()
         
-# ลบโพสต์ของนักเรียน (ซ่อนโพสต์แทนการลบจริง)
+# ลบโพสต์ของนักเรียนออกจากฐานข้อมูลถาวร (Hard Delete)
 def delete_student_post(user_id, post_id):
     try:
         connection = db.get_connection()
 
         with connection.cursor() as cursor:
-
-            # เช็คว่าโพสต์เป็นของ user นี้ไหม
+            # 1. เช็คสิทธิ์ความเป็นเจ้าของโพสต์ (Security Check)
+            # ต้อง JOIN กับ student_profiles เพราะในมือเรามี user_id แต่ในตารางโพสต์เก็บ student_id
             cursor.execute("""
-                SELECT post_id
-                FROM student_posts
-                WHERE post_id = %s
-                AND student_id = %s
+                SELECT p.post_id 
+                FROM student_posts p
+                JOIN student_profiles sp ON p.student_id = sp.student_id
+                WHERE p.post_id = %s 
+                AND sp.user_id = %s
             """, (post_id, user_id))
 
             post = cursor.fetchone()
@@ -177,18 +178,13 @@ def delete_student_post(user_id, post_id):
             if not post:
                 return {
                     "status": "error",
-                    "message": "ไม่พบโพสต์นี้"
+                    "message": "ไม่พบโพสต์นี้ หรือคุณไม่มีสิทธิ์ลบข้อมูลนี้"
                 }
 
-            # ลบ applications ก่อน
+            # 2. คำสั่งลบข้อมูลถาวร
+            # เนื่องจากมี ON DELETE CASCADE ใน Schema ข้อมูลในตาราง applications จะถูกลบตามอัตโนมัติ
             cursor.execute("""
-                DELETE FROM applications
-                WHERE post_id = %s
-            """, (post_id,))
-
-            # ลบ post
-            cursor.execute("""
-                DELETE FROM student_posts
+                DELETE FROM student_posts 
                 WHERE post_id = %s
             """, (post_id,))
 
@@ -196,7 +192,7 @@ def delete_student_post(user_id, post_id):
 
             return {
                 "status": "success",
-                "message": "ลบโพสต์สำเร็จ"
+                "message": "ลบข้อมูลออกจากระบบถาวรเรียบร้อยแล้ว"
             }
 
     except Exception as e:
