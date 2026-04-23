@@ -21,7 +21,7 @@ def create_app():
 
     @app.route("/login")
     def login_page():
-        return send_from_directory("../frontend/auth", "login.html")
+      return send_from_directory("../frontend/auth", "login.html")
 
     @app.route("/register")
     def register_page():
@@ -52,8 +52,57 @@ def create_app():
     def serve_assets(filepath):
         return send_from_directory("../frontend", filepath)
     
-    # register blueprints
-    app.register_blueprint(admin_bp)
+    # # register js routes
+    # @app.route("/<filename>.js")
+    # def serve_root_js(filename):
+    #     return send_from_directory("../frontend/auth", f"{filename}.js")
+    
+    # @app.route("/<filename>.js")
+    # def serve_root_js(filename):
+    #     return send_from_directory("../frontend/admin", f"{filename}.js")
+    
+    # @app.route("/<filename>.js")
+    # def serve_root_js(filename):
+    #     return send_from_directory("../frontend/student", f"{filename}.js")
+    
+    # @app.route("/<filename>.js")
+    # def serve_root_js(filename):
+    #     return send_from_directory("../frontend/tutor", f"{filename}.js")
+    
+    # @app.route("/<filename>.js")
+    # def serve_root_js(filename):
+    #     return send_from_directory("../frontend/tutorprofile", f"{filename}.js")  
+      
+    # # register css routes
+    # @app.route("/<filename>.css")
+    # def serve_root_css(filename):
+    #     return send_from_directory("../frontend/auth", f"{filename}.css")
+    
+    # @app.route("/<filename>.css")
+    # def serve_root_css(filename):
+    #     return send_from_directory("../frontend/admin", f"{filename}.css")
+    
+    # @app.route("/<filename>.css")
+    # def serve_root_css(filename):
+    #     return send_from_directory("../frontend/student", f"{filename}.css")
+    
+    # @app.route("/<filename>.css")
+    # def serve_root_css(filename):
+    #     return send_from_directory("../frontend/tutor", f"{filename}.css")
+    
+    # @app.route("/<filename>.css")
+    # def serve_root_css(filename):
+    #     return send_from_directory("../frontend/tutorprofile", f"{filename}.css")
+    
+
+    
+    
+    # register blueprint
+    from backend.routes.auth import auth_bp
+    from backend.routes.student import student_bp
+    from backend.routes.tutor import tutor_bp
+    
+    # อิงตาม auth, student, tutor ตรงๆ
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(student_bp, url_prefix='/student')
     app.register_blueprint(tutor_bp, url_prefix='/tutor')
