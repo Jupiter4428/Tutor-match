@@ -47,6 +47,15 @@ def create_app():
     def tutor_profile_edit():
         return send_from_directory("../frontend/tutorprofile", "edit.html")
 
+    @app.route("/student/wallet")
+    def student_wallet_page():
+        return send_from_directory("../frontend/student", "wallet.html")
+
+    @app.route("/tutor/wallet")
+    def tutor_wallet_page():
+        return send_from_directory("../frontend/tutor", "tutor_wallet.html")
+    
+    
     # จัดการไฟล์ย่อยๆ ทั้งหมด (CSS, JS, รูปภาพ)
     @app.route("/assets/<path:filepath>")
     def serve_assets(filepath):
