@@ -19,13 +19,13 @@ student_bp = Blueprint('student', __name__)
 @role_required('student')
 def add_post():
     data = request.get_json()
-    subject         = data.get('subject')
-    grade_level     = data.get('grade_level')
+    subject = data.get('subject')
+    grade_level = data.get('grade_level')
     learning_format = data.get('learning_format')
-    location        = data.get('location')
-    preferred_time  = data.get('preferred_time')
-    description     = data.get('description')
-    budget          = data.get('budget')
+    location = data.get('location')
+    preferred_time = data.get('preferred_time')
+    description = data.get('description')
+    budget = data.get('budget')
 
     if not all([subject, grade_level, learning_format, location, budget]):
         return jsonify({"status": "error", "message": "กรุณากรอกข้อมูลสำคัญให้ครบถ้วน"}), 400
