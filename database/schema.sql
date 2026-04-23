@@ -88,6 +88,7 @@ CREATE TABLE tutor_profiles (
 -- 5) tutor_subjects
 -- BCNF: composite PK prevents duplicate subjects per tutor
 -- =========================================================
+
 CREATE TABLE tutor_subjects (
     tutor_id INT NOT NULL,
     subject VARCHAR(100) NOT NULL,
