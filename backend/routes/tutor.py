@@ -26,7 +26,7 @@ from backend.services.tutor_service import (
 
 tutor_bp = Blueprint('tutor', __name__)
 
-# ✨ เพิ่ม Route สำหรับ Wallet
+# เพิ่ม Route สำหรับ Wallet
 @tutor_bp.route('/api/wallet', methods=['GET'])
 @token_required
 @role_required('tutor')
