@@ -22,8 +22,10 @@
       </div>
 
       <div class="header-actions">
-  <button class="btn btn-go-tutor-profile" onclick="goToProfile()">🔙 Back To Profile</button>
-</div>
+        <button class="btn btn-go-tutor-profile" onclick="goToProfile()">
+          ⬅ Back To Profile
+        </button>
+      </div>
     </div>
 
     <section class="hero glass">
@@ -43,14 +45,18 @@
     <div class="layout">
       <aside class="sidebar glass">
         <div class="profile-ring">
-          <img id="previewImage" src="/uploads/default_profile.jpg" alt="Tutor profile">
+          <img id="previewImage" src="/static/uploads/default_profile.jpg" alt="Tutor profile">
         </div>
 
         <h3 id="tutorName"></h3>
         <p id="tutorSubtitle"></p>
 
-        <label for="profilePicture" class="upload-label">📸 Upload New Photo</label>
-        <input type="file" id="profilePicture" accept="image/*" onchange="previewProfileImage(event)">
+        <label for="profilePicture" class="upload-label">
+          📸 Upload New Photo
+        </label>
+
+        <input type="file" id="profilePicture" accept=".jpg,.jpeg,.png,.webp" onchange="previewProfileImage(event)"
+          hidden>
         <div class="file-note">รองรับไฟล์ JPG, PNG และ WEBP</div>
 
         <div class="mode-badge">✨ Tutor Mode Activated</div>
@@ -129,10 +135,10 @@
             </div>
           </div>
 
-       <div class="bottom-actions">
-  <button type="reset" class="btn btn-secondary" onclick="resetPreview()">↺ Reset</button>
-  <button type="submit" class="btn btn-primary">💾 Save Profile</button>
-</div>
+          <div class="bottom-actions">
+            <button type="reset" class="btn btn-secondary" onclick="resetPreview()">↺ Reset</button>
+            <button type="submit" class="btn btn-primary">💾 Save Profile</button>
+          </div>
         </form>
       </section>
     </div>

@@ -24,15 +24,20 @@ function previewProfileImage(event) {
 }
 
 function goToProfile() {
-  window.location.href = '/home/tutor';
+  window.location.href = '/profile/tutor';
 }
 
 function resetPreview() {
-  setTimeout(() => {
+  setTimeout(async () => {
     previewRate.textContent = hourlyRateInput.value.trim()
-      ? `฿${hourlyRateInput.value.trim()} / hr` : '฿0 / hr';
-    document.getElementById('previewImage').src = defaultImage;
+      ? `฿${hourlyRateInput.value.trim()} / hr`
+      : '฿0 / hr';
+
     document.getElementById('profilePicture').value = '';
+
+    // โหลดรูปจริงจาก DB กลับมา
+    await loadCurrentProfile();
+
   }, 0);
 }
 
@@ -51,11 +56,10 @@ async function loadCurrentProfile() {
   const data = await res.json();
   console.log(data);
 
-  if (data.status === 'success') {
-    alert('อัปเดตโปรไฟล์สำเร็จ');
-    window.location.href = '/profile/tutor';
-  } else {
-    alert(data.message || 'อัปเดตไม่สำเร็จ');
+
+  if (data.status !== 'success') {
+    alert(data.message || 'โหลดโปรไฟล์ไม่สำเร็จ');
+    return;
   }
 
   const p = data.data;
@@ -66,40 +70,49 @@ async function loadCurrentProfile() {
   document.getElementById('previewTutorId').innerText = p.tutor_id;
   document.getElementById('previewRate').innerText = `฿${p.hourly_rate} / hr`;
 
+  const previewImage = document.getElementById('previewImage');
+
   if (p.profile_picture_url) {
-    document.getElementById('previewImage').src = `/${p.profile_picture_url}`;
+    previewImage.src =
+      `/${p.profile_picture_url}?t=${new Date().getTime()}`;
+  } else {
+    previewImage.src = '/static/uploads/default_profile.jpg';
   }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append('bio', document.getElementById('bio').value.trim());
+    formData.append('hourly_rate', hourlyRateInput.value.trim());
+
+    const fileInput = document.getElementById('profilePicture');
+    if (fileInput.files.length > 0) {
+      formData.append('profile_picture', fileInput.files[0]);
+    }
+
+    const res = await fetch('/tutor/profile', {
+      method: 'PUT',
+      headers: { 'Authorization': `Bearer ${TOKEN}` },
+      body: formData
+    });
+
+    const data = await res.json();
+    console.log("UPDATE RESPONSE:", data);
+
+    if (data.status === 'success') {
+      alert('อัปเดตโปรไฟล์สำเร็จ');
+
+      // โหลดข้อมูลใหม่จาก DB มาแสดงหน้าเดิม
+      await loadCurrentProfile();
+
+      // reset file input
+      document.getElementById('profilePicture').value = '';
+    } else {
+      alert(data.message || 'อัปเดตไม่สำเร็จ');
+    }
+
+  });
 }
 
-form.addEventListener('submit', async function (e) {
-  e.preventDefault();
-
-  const formData = new FormData();
-  formData.append('bio', document.getElementById('bio').value.trim());
-  formData.append('hourly_rate', hourlyRateInput.value.trim());
-
-  const fileInput = document.getElementById('profilePicture');
-  if (fileInput.files.length > 0) {
-    formData.append('profile_picture', fileInput.files[0]);
-  }
-
-  const res = await fetch('/tutor/profile', {
-    method: 'PUT',
-    headers: { 'Authorization': `Bearer ${TOKEN}` },
-    body: formData
-  });
-
-  const data = await res.json();
-  console.log("UPDATE RESPONSE:", data);
-
-  if (data.status === 'success') {
-    alert('อัปเดตโปรไฟล์สำเร็จ');
-
-    // force reload profile page
-    window.location.href = '/profile/tutor';
-  } else {
-    alert(data.message || 'อัปเดตไม่สำเร็จ');
-  }
-
-  loadCurrentProfile();
-});
+loadCurrentProfile();

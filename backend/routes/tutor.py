@@ -3,12 +3,7 @@ import os
 import uuid
 from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
-from backend.utils.auth_helper import token_required, role_required
-# tutor_routes.py
-import os
-import uuid
-from flask import Blueprint, request, jsonify
-from werkzeug.utils import secure_filename
+
 from backend.utils.auth_helper import token_required, role_required
 from backend.services.tutor_service import (
     get_tutor_profile,
@@ -20,105 +15,140 @@ from backend.services.tutor_service import (
     get_tutor_schedule,
     get_available_tutors,
     get_tutor_profile_public,
-    get_tutor_wallet,      
-    request_withdrawal 
+    get_tutor_wallet,
+    request_withdrawal
 )
 
 tutor_bp = Blueprint('tutor', __name__)
 
-# ✨ เพิ่ม Route สำหรับ Wallet
-@tutor_bp.route('/api/wallet', methods=['GET'])
+
+# =========================
+# Wallet API
+# =========================
+
+@tutor_bp.route('/wallet', methods=['GET'])
 @token_required
 @role_required('tutor')
-def view_wallet():
-    # เรียกใช้ service เพื่อดึงยอดเงินและรายการเดินบัญชี
+def get_wallet():
+    """ดึงข้อมูลกระเป๋าเงินของติวเตอร์"""
     result = get_tutor_wallet(request.user_id)
     return jsonify(result), 200
 
-@tutor_bp.route('/api/wallet/withdraw', methods=['POST'])
+
+@tutor_bp.route('/wallet/withdraw', methods=['POST'])
 @token_required
 @role_required('tutor')
-def withdraw():
+def request_withdraw():
+    """ขอถอนเงินจากกระเป๋า"""
     data = request.get_json()
     amount = data.get('amount')
     bank_name = data.get('bank_name')
     account_number = data.get('account_number')
-    
+
     if not all([amount, bank_name, account_number]):
-        return jsonify({"status": "error", "message": "ข้อมูลไม่ครบถ้วน"}), 400
-        
+        return jsonify({
+            "status": "error",
+            "message": "ต้องส่ง amount, bank_name, account_number"
+        }), 400
+
     result = request_withdrawal(request.user_id, amount, bank_name, account_number)
-    return jsonify(result), 200 if result['status'] == 'success' else 400
+    status_code = 200 if result['status'] == 'success' else 400
+    return jsonify(result), status_code
 
-tutor_bp = Blueprint('tutor', __name__)
 
+# =========================
+# Posts API
+# =========================
 
-# GET /tutor/posts?subject=<keyword> — ดูโพสต์ที่เปิดรับสมัครทั้งหมด
 @tutor_bp.route('/posts', methods=['GET'])
 @token_required
 @role_required('tutor')
 def list_open_posts():
+    """ดูโพสต์ที่เปิดรับสมัครทั้งหมด (รองรับ filter ตามวิชา)"""
     subject_filter = request.args.get('subject', None)
     result = get_open_posts(subject_filter=subject_filter)
     return jsonify(result), 200
 
 
-# POST /tutor/apply — ติวเตอร์สมัครรับงาน
+# =========================
+# Applications API
+# =========================
+
 @tutor_bp.route('/apply', methods=['POST'])
 @token_required
 @role_required('tutor')
 def apply():
-    result = apply_to_post(user_id=request.user_id, post_id=request.get_json().get('post_id'))
-    status_code = 201 if result["status"] == "success" else 400
-    return jsonify(result), status_code
+    """ติวเตอร์สมัครรับงาน"""
+    try:
+        data = request.get_json()
+        post_id = data.get('post_id')
+
+        if not post_id:
+            return jsonify({
+                "status": "error",
+                "message": "ต้องส่ง post_id"
+            }), 400
+
+        result = apply_to_post(user_id=request.user_id, post_id=post_id)
+        status_code = 201 if result["status"] == "success" else 400
+        return jsonify(result), status_code
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
 
-# GET /tutor/my-applications — ดูสถานะใบสมัครที่ส่งไปทั้งหมด
 @tutor_bp.route('/my-applications', methods=['GET'])
 @token_required
 @role_required('tutor')
 def my_applications():
+    """ดูสถานะใบสมัครที่ส่งไปทั้งหมด"""
     result = get_tutor_applications(user_id=request.user_id)
     return jsonify(result), 200
 
 
-# GET /tutor/dashboard — สรุปสถิติ Dashboard
+# =========================
+# Dashboard & Schedule API
+# =========================
+
 @tutor_bp.route('/dashboard', methods=['GET'])
 @token_required
 @role_required('tutor')
 def dashboard_stats():
+    """ดึงสถิติ Dashboard ของติวเตอร์"""
     result = get_tutor_dashboard_stats(user_id=request.user_id)
     return jsonify(result), 200
 
 
-# GET /tutor/schedule — ดูตารางสอนที่ได้รับการยืนยันแล้ว
 @tutor_bp.route('/schedule', methods=['GET'])
 @token_required
 @role_required('tutor')
-def schedule():
+def get_schedule():
+    """ดูตารางสอนที่ได้รับการยืนยันแล้ว"""
     result = get_tutor_schedule(user_id=request.user_id)
     return jsonify(result), 200
+
 
 # =========================
 # Tutor Profile API
 # =========================
 
-
-# GET /tutor/profile — ดึงข้อมูลโปรไฟล์ติวเตอร์ของ user ที่ login อยู่
-@tutor_bp.route("/profile", methods=["GET"])
+@tutor_bp.route('/profile', methods=['GET'])
 @token_required
-@role_required("tutor")
+@role_required('tutor')
 def get_profile():
+    """ดึงข้อมูลโปรไฟล์ติวเตอร์ของผู้ใช้ที่ login"""
     result = get_tutor_profile(request.user_id)
-    return jsonify(result)
+    return jsonify(result), 200
 
 
-# PUT /tutor/profile — อัปเดตข้อมูลโปรไฟล์ติวเตอร์ (รวมรูปโปรไฟล์)
-@tutor_bp.route("/profile", methods=["PUT"])
+@tutor_bp.route('/profile', methods=['PUT'])
 @token_required
-@role_required("tutor")
+@role_required('tutor')
 def update_profile():
-
+    """อัปเดตข้อมูลโปรไฟล์ติวเตอร์ (รวมรูปโปรไฟล์)"""
     bio = request.form.get("bio")
     hourly_rate = request.form.get("hourly_rate")
     profile_file = request.files.get("profile_picture")
@@ -126,26 +156,24 @@ def update_profile():
     filename = None
 
     if profile_file:
-        original_filename = secure_filename(
-            profile_file.filename
-        )
+        original_filename = secure_filename(profile_file.filename)
+        file_ext = os.path.splitext(original_filename)[1].lower()
 
-        file_ext = os.path.splitext(
-            original_filename
-        )[1]
+        allowed_extensions = {".jpg", ".jpeg", ".png", ".webp"}
+
+        if file_ext not in allowed_extensions:
+            return jsonify({
+                "status": "error",
+                "message": "รองรับเฉพาะ JPG, PNG และ WEBP เท่านั้น"
+            }), 400
 
         filename = f"{uuid.uuid4()}{file_ext}"
-
-        upload_folder = "static/uploads"
+        upload_folder = os.path.join(os.getcwd(), "static", "uploads")
 
         if not os.path.exists(upload_folder):
             os.makedirs(upload_folder)
 
-        upload_path = os.path.join(
-            upload_folder,
-            filename
-        )
-
+        upload_path = os.path.join(upload_folder, filename)
         profile_file.save(upload_path)
 
     result = update_tutor_profile(
@@ -155,43 +183,21 @@ def update_profile():
         filename
     )
 
-    return jsonify(result)
+    return jsonify(result), 200
 
-# GET /tutor/list — รายชื่อติวเตอร์ทั้งหมดที่ verified
+
 @tutor_bp.route('/list', methods=['GET'])
 @token_required
 def list_tutors():
+    """ดึงรายชื่อติวเตอร์ทั้งหมดที่ verified"""
     result = get_available_tutors()
     return jsonify(result), 200
 
-# GET /tutor/profile/<tutor_id> — โปรไฟล์ติวเตอร์รายบุคคล
+
 @tutor_bp.route('/profile/<int:tutor_id>', methods=['GET'])
 @token_required
 def public_tutor_profile(tutor_id):
+    """ดึงโปรไฟล์ติวเตอร์รายบุคคล (โปรไฟล์สาธารณะ)"""
     result = get_tutor_profile_public(tutor_id)
     status_code = 200 if result['status'] == 'success' else 404
     return jsonify(result), status_code
-
-# เพิ่มใน tutor.py
-
-@tutor_bp.route('/wallet', methods=['GET'])
-@token_required
-@role_required('tutor')
-def view_wallet():
-    result = get_tutor_wallet(request.user_id)
-    return jsonify(result)
-
-@tutor_bp.route('/wallet/withdraw', methods=['POST'])
-@token_required
-@role_required('tutor')
-def withdraw():
-    data = request.get_json()
-    amount = data.get('amount')
-    bank_name = data.get('bank_name')
-    account_number = data.get('account_number')
-    
-    if not all([amount, bank_name, account_number]):
-        return jsonify({"status": "error", "message": "ข้อมูลไม่ครบถ้วน"}), 400
-        
-    result = request_withdrawal(request.user_id, amount, bank_name, account_number)
-    return jsonify(result)

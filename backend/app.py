@@ -9,7 +9,11 @@ from backend.routes.tutor import tutor_bp
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        static_folder="../static",
+        static_url_path="/static"
+    )
     app.config["SECRET_KEY"] = SECRET_KEY
 
     CORS(app, origins=ALLOWED_ORIGINS, supports_credentials=True)
@@ -39,9 +43,19 @@ def create_app():
     def tutor_home():
         return send_from_directory("../frontend/tutor", "home_tutor.html")
 
-    @app.route("/profile/tutor")
+    @app.route('/profile/tutor')
     def tutor_profile():
-        return send_from_directory("../frontend/tutorprofile", "profile.html")
+        return send_from_directory(
+            "../frontend/tutorprofile",
+            "profile.html"
+        )
+            
+    @app.route('/frontend/tutorprofile/<path:filename>')
+    def tutorprofile_assets(filename):
+        return send_from_directory(
+            "../frontend/tutorprofile",
+            filename
+        )
 
     @app.route("/profile/tutor/edit")
     def tutor_profile_edit():
