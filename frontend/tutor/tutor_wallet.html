@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutor Wallet - Tutor Match</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="tutor_wallet.css">
+</head>
+<body>
+  <div class="bg-glow glow-1"></div>
+  <div class="bg-glow glow-2"></div>
+  <div class="bg-glow glow-3"></div>
+
+  <div class="container">
+    <nav class="navbar">
+      <div class="brand">
+        <div class="brand-icon">🏦</div>
+        <div>
+          <h1>Tutor Wallet</h1>
+          <p>ระบบถอนรายได้ของติวเตอร์ • ถอนเงินได้อย่างเดียว</p>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <a href="#" class="btn btn-secondary">🏠 Home Tutor</a>
+        <a href="#" class="btn btn-secondary">📚 My Classes</a>
+        <a href="#" class="btn btn-primary">💸 Withdraw</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-left card">
+        <div class="hero-tag">✨ Tutor Earnings • Safe Withdrawal • Auto Summary</div>
+        <h2>กระเป๋าเงินติวเตอร์<br>หน้า ถอนรายได้ แบบจัดเต็ม<br>หรู ดูมืออาชีพ</h2>
+        <p>
+          หน้านี้ออกแบบมาสำหรับติวเตอร์โดยเฉพาะ ใช้ดูรายได้คงเหลือในระบบ
+          ถอนเงินเข้าบัญชีธนาคาร ตรวจสอบยอดหลังถอน และดูประวัติธุรกรรมแบบสวย ๆ
+          โดยตามกติกาของระบบ ติวเตอร์สามารถถอนเงินรายได้จากการสอนเท่านั้น
+          ไม่สามารถฝากเงินเข้า Wallet เองได้
+        </p>
+
+        <div class="hero-stats">
+          <div class="stat-box">
+            <h3>฿ 8,450</h3>
+            <p>ยอดรายได้คงเหลือที่ถอนออกได้</p>
+          </div>
+          <div class="stat-box">
+            <h3>27 รายการ</h3>
+            <p>ธุรกรรมรายได้และการถอนในเดือนนี้</p>
+          </div>
+          <div class="stat-box">
+            <h3>10%</h3>
+            <p>ค่าธรรมเนียมแพลตฟอร์มที่หักก่อนเข้ากระเป๋า</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right card">
+        <div class="wallet-highlight">
+          <span>Available Tutor Balance</span>
+          <h3 id="currentWalletBalance">฿8,450.00</h3>
+          <div class="wallet-meta">
+            <div class="pill active">● Wallet Active</div>
+            <div class="pill">Tutor ID: #TTR-2048</div>
+            <div class="pill">Updated: 24 Apr 2026</div>
+          </div>
+        </div>
+
+        <div class="summary-mini-grid">
+          <div class="mini-card">
+            <span class="mini-label">รายได้ล่าสุด</span>
+            <div class="mini-value">+ ฿810</div>
+          </div>
+          <div class="mini-card">
+            <span class="mini-label">ถอนล่าสุด</span>
+            <div class="mini-value">- ฿1,500</div>
+          </div>
+          <div class="mini-card">
+            <span class="mini-label">สถานะล่าสุด</span>
+            <div class="mini-value">Completed</div>
+          </div>
+          <div class="mini-card">
+            <span class="mini-label">Wallet Status</span>
+            <div class="mini-value">Active</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="main-grid">
+      <div class="withdraw-card card">
+        <div class="section-head">
+          <div>
+            <h3>ถอนเงินรายได้ของติวเตอร์</h3>
+            <p>ใช้สำหรับถอนรายได้จากการสอนเข้าบัญชีธนาคารเท่านั้น</p>
+          </div>
+          <div class="pill warning">Tutor Only</div>
+        </div>
+
+        <div class="notice-box">
+          <div class="notice-icon">📌</div>
+          <div>
+            <h4>เงื่อนไขสำคัญ</h4>
+            <p>
+              ติวเตอร์สามารถถอนเงินจากรายได้ที่ได้รับหลังหักค่าธรรมเนียมแพลตฟอร์มแล้วเท่านั้น
+              ไม่สามารถเติมเงินเข้า Wallet เองได้ ตามตรรกะของระบบ Wallet ฝั่ง Tutor
+            </p>
+          </div>
+        </div>
+
+        <div class="quick-amounts">
+          <button class="withdraw-btn active">฿500</button>
+          <button class="withdraw-btn">฿1000</button>
+          <button class="withdraw-btn">฿2000</button>
+          <button class="withdraw-btn">฿5000</button>
+        </div>
+
+        <div class="input-group">
+          <label for="withdrawAmount">จำนวนเงินที่ต้องการถอน</label>
+          <input id="withdrawAmount" type="number" placeholder="กรอกจำนวนเงิน เช่น 1500">
+        </div>
+
+        <div class="input-group">
+          <label for="bankName">เลือกธนาคารปลายทาง</label>
+          <select id="bankName">
+            <option value="">เลือกธนาคาร</option>
+            <option>ธนาคารกสิกรไทย</option>
+            <option>ธนาคารกรุงไทย</option>
+            <option>ธนาคารไทยพาณิชย์</option>
+            <option>ธนาคารกรุงเทพ</option>
+            <option>ธนาคารกรุงศรีอยุธยา</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="accountName">ชื่อบัญชี</label>
+          <input id="accountName" type="text" placeholder="เช่น นายธนภัทร ใจดี">
+        </div>
+
+        <div class="input-group">
+          <label for="accountNumber">เลขบัญชีปลายทาง</label>
+          <input id="accountNumber" type="text" placeholder="เช่น 123-4-56789-0">
+        </div>
+
+        <div class="input-group">
+          <label for="withdrawNote">หมายเหตุการถอนเงิน</label>
+          <textarea id="withdrawNote" rows="4" placeholder="เช่น ถอนรายได้ประจำสัปดาห์ หรือถอนรายได้จากคอร์สคณิตศาสตร์"></textarea>
+        </div>
+
+        <div class="summary-box">
+          <div class="summary-row">
+            <span>จำนวนเงินถอน</span>
+            <strong id="summaryWithdraw">฿500.00</strong>
+          </div>
+          <div class="summary-row">
+            <span>ประเภทธุรกรรม</span>
+            <strong>withdrawal</strong>
+          </div>
+          <div class="summary-row">
+            <span>Wallet Status</span>
+            <strong>active</strong>
+          </div>
+          <div class="summary-row">
+            <span>ยอดคงเหลือหลังถอน</span>
+            <strong id="summaryBalanceAfterWithdraw">฿7,950.00</strong>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button class="btn btn-danger" id="confirmWithdrawBtn">🏦 Confirm Withdraw</button>
+          <button class="btn btn-secondary">📄 Download Slip</button>
+        </div>
+      </div>
+
+      <div class="side-panel">
+        <div class="card info-card">
+          <div class="section-head compact">
+            <div>
+              <h3>โครงสร้างรายได้ติวเตอร์</h3>
+              <p>ตัวอย่างการคำนวณรายได้สุทธิหลังหัก GP</p>
+            </div>
+          </div>
+
+          <div class="earning-flow">
+            <div class="earning-step">
+              <div class="step-icon">1</div>
+              <div>
+                <h4>นักเรียนจ่ายเต็มจำนวน</h4>
+                <p>เช่น นักเรียนจ่ายค่าเรียน 900 บาท</p>
+              </div>
+            </div>
+
+            <div class="earning-step">
+              <div class="step-icon">2</div>
+              <div>
+                <h4>ระบบหักค่าธรรมเนียมแพลตฟอร์ม</h4>
+                <p>หัก GP 10% = 90 บาท</p>
+              </div>
+            </div>
+
+            <div class="earning-step">
+              <div class="step-icon">3</div>
+              <div>
+                <h4>รายได้สุทธิเข้า Tutor Wallet</h4>
+                <p>ติวเตอร์ได้รับ 810 บาท และถอนออกได้ภายหลัง</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card info-card">
+          <div class="section-head compact">
+            <div>
+              <h3>สิทธิ์การใช้งานฝั่งติวเตอร์</h3>
+              <p>อิงตาม business logic ของระบบ</p>
+            </div>
+          </div>
+
+          <div class="policy-list">
+            <div class="policy-item">
+              <strong>ถอนเงินได้:</strong> ถอนเฉพาะรายได้จากการสอนที่เข้ากระเป๋าแล้ว
+            </div>
+            <div class="policy-item">
+              <strong>ฝากเงินไม่ได้:</strong> ติวเตอร์ไม่สามารถเติมเงินเข้า Wallet เองได้
+            </div>
+            <div class="policy-item">
+              <strong>ตรวจสอบย้อนหลังได้:</strong> ดู transaction log เพื่อเช็กยอดเข้า-ออกย้อนหลัง
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="transaction-card card">
+      <div class="section-head">
+        <div>
+          <h3>Transaction Log</h3>
+          <p>ประวัติรายได้และการถอนของติวเตอร์</p>
+        </div>
+
+        <div class="filter-pills">
+          <button class="filter-pill active">ทั้งหมด</button>
+          <button class="filter-pill">Tutor Earnings</button>
+          <button class="filter-pill">Withdrawal</button>
+          <button class="filter-pill">Platform Fee</button>
+        </div>
+      </div>
+
+      <div class="transaction-list">
+        <div class="transaction-item">
+          <div class="transaction-icon earnings">💼</div>
+          <div class="transaction-main">
+            <h4>รายได้จากการสอนคอร์สคณิตศาสตร์ ม.4</h4>
+            <p>อ้างอิง: application #APP-1142 • tutor_earnings หลังหัก GP แล้ว</p>
+          </div>
+          <div class="transaction-type">
+            <span class="status-chip success">tutor_earnings</span>
+          </div>
+          <div class="transaction-money">
+            <div class="money in">+ ฿810.00</div>
+            <div class="money-sub">Balance After: ฿8,450.00</div>
+          </div>
+          <div class="transaction-date">
+            24 เม.ย. 2026<br><span>10:20 น.</span>
+          </div>
+        </div>
+
+        <div class="transaction-item">
+          <div class="transaction-icon withdrawal">🏦</div>
+          <div class="transaction-main">
+            <h4>ถอนเงินเข้าบัญชีธนาคาร</h4>
+            <p>อ้างอิง: withdrawal_request #WDR-913 • ถอนรายได้ประจำสัปดาห์</p>
+          </div>
+          <div class="transaction-type">
+            <span class="status-chip danger">withdrawal</span>
+          </div>
+          <div class="transaction-money">
+            <div class="money out">- ฿1,500.00</div>
+            <div class="money-sub">Balance After: ฿7,640.00</div>
+          </div>
+          <div class="transaction-date">
+            23 เม.ย. 2026<br><span>19:05 น.</span>
+          </div>
+        </div>
+
+        <div class="transaction-item">
+          <div class="transaction-icon fee">💠</div>
+          <div class="transaction-main">
+            <h4>หักค่าธรรมเนียมแพลตฟอร์ม</h4>
+            <p>อ้างอิง: application #APP-1101 • GP 10% จากคอร์สภาษาอังกฤษ</p>
+          </div>
+          <div class="transaction-type">
+            <span class="status-chip warning">platform_fee</span>
+          </div>
+          <div class="transaction-money">
+            <div class="money out">- ฿90.00</div>
+            <div class="money-sub">Balance After: ฿6,830.00</div>
+          </div>
+          <div class="transaction-date">
+            22 เม.ย. 2026<br><span>13:40 น.</span>
+          </div>
+        </div>
+
+        <div class="transaction-item">
+          <div class="transaction-icon earnings">📘</div>
+          <div class="transaction-main">
+            <h4>รายได้จากการสอนคอร์สภาษาอังกฤษ</h4>
+            <p>อ้างอิง: application #APP-1101 • รายได้สุทธิที่เข้ากระเป๋าติวเตอร์</p>
+          </div>
+          <div class="transaction-type">
+            <span class="status-chip success">tutor_earnings</span>
+          </div>
+          <div class="transaction-money">
+            <div class="money in">+ ฿900.00</div>
+            <div class="money-sub">Balance After: ฿6,920.00</div>
+          </div>
+          <div class="transaction-date">
+            22 เม.ย. 2026<br><span>13:38 น.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">
+      หน้านี้เป็น Frontend สำหรับฝั่งติวเตอร์ โดยออกแบบให้สอดคล้องกับตรรกะระบบ Wallet และ Transaction Log
+      ที่ติวเตอร์สามารถถอนรายได้จากการสอนได้เท่านั้น และดูยอดเงินคงเหลือหลังถอนแบบชัดเจน
+    </div>
+  </div>
+
+  <script src="tutor_wallet.js"></script>
+</body>
+</html>
