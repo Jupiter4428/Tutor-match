@@ -13,6 +13,8 @@ from backend.services.tutor_service import (
     get_tutor_applications,
     get_tutor_dashboard_stats,
     get_tutor_schedule,
+    get_available_tutors,
+    get_tutor_profile_public
 )
 from werkzeug.utils import secure_filename
 
@@ -21,6 +23,8 @@ tutor_bp = Blueprint('tutor', __name__)
 
 # GET /tutor/posts?subject=<keyword> — ดูโพสต์ที่เปิดรับสมัครทั้งหมด
 @tutor_bp.route('/posts', methods=['GET'])
+@token_required
+@role_required('tutor')
 def list_open_posts():
     subject_filter = request.args.get('subject', None)
     result = get_open_posts(subject_filter=subject_filter)
@@ -28,55 +32,39 @@ def list_open_posts():
 
 
 # POST /tutor/apply — ติวเตอร์สมัครรับงาน
-# Body: { "tutor_id": <user_id>, "post_id": <post_id> }
 @tutor_bp.route('/apply', methods=['POST'])
+@token_required
+@role_required('tutor')
 def apply():
-    data = request.get_json()
-
-    user_id = data.get('tutor_id')   # หน้าบ้านส่ง tutor_id ซึ่งคือ user_id
-    post_id = data.get('post_id')
-
-    if not all([user_id, post_id]):
-        return jsonify({"status": "error", "message": "ข้อมูลไม่ครบถ้วน (tutor_id, post_id)"}), 400
-
-    result = apply_to_post(user_id=user_id, post_id=post_id)
+    result = apply_to_post(user_id=request.user_id, post_id=request.get_json().get('post_id'))
     status_code = 201 if result["status"] == "success" else 400
     return jsonify(result), status_code
 
 
-# GET /tutor/my-applications?tutor_id=<user_id> — ดูสถานะใบสมัครที่ส่งไปทั้งหมด
+# GET /tutor/my-applications — ดูสถานะใบสมัครที่ส่งไปทั้งหมด
 @tutor_bp.route('/my-applications', methods=['GET'])
+@token_required
+@role_required('tutor')
 def my_applications():
-    user_id = request.args.get('tutor_id')
-
-    if not user_id:
-        return jsonify({"status": "error", "message": "Missing tutor_id", "data": []}), 400
-
-    result = get_tutor_applications(user_id=user_id)
+    result = get_tutor_applications(user_id=request.user_id)
     return jsonify(result), 200
 
 
-# GET /tutor/dashboard?tutor_id=<user_id> — สรุปสถิติ Dashboard
+# GET /tutor/dashboard — สรุปสถิติ Dashboard
 @tutor_bp.route('/dashboard', methods=['GET'])
+@token_required
+@role_required('tutor')
 def dashboard_stats():
-    user_id = request.args.get('tutor_id')
-
-    if not user_id:
-        return jsonify({"status": "error", "message": "Missing tutor_id"}), 400
-
-    result = get_tutor_dashboard_stats(user_id=user_id)
+    result = get_tutor_dashboard_stats(user_id=request.user_id)
     return jsonify(result), 200
 
 
-# GET /tutor/schedule?tutor_id=<user_id> — ดูตารางสอนที่ได้รับการยืนยันแล้ว
+# GET /tutor/schedule — ดูตารางสอนที่ได้รับการยืนยันแล้ว
 @tutor_bp.route('/schedule', methods=['GET'])
+@token_required
+@role_required('tutor')
 def schedule():
-    user_id = request.args.get('tutor_id')
-
-    if not user_id:
-        return jsonify({"status": "error", "message": "Missing tutor_id", "data": []}), 400
-
-    result = get_tutor_schedule(user_id=user_id)
+    result = get_tutor_schedule(user_id=request.user_id)
     return jsonify(result), 200
 
 # =========================
@@ -136,3 +124,18 @@ def update_profile():
     )
 
     return jsonify(result)
+
+# GET /tutor/list — รายชื่อติวเตอร์ทั้งหมดที่ verified
+@tutor_bp.route('/list', methods=['GET'])
+@token_required
+def list_tutors():
+    result = get_available_tutors()
+    return jsonify(result), 200
+
+# GET /tutor/profile/<tutor_id> — โปรไฟล์ติวเตอร์รายบุคคล
+@tutor_bp.route('/profile/<int:tutor_id>', methods=['GET'])
+@token_required
+def public_tutor_profile(tutor_id):
+    result = get_tutor_profile_public(tutor_id)
+    status_code = 200 if result['status'] == 'success' else 404
+    return jsonify(result), status_code
