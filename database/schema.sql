@@ -241,4 +241,22 @@ CREATE TABLE user_action_logs (
         ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- =========================================================
+-- 13) reports
+-- สำหรับเก็บข้อมูลการแจ้งปัญหาระบบ ร้องเรียนผู้ใช้ หรือโพสต์ต่างๆ
+-- =========================================================
+CREATE TABLE reports (
+    report_id INT AUTO_INCREMENT PRIMARY KEY,
+    reporter_id INT NOT NULL, -- คนที่แจ้งปัญหา
+    target_type ENUM('user', 'post', 'review', 'other') NOT NULL, -- ประเภทสิ่งที่ถูกรายงาน
+    target_id INT NULL, -- ID ของสิ่งที่ถูกรายงาน (เช่น post_id, user_id)
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    status ENUM('pending', 'investigating', 'resolved', 'dismissed') NOT NULL DEFAULT 'pending',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_reports_reporter
+        FOREIGN KEY (reporter_id) REFERENCES users(user_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 SET FOREIGN_KEY_CHECKS = 1;
