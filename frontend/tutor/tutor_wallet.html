@@ -27,9 +27,11 @@
       </div>
 
       <div class="nav-actions">
-        <a href="#" class="btn btn-secondary">🏠 Home Tutor</a>
-        <a href="#" class="btn btn-secondary">📚 My Classes</a>
-        <a href="#" class="btn btn-primary">💸 Withdraw</a>
+        <div class="nav-actions">
+          <button onclick="window.location.href='/home/tutor'" class="btn btn-secondary">🏠 Home Tutor</button>
+          <a href="javascript:void(0)" onclick="goToProfile()" class="btn btn-secondary">📚 My Classes</a>
+          <a href="javascript:void(0)" onclick="scrollToSection('deposit-section')" class="btn btn-primary">💸 Withdraw</a>
+      </div>
       </div>
     </nav>
 

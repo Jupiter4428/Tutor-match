@@ -359,3 +359,60 @@ def get_tutor_profile_public(tutor_id):
         return {"status": "error", "message": str(e)}
     finally:
         connection.close()
+
+def get_tutor_wallet(user_id):
+    connection = db.get_connection()
+    try:
+        with connection.cursor() as cursor:
+            # ดึงยอดเงินปัจจุบันจากตาราง wallets
+            cursor.execute("""
+                SELECT w.balance 
+                FROM wallets w
+                JOIN users u ON w.user_id = u.user_id
+                WHERE u.user_id = %s
+            """, (user_id,))
+            wallet = cursor.fetchone()
+            
+            # ดึงประวัติธุรกรรมล่าสุด
+            cursor.execute("""
+                SELECT transaction_type, amount, balance_after, description, transaction_date
+                FROM transaction_logs tl
+                JOIN wallets w ON tl.wallet_id = w.wallet_id
+                WHERE w.user_id = %s
+                ORDER BY transaction_date DESC LIMIT 10
+            """, (user_id,))
+            transactions = cursor.fetchall()
+
+            return {
+                "status": "success", 
+                "balance": float(wallet['balance']) if wallet else 0,
+                "transactions": transactions
+            }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+def request_withdrawal(user_id, amount, bank_name, account_number):
+    connection = db.get_connection()
+    try:
+        with connection.cursor() as cursor:
+            # 1. เช็คยอดเงินว่าพอไหม
+            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s", (user_id,))
+            wallet = cursor.fetchone()
+            if not wallet or wallet['balance'] < amount:
+                return {"status": "error", "message": "ยอดเงินไม่เพียงพอ"}
+
+            # 2. หักเงินใน wallet
+            new_balance = float(wallet['balance']) - float(amount)
+            cursor.execute("UPDATE wallets SET balance = %s WHERE wallet_id = %s", (new_balance, wallet['wallet_id']))
+
+            # 3. บันทึก log การถอน
+            cursor.execute("""
+                INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, description)
+                VALUES (%s, 'withdrawal', %s, %s, %s)
+            """, (wallet['wallet_id'], amount, new_balance, f"ถอนเงินเข้าบัญชี {bank_name} ({account_number})"))
+            
+            connection.commit()
+            return {"status": "success", "message": "ส่งคำขอถอนเงินเรียบร้อยแล้ว"}
+    except Exception as e:
+        connection.rollback()
+        return {"status": "error", "message": str(e)}

@@ -4,6 +4,12 @@ import uuid
 from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
 from backend.utils.auth_helper import token_required, role_required
+# tutor_routes.py
+import os
+import uuid
+from flask import Blueprint, request, jsonify
+from werkzeug.utils import secure_filename
+from backend.utils.auth_helper import token_required, role_required
 from backend.services.tutor_service import (
     get_tutor_profile,
     update_tutor_profile,
@@ -13,8 +19,38 @@ from backend.services.tutor_service import (
     get_tutor_dashboard_stats,
     get_tutor_schedule,
     get_available_tutors,
-    get_tutor_profile_public
+    get_tutor_profile_public,
+    get_tutor_wallet,      
+    request_withdrawal 
 )
+
+tutor_bp = Blueprint('tutor', __name__)
+
+# --- โค้ดเดิมของคุณ (list_open_posts, apply, ฯลฯ) ---
+
+# ✨ เพิ่ม Route สำหรับ Wallet
+@tutor_bp.route('/api/wallet', methods=['GET'])
+@token_required
+@role_required('tutor')
+def view_wallet():
+    # เรียกใช้ service เพื่อดึงยอดเงินและรายการเดินบัญชี
+    result = get_tutor_wallet(request.user_id)
+    return jsonify(result), 200
+
+@tutor_bp.route('/api/wallet/withdraw', methods=['POST'])
+@token_required
+@role_required('tutor')
+def withdraw():
+    data = request.get_json()
+    amount = data.get('amount')
+    bank_name = data.get('bank_name')
+    account_number = data.get('account_number')
+    
+    if not all([amount, bank_name, account_number]):
+        return jsonify({"status": "error", "message": "ข้อมูลไม่ครบถ้วน"}), 400
+        
+    result = request_withdrawal(request.user_id, amount, bank_name, account_number)
+    return jsonify(result), 200 if result['status'] == 'success' else 400
 
 tutor_bp = Blueprint('tutor', __name__)
 
@@ -137,3 +173,27 @@ def public_tutor_profile(tutor_id):
     result = get_tutor_profile_public(tutor_id)
     status_code = 200 if result['status'] == 'success' else 404
     return jsonify(result), status_code
+
+# เพิ่มใน tutor.py
+
+@tutor_bp.route('/wallet', methods=['GET'])
+@token_required
+@role_required('tutor')
+def view_wallet():
+    result = get_tutor_wallet(request.user_id)
+    return jsonify(result)
+
+@tutor_bp.route('/wallet/withdraw', methods=['POST'])
+@token_required
+@role_required('tutor')
+def withdraw():
+    data = request.get_json()
+    amount = data.get('amount')
+    bank_name = data.get('bank_name')
+    account_number = data.get('account_number')
+    
+    if not all([amount, bank_name, account_number]):
+        return jsonify({"status": "error", "message": "ข้อมูลไม่ครบถ้วน"}), 400
+        
+    result = request_withdrawal(request.user_id, amount, bank_name, account_number)
+    return jsonify(result)
