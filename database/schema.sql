@@ -284,14 +284,29 @@ CREATE TABLE transaction_logs (
     wallet_id INT NOT NULL,
     transaction_type ENUM('deposit', 'withdrawal', 'payment', 'refund', 'platform_fee', 'tutor_earnings') NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
-    balance_after DECIMAL(10,2) NOT NULL,
-    reference_type ENUM('application', 'withdrawal_request', 'deposit_slip') NULL,
-    reference_id INT NULL,
-    description VARCHAR(255) NULL,
+    balance_after DECIMAL(10,2) NOT NULL, -- ยอดเงินคงเหลือหลังทำรายการ (ตามหน้า UI) [cite: 27]
+    reference_type ENUM('application', 'withdrawal_request', 'deposit_slip') NULL, -- อ้างอิงแหล่งที่มา 
+    reference_id INT NULL, -- ID อ้างอิง เช่น เลขที่ใบสมัคร 
+    description VARCHAR(255) NULL, -- คำอธิบาย เช่น "ชำระค่าเรียนคอร์สคณิตศาสตร์" [cite: 35, 36]
     transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_transaction_logs_wallet
-        FOREIGN KEY (wallet_id) REFERENCES wallets(wallet_id)
+    CONSTRAINT fk_transaction_logs_wallet 
+        FOREIGN KEY (wallet_id) REFERENCES wallets(wallet_id) 
         ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =========================================================
+-- 16) user_bank_accounts
+-- เพื่อให้หน้า "ถอนเงินออกจาก Wallet" ใช้งานได้จริง 
+-- คุณต้องมีที่เก็บเลขบัญชีและชื่อธนาคารของผู้ใช้ (เช่น กสิกร, กรุงไทย ตามในรูป)
+-- =========================================================
+CREATE TABLE user_bank_accounts (
+    bank_account_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    bank_name ENUM('Kasikorn', 'Krungthai', 'Siam Commercial', 'Bangkok', 'Krungsri') NOT NULL,
+    account_number VARCHAR(20) NOT NULL,
+    account_name VARCHAR(100) NOT NULL,
+    is_primary BOOLEAN DEFAULT FALSE, -- บัญชีหลักที่ใช้บ่อย
+    CONSTRAINT fk_bank_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 SET FOREIGN_KEY_CHECKS = 1;
