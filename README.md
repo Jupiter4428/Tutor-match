@@ -124,9 +124,6 @@ SELECT * FROM users;
 SELECT * FROM tutor_profiles;
 SELECT * FROM student_posts WHERE status = 'open';
 
-# ออกจาก MySQL shell
-EXIT;
-
 # รัน .sql file จากใน MySQL shell
 # (ต้องอยู่ใน mysql> prompt ก่อน และใช้ path แบบ forward slash หรือ escape backslash)
 source database/seed.sql
@@ -134,6 +131,9 @@ source database/seed.sql
 # รัน .sql file จากภายนอก (PowerShell) โดยไม่ต้องเข้า shell
 Get-Content database/seed.sql | mysql -u root -p tutor_match
 # Enter password: <รหัสผ่าน MySQL ของคุณ>
+
+# ออกจาก MySQL shell
+EXIT;
 ```
 
 ---
