@@ -2,13 +2,13 @@ const TOKEN = localStorage.getItem('token');
 const USER_ID = localStorage.getItem('user_id');
 const ROLE = localStorage.getItem('user_role');
 
-if (!TOKEN || ROLE !== 'tutor') {
-  localStorage.clear();
-  window.location.href = '/login';
-}
+// if (!TOKEN || ROLE !== 'tutor') {
+//   localStorage.clear();
+//   window.location.href = '/login';
+// }
 
 function authHeader() {
-  return { 'Authorization': `Bearer ${TOKEN}` };
+  return { Authorization: `Bearer ${TOKEN}` };
 }
 
 function handleAuthError(res) {
@@ -25,8 +25,16 @@ let myApplications = [];
 let schedules = [];
 
 let reviews = [
-  { title: "รีวิวจากนักเรียน A", meta: "⭐ 5.0 คะแนน", desc: "ติวเตอร์สอนเข้าใจง่ายมาก ใจเย็น และอธิบายละเอียดสุด ๆ" },
-  { title: "รีวิวจากนักเรียน B", meta: "⭐ 4.8 คะแนน", desc: "สอนสนุก เป็นกันเอง มีเทคนิคจำที่ช่วยให้ทำโจทย์ได้เร็วขึ้น" }
+  {
+    title: "รีวิวจากนักเรียน A",
+    meta: "⭐ 5.0 คะแนน",
+    desc: "ติวเตอร์สอนเข้าใจง่ายมาก ใจเย็น และอธิบายละเอียดสุด ๆ"
+  },
+  {
+    title: "รีวิวจากนักเรียน B",
+    meta: "⭐ 4.8 คะแนน",
+    desc: "สอนสนุก เป็นกันเอง มีเทคนิคจำที่ช่วยให้ทำโจทย์ได้เร็วขึ้น"
+  }
 ];
 
 function goToEditProfile() {
@@ -39,7 +47,11 @@ function scrollToSection(id) {
 }
 
 function formatMap(val) {
-  return { online: 'ออนไลน์', onsite: 'ออนไซต์', both: 'ออนไลน์ / ออนไซต์' }[val] || val;
+  return {
+    online: 'ออนไลน์',
+    onsite: 'ออนไซต์',
+    both: 'ออนไลน์ / ออนไซต์'
+  }[val] || val;
 }
 
 function getJobBadge(status) {
@@ -50,44 +62,57 @@ function getJobBadge(status) {
 
 function renderJobs() {
   const jobList = document.getElementById('jobList');
+  if (!jobList) return;
+
   if (jobs.length === 0) {
     jobList.innerHTML = '<div class="empty-state">ไม่มีงานสอนในขณะนี้ ลองอัปเดตรายการใหม่</div>';
     return;
   }
+
   jobList.innerHTML = jobs.map(job => {
     const applied = myApplications.some(a => a.post_id === job.post_id);
     return `
-    <div class="job-card">
-      <div class="item-top">
-        <div>
-          <div class="item-title">${job.subject}</div>
-          <div class="item-meta">
-            นักเรียน: ${job.student_name}<br>
-            ระดับ: ${job.grade_level || '-'} | งบ: ${job.budget} บาท/ชม.<br>
-            รูปแบบ: ${formatMap(job.learning_format)} | 📍 ${job.location}<br>
-            เวลา: ${job.preferred_time || '-'}
+      <div class="job-card">
+        <div class="item-top">
+          <div>
+            <div class="item-title">${job.subject}</div>
+            <div class="item-meta">
+              นักเรียน: ${job.student_name}<br>
+              ระดับ: ${job.grade_level || '-'} | งบ: ${job.budget} บาท/ชม.<br>
+              รูปแบบ: ${formatMap(job.learning_format)} | 📍 ${job.location}<br>
+              เวลา: ${job.preferred_time || '-'}
+            </div>
           </div>
+          ${getJobBadge(job.status || 'open')}
         </div>
-        ${getJobBadge(job.status || 'open')}
+        <div class="item-desc">${job.description || 'ไม่มีรายละเอียดเพิ่มเติม'}</div>
+        <div class="item-actions">
+          ${
+            applied
+              ? '<span style="color:#35e0a1;font-weight:700">✅ สมัครแล้ว</span>'
+              : `<button class="small-btn accept-btn" onclick="acceptJob(${job.post_id})">รับงานนี้</button>`
+          }
+        </div>
       </div>
-      <div class="item-desc">${job.description || 'ไม่มีรายละเอียดเพิ่มเติม'}</div>
-      <div class="item-actions">
-        ${applied
-        ? '<span style="color:#35e0a1;font-weight:700">✅ สมัครแล้ว</span>'
-        : `<button class="small-btn accept-btn" onclick="acceptJob(${job.post_id})">รับงานนี้</button>`
-      }
-      </div>
-    </div>`;
+    `;
   }).join('');
 }
 
 function renderSchedules() {
   const list = document.getElementById('scheduleList');
+  if (!list) return;
+
   if (schedules.length === 0) {
     list.innerHTML = '<div class="empty-state">ยังไม่มีตารางสอน<br>รอนักเรียน accept ใบสมัครของคุณ 🎯</div>';
     return;
   }
-  const fmtMode = v => ({ online: 'ออนไลน์', onsite: 'ออนไซต์', both: 'ออนไลน์ / ออนไซต์' }[v] || v);
+
+  const fmtMode = v => ({
+    online: 'ออนไลน์',
+    onsite: 'ออนไซต์',
+    both: 'ออนไลน์ / ออนไซต์'
+  }[v] || v);
+
   list.innerHTML = schedules.map(item => `
     <div class="schedule-card">
       <div class="item-top">
@@ -109,10 +134,12 @@ function renderSchedules() {
 function renderReviews() {
   const reviewList = document.getElementById('reviewList');
   if (!reviewList) return;
+
   if (reviews.length === 0) {
     reviewList.innerHTML = '<div class="empty-state">ยังไม่มีรีวิว</div>';
     return;
   }
+
   reviewList.innerHTML = reviews.map((item, i) => `
     <div class="review-card">
       <div class="item-top">
@@ -124,34 +151,20 @@ function renderReviews() {
       </div>
       <div class="item-desc">${item.desc}</div>
       <div class="item-actions">
-        <button class="small-btn view-btn"   onclick="editReview(${i})">✏️ Edit</button>
-        <button class="small-btn delete-btn" onclick="deleteReview(${i})">🗑️ Delete</button>
+        <button class="small-btn delete-btn" onclick="reportReview(${i})">🚨 แจ้งลบ</button>
       </div>
     </div>
   `).join('');
 }
 
-function addReview() {
-  const title = prompt('กรอกหัวข้อรีวิว'); if (!title) return;
-  const meta = prompt('กรอกคะแนน เช่น ⭐ 5.0'); if (!meta) return;
-  const desc = prompt('กรอกรายละเอียด'); if (!desc) return;
-  reviews.unshift({ title, meta, desc });
-  renderReviews();
-}
+function reportReview(i) {
+  const review = reviews[i];
+  if (!review) return;
 
-function editReview(i) {
-  const r = reviews[i];
-  const t = prompt('แก้ไขหัวข้อ', r.title); if (t === null) return;
-  const m = prompt('แก้ไขคะแนน', r.meta); if (m === null) return;
-  const d = prompt('แก้ไขรายละเอียด', r.desc); if (d === null) return;
-  reviews[i] = { title: t, meta: m, desc: d };
-  renderReviews();
-}
+  const confirmed = confirm(`ต้องการแจ้งลบ "${review.title}" ใช่หรือไม่?`);
+  if (!confirmed) return;
 
-function deleteReview(i) {
-  if (!confirm('ลบรีวิวนี้?')) return;
-  reviews.splice(i, 1);
-  renderReviews();
+  alert('ส่งคำขอแจ้งลบเรียบร้อย');
 }
 
 function updateStats(dashData) {
@@ -165,6 +178,7 @@ function updateStats(dashData) {
   document.getElementById('heroClasses').textContent = teachingNow;
   document.getElementById('heroIncome').textContent = incomeDisplay;
   document.getElementById('heroRating').textContent = avgRating || '-';
+
   document.getElementById('statAvailableJobs').textContent = availableJobs;
   document.getElementById('statTeachingNow').textContent = teachingNow;
   document.getElementById('statIncome').textContent = incomeDisplay;
@@ -174,33 +188,55 @@ function updateStats(dashData) {
 function loadJobs(subjectFilter) {
   let url = '/tutor/posts';
   if (subjectFilter) url += `?subject=${encodeURIComponent(subjectFilter)}`;
+
   fetch(url, { headers: authHeader() })
-    .then(res => { if (handleAuthError(res)) return null; return res.json(); })
+    .then(res => {
+      if (handleAuthError(res)) return null;
+      return res.json();
+    })
     .then(data => {
       if (!data) return;
       jobs = data.data || [];
       renderJobs();
     })
-    .catch(() => { document.getElementById('jobList').innerHTML = '<div class="empty-state">โหลดข้อมูลไม่สำเร็จ</div>'; });
+    .catch(() => {
+      document.getElementById('jobList').innerHTML =
+        '<div class="empty-state">โหลดข้อมูลไม่สำเร็จ</div>';
+    });
 }
 
 function loadMyApplications() {
   return fetch('/tutor/my-applications', { headers: authHeader() })
-    .then(res => { if (handleAuthError(res)) return null; return res.json(); })
-    .then(data => { if (data) myApplications = data.data || []; })
-    .catch(() => { myApplications = []; });
+    .then(res => {
+      if (handleAuthError(res)) return null;
+      return res.json();
+    })
+    .then(data => {
+      if (data) myApplications = data.data || [];
+    })
+    .catch(() => {
+      myApplications = [];
+    });
 }
 
 function loadDashboard() {
   return fetch('/tutor/dashboard', { headers: authHeader() })
-    .then(res => { if (handleAuthError(res)) return null; return res.json(); })
-    .then(data => { if (data) updateStats(data.data || {}); })
+    .then(res => {
+      if (handleAuthError(res)) return null;
+      return res.json();
+    })
+    .then(data => {
+      if (data) updateStats(data.data || {});
+    })
     .catch(() => updateStats({}));
 }
 
 function loadSchedule() {
   return fetch('/tutor/schedule', { headers: authHeader() })
-    .then(res => { if (handleAuthError(res)) return null; return res.json(); })
+    .then(res => {
+      if (handleAuthError(res)) return null;
+      return res.json();
+    })
     .then(data => {
       if (!data) return;
       schedules = data.data || [];
@@ -208,20 +244,31 @@ function loadSchedule() {
       document.getElementById('statTeachingNow').textContent = schedules.length;
       document.getElementById('heroClasses').textContent = schedules.length;
     })
-    .catch(() => { document.getElementById('scheduleList').innerHTML = '<div class="empty-state">โหลดตารางสอนไม่สำเร็จ</div>'; });
+    .catch(() => {
+      document.getElementById('scheduleList').innerHTML =
+        '<div class="empty-state">โหลดตารางสอนไม่สำเร็จ</div>';
+    });
 }
 
 function acceptJob(post_id) {
   if (!confirm('ยืนยันการสมัครรับงานสอนนี้?')) return;
+
   fetch('/tutor/apply', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeader() },
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader()
+    },
     body: JSON.stringify({ post_id })
   })
-    .then(res => { if (handleAuthError(res)) return null; return res.json(); })
+    .then(res => {
+      if (handleAuthError(res)) return null;
+      return res.json();
+    })
     .then(data => {
       if (!data) return;
       alert(data.message || 'สมัครเรียบร้อย');
+
       if (data.status === 'success') {
         loadMyApplications().then(() => renderJobs());
         loadDashboard();
