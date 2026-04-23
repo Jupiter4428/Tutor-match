@@ -45,8 +45,8 @@
 > สามารถใช้ **MySQL Workbench** แทนการพิมพ์คำสั่งผ่าน PowerShell ก็ได้ ผลลัพธ์เหมือนกัน
 
 ```bash
-# clone เฉพาะ branch renovate ลงมาในโฟลเดอร์ชื่อ project
-git clone -b renovate https://github.com/Jupiter4428/Tutor-match.git project
+# clone เฉพาะ branch demo ลงมาในโฟลเดอร์ชื่อ project
+git clone -b demo https://github.com/Jupiter4428/Tutor-match.git project
 
 # เข้าโฟลเดอร์โปรเจกต์
 cd project
