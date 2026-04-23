@@ -27,6 +27,8 @@ tutor_bp = Blueprint('tutor', __name__)
 # =========================
 
 @tutor_bp.route('/wallet', methods=['GET'])
+# เพิ่ม Route สำหรับ Wallet
+@tutor_bp.route('/api/wallet', methods=['GET'])
 @token_required
 @role_required('tutor')
 def get_wallet():
