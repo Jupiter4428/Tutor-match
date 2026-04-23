@@ -35,7 +35,7 @@
         <h2>ระบบฝากเงินของนักเรียน<br>สวย หรู ใช้งานง่าย<br>และพร้อมเชื่อม Backend</h2>
         <p>
           หน้านี้ใช้สำหรับจัดการกระเป๋าเงินของนักเรียนโดยเฉพาะ
-          สามารถดูยอดเงินคงเหลือ ฝากเงิน ตรวจสอบสถานะ wallet
+          สามารถดูยอดเงินคงเหลือ ฝากเงิน ถอนเงิน ตรวจสอบสถานะ wallet
           ดูประวัติ transaction และติดตาม flow การจ่ายค่าเรียนแบบ escrow ได้ในหน้าเดียว
         </p>
 
@@ -58,7 +58,7 @@
       <div class="card hero-right">
         <div class="wallet-balance">
           <span>Current Wallet Balance</span>
-          <h3>฿ 2,450.00</h3>
+          <h3 id="currentWalletBalance">฿ 2,450.00</h3>
           <div class="wallet-meta">
             <div class="pill active">● Wallet Active</div>
             <div class="pill">Wallet ID: #WLT-10024</div>
@@ -165,6 +165,74 @@
         <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:18px;">
           <button class="btn btn-primary" id="confirmDepositBtn">💸 Confirm Deposit</button>
           <button class="btn btn-secondary">📤 Upload Slip</button>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div class="section-head">
+          <div>
+            <h3>ถอนเงินออกจาก Wallet</h3>
+            <p>นักเรียนสามารถถอนยอดคงเหลือที่ยังไม่ได้ใช้กลับเข้าบัญชีธนาคาร</p>
+          </div>
+          <div class="pill frozen">Withdrawal</div>
+        </div>
+
+        <div class="quick-amounts withdraw-amounts">
+          <button class="withdraw-btn active">฿100</button>
+          <button class="withdraw-btn">฿300</button>
+          <button class="withdraw-btn">฿500</button>
+          <button class="withdraw-btn">฿1000</button>
+        </div>
+
+        <div class="input-group">
+          <label for="withdrawAmount">จำนวนเงินที่ต้องการถอน</label>
+          <input id="withdrawAmount" type="number" placeholder="กรอกจำนวนเงิน เช่น 300">
+        </div>
+
+        <div class="input-group">
+          <label for="bankName">เลือกธนาคาร</label>
+          <select id="bankName">
+            <option value="">เลือกธนาคาร</option>
+            <option>ธนาคารกสิกรไทย</option>
+            <option>ธนาคารกรุงไทย</option>
+            <option>ธนาคารไทยพาณิชย์</option>
+            <option>ธนาคารกรุงเทพ</option>
+            <option>ธนาคารกรุงศรีอยุธยา</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="accountNumber">เลขบัญชีปลายทาง</label>
+          <input id="accountNumber" type="text" placeholder="เช่น 123-4-56789-0">
+        </div>
+
+        <div class="input-group">
+          <label for="withdrawNote">หมายเหตุการถอนเงิน</label>
+          <textarea id="withdrawNote" rows="4" placeholder="เช่น ถอนเงินคงเหลือที่ยังไม่ได้ใช้"></textarea>
+        </div>
+
+        <div class="summary-box withdraw-summary">
+          <div class="summary-row">
+            <span>จำนวนเงินถอน</span>
+            <strong id="summaryWithdraw">฿100.00</strong>
+          </div>
+          <div class="summary-row">
+            <span>ประเภทธุรกรรม</span>
+            <strong>withdrawal</strong>
+          </div>
+          <div class="summary-row">
+            <span>ค่าธรรมเนียม</span>
+            <strong>฿0.00</strong>
+          </div>
+          <div class="summary-row">
+            <span>ยอดคงเหลือหลังถอน</span>
+            <strong id="summaryWithdrawBalance">฿2,350.00</strong>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:18px;">
+          <button class="btn btn-danger" id="confirmWithdrawBtn">🏦 Confirm Withdraw</button>
+          <button class="btn btn-secondary">📄 ดูประวัติการถอน</button>
         </div>
       </div>
 
