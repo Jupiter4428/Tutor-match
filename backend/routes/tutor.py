@@ -26,8 +26,6 @@ from backend.services.tutor_service import (
 
 tutor_bp = Blueprint('tutor', __name__)
 
-# --- โค้ดเดิมของคุณ (list_open_posts, apply, ฯลฯ) ---
-
 # ✨ เพิ่ม Route สำหรับ Wallet
 @tutor_bp.route('/api/wallet', methods=['GET'])
 @token_required
