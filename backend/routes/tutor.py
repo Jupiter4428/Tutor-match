@@ -1,13 +1,12 @@
 # tutor_routes.py
 import os
 import uuid
-from backend.services.tutor_service import (
-    get_tutor_profile,
-    update_tutor_profile
-)
 from flask import Blueprint, request, jsonify
+from werkzeug.utils import secure_filename
 from backend.utils.auth_helper import token_required, role_required
 from backend.services.tutor_service import (
+    get_tutor_profile,
+    update_tutor_profile,
     get_open_posts,
     apply_to_post,
     get_tutor_applications,
@@ -16,7 +15,6 @@ from backend.services.tutor_service import (
     get_available_tutors,
     get_tutor_profile_public
 )
-from werkzeug.utils import secure_filename
 
 tutor_bp = Blueprint('tutor', __name__)
 
