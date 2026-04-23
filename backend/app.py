@@ -16,7 +16,7 @@ def create_app():
 
     @app.route("/login")
     def login_page():
-        return send_from_directory("../frontend/auth", "login.html")
+      return send_from_directory("../frontend/auth", "login.html")
 
     @app.route("/register")
     def register_page():
@@ -46,50 +46,6 @@ def create_app():
     @app.route("/assets/<path:filepath>")
     def serve_assets(filepath):
         return send_from_directory("../frontend", filepath)
-    
-    # # register js routes
-    # @app.route("/<filename>.js")
-    # def serve_root_js(filename):
-    #     return send_from_directory("../frontend/auth", f"{filename}.js")
-    
-    # @app.route("/<filename>.js")
-    # def serve_root_js(filename):
-    #     return send_from_directory("../frontend/admin", f"{filename}.js")
-    
-    # @app.route("/<filename>.js")
-    # def serve_root_js(filename):
-    #     return send_from_directory("../frontend/student", f"{filename}.js")
-    
-    # @app.route("/<filename>.js")
-    # def serve_root_js(filename):
-    #     return send_from_directory("../frontend/tutor", f"{filename}.js")
-    
-    # @app.route("/<filename>.js")
-    # def serve_root_js(filename):
-    #     return send_from_directory("../frontend/tutorprofile", f"{filename}.js")  
-      
-    # # register css routes
-    # @app.route("/<filename>.css")
-    # def serve_root_css(filename):
-    #     return send_from_directory("../frontend/auth", f"{filename}.css")
-    
-    # @app.route("/<filename>.css")
-    # def serve_root_css(filename):
-    #     return send_from_directory("../frontend/admin", f"{filename}.css")
-    
-    # @app.route("/<filename>.css")
-    # def serve_root_css(filename):
-    #     return send_from_directory("../frontend/student", f"{filename}.css")
-    
-    # @app.route("/<filename>.css")
-    # def serve_root_css(filename):
-    #     return send_from_directory("../frontend/tutor", f"{filename}.css")
-    
-    # @app.route("/<filename>.css")
-    # def serve_root_css(filename):
-    #     return send_from_directory("../frontend/tutorprofile", f"{filename}.css")
-    
-
     
     
     # register blueprint
