@@ -39,14 +39,14 @@ def get_admin_stats():
             cursor.execute("""
                 SELECT COUNT(*) as total
                 FROM users
-                WHERE status = 'pending'
+                WHERE account_status = 'pending'
             """)
             pending = cursor.fetchone()["total"]
 
             cursor.execute("""
                 SELECT COUNT(*) as total
                 FROM users
-                WHERE status = 'banned'
+                WHERE account_status = 'banned'
             """)
             banned = cursor.fetchone()["total"]
             
@@ -86,7 +86,7 @@ def get_all_users():
                     u.name,
                     u.email,
                     u.role,
-                    u.status,
+                    u.account_status as status,
                     u.created_at as createdAt
                 FROM users u
                 ORDER BY u.created_at DESC
@@ -140,7 +140,7 @@ def update_user_status():
         with connection.cursor() as cursor:
             cursor.execute("""
                 UPDATE users
-                SET status = %s
+                SET account_status = %s
                 WHERE user_id = %s
             """, (status, user_id))
 
