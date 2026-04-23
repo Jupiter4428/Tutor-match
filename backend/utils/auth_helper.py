@@ -12,9 +12,10 @@ def token_required(f):
             return jsonify({"status": "error", "message": "ไม่พบ token"}), 401
 
         try:
-            # token มาในรูป "Bearer <token>"
-            token = token.split(" ")[1]
-            payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            parts = token.split(" ")
+            if len(parts) != 2 or parts[0].lower() != "bearer":
+                return jsonify({"status": "error", "message": "รูปแบบ token ไม่ถูกต้อง"}), 401
+            payload = jwt.decode(parts[1], SECRET_KEY, algorithms=["HS256"])
             request.user_id = payload["user_id"]
             request.role = payload["role"]
         except jwt.ExpiredSignatureError:
