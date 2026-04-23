@@ -1,13 +1,13 @@
 # app.py
 from flask import Flask, send_from_directory
 from flask_cors import CORS
-from backend.config import SECRET_KEY
+from backend.config import SECRET_KEY, ALLOWED_ORIGINS
 
 def create_app():
     app = Flask(__name__)
     app.config["SECRET_KEY"] = SECRET_KEY
 
-    CORS(app)
+    CORS(app, origins=ALLOWED_ORIGINS, supports_credentials=True)
 
     #register static routes
     @app.route("/")
