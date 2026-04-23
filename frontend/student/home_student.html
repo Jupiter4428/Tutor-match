@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Home - Tutor Match</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="/assets/student/home_student.css">
-
 </head>
+
 <body>
   <div class="floating-glow"></div>
 
@@ -43,8 +45,10 @@
         </p>
 
         <div class="hero-buttons">
-          <button class="btn btn-primary" onclick="scrollToSection('create-post-section')">🚀 เริ่มโพสต์หาติวเตอร์</button>
-          <button class="btn btn-secondary" onclick="scrollToSection('available-tutors-section')">👀 ดูติวเตอร์ที่แนะนำ</button>
+          <button class="btn btn-primary" onclick="scrollToSection('create-post-section')">🚀
+            เริ่มโพสต์หาติวเตอร์</button>
+          <button class="btn btn-secondary" onclick="scrollToSection('available-tutors-section')">👀
+            ดูติวเตอร์ที่แนะนำ</button>
         </div>
 
         <div class="hero-stats">
@@ -68,7 +72,8 @@
           <div class="title">🌟 ไฮไลต์วันนี้</div>
           <div class="highlight-box">
             <strong>สร้างโพสต์ให้น่าสนใจ = ได้คนตอบไวขึ้น</strong>
-            <span>ใส่ชื่อวิชา รายละเอียดปัญหา เป้าหมายการเรียน ระดับชั้น และงบประมาณให้ครบ เพื่อช่วยให้ติวเตอร์เห็นภาพและตัดสินใจรับงานง่ายขึ้น</span>
+            <span>ใส่ชื่อวิชา รายละเอียดปัญหา เป้าหมายการเรียน ระดับชั้น และงบประมาณให้ครบ
+              เพื่อช่วยให้ติวเตอร์เห็นภาพและตัดสินใจรับงานง่ายขึ้น</span>
           </div>
         </div>
 
@@ -150,13 +155,15 @@
 
           <div class="form-group full">
             <label for="description">รายละเอียดเพิ่มเติม</label>
-            <textarea id="description" placeholder="อธิบายสิ่งที่อยากให้ติวเตอร์ช่วย เช่น เนื้อหาที่ไม่เข้าใจ เป้าหมาย คะแนนสอบ หรือหัวข้อที่ต้องเน้น"></textarea>
+            <textarea id="description"
+              placeholder="อธิบายสิ่งที่อยากให้ติวเตอร์ช่วย เช่น เนื้อหาที่ไม่เข้าใจ เป้าหมาย คะแนนสอบ หรือหัวข้อที่ต้องเน้น"></textarea>
           </div>
         </div>
 
         <div class="form-footer">
           <div class="tip-box">
-            💡 เคล็ดลับ: โพสต์ที่มีรายละเอียดชัดเจนมักได้การตอบกลับเร็วกว่า และมีโอกาสเจอติวเตอร์ที่ตรงความต้องการมากกว่า
+            💡 เคล็ดลับ: โพสต์ที่มีรายละเอียดชัดเจนมักได้การตอบกลับเร็วกว่า
+            และมีโอกาสเจอติวเตอร์ที่ตรงความต้องการมากกว่า
           </div>
           <button class="btn btn-primary" onclick="submitPost()">✨ ลงประกาศหาติวเตอร์</button>
         </div>
@@ -249,20 +256,12 @@
 
         <!-- Filter -->
         <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
-          <select
-            id="tutorSubjectFilter"
-            onchange="filterTutors()"
-            style="flex:1;padding:10px 14px;border-radius:12px;border:1px solid #d0d0e0;
-                   outline:none;font-size:0.93rem;cursor:pointer;"
-          >
+          <select id="tutorSubjectFilter" onchange="filterTutors()" style="flex:1;padding:10px 14px;border-radius:12px;border:1px solid #d0d0e0;
+                   outline:none;font-size:0.93rem;cursor:pointer;">
             <option value="">📚 ทุกวิชา</option>
           </select>
-          <select
-            id="tutorFormatFilter"
-            onchange="filterTutors()"
-            style="padding:10px 14px;border-radius:12px;border:1px solid #d0d0e0;
-                   outline:none;font-size:0.93rem;cursor:pointer;"
-          >
+          <select id="tutorFormatFilter" onchange="filterTutors()" style="padding:10px 14px;border-radius:12px;border:1px solid #d0d0e0;
+                   outline:none;font-size:0.93rem;cursor:pointer;">
             <option value="">🖥️ ทุกรูปแบบ</option>
             <option value="online">ออนไลน์</option>
             <option value="onsite">ออนไซต์</option>
@@ -283,6 +282,7 @@
       <button class="btn btn-primary" onclick="scrollToSection('create-post-section')">เริ่มเลยตอนนี้</button>
     </section>
   </div>
-<script src="/assets/student/home_student.js"></script>
+  <script src="/assets/student/home_student.js"></script>
 </body>
+
 </html>

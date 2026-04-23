@@ -45,8 +45,8 @@
 > สามารถใช้ **MySQL Workbench** แทนการพิมพ์คำสั่งผ่าน PowerShell ก็ได้ ผลลัพธ์เหมือนกัน
 
 ```bash
-# clone เฉพาะ branch renovate ลงมาในโฟลเดอร์ชื่อ project
-git clone -b renovate https://github.com/Jupiter4428/Tutor-match.git project
+# clone เฉพาะ branch demo ลงมาในโฟลเดอร์ชื่อ project
+git clone -b demo https://github.com/Jupiter4428/Tutor-match.git project
 
 # เข้าโฟลเดอร์โปรเจกต์
 cd project
@@ -93,6 +93,9 @@ $env:PATH += ";C:\Program Files\MySQL\MySQL Server 9.6\bin"
 # ลองใหม่อีกครั้ง
 mysql --version
 
+# cd เข้าโปรเจค
+cd project
+
 # สร้าง Database (ถ้ามีอยู่แล้วจะข้ามไป ไม่มี error)
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS tutor_match CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 # Enter password: <รหัสผ่าน MySQL ของคุณ>
@@ -124,16 +127,12 @@ SELECT * FROM users;
 SELECT * FROM tutor_profiles;
 SELECT * FROM student_posts WHERE status = 'open';
 
-# ออกจาก MySQL shell
-EXIT;
-
-# รัน .sql file จากใน MySQL shell
-# (ต้องอยู่ใน mysql> prompt ก่อน และใช้ path แบบ forward slash หรือ escape backslash)
-source database/seed.sql
-
 # รัน .sql file จากภายนอก (PowerShell) โดยไม่ต้องเข้า shell
 Get-Content database/seed.sql | mysql -u root -p tutor_match
 # Enter password: <รหัสผ่าน MySQL ของคุณ>
+
+# ออกจาก MySQL shell
+EXIT;
 ```
 
 ---

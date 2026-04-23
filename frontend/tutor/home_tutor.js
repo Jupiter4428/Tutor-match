@@ -1,6 +1,6 @@
-const TOKEN   = localStorage.getItem('token');
+const TOKEN = localStorage.getItem('token');
 const USER_ID = localStorage.getItem('user_id');
-const ROLE    = localStorage.getItem('user_role');
+const ROLE = localStorage.getItem('user_role');
 
 if (!TOKEN || ROLE !== 'tutor') {
   localStorage.clear();
@@ -43,7 +43,7 @@ function formatMap(val) {
 }
 
 function getJobBadge(status) {
-  if (status === 'open')    return '<span class="badge badge-open">เหมาะกับคุณ</span>';
+  if (status === 'open') return '<span class="badge badge-open">เหมาะกับคุณ</span>';
   if (status === 'warning') return '<span class="badge badge-warning">ด่วน</span>';
   return '<span class="badge badge-done">ปิดแล้ว</span>';
 }
@@ -73,9 +73,9 @@ function renderJobs() {
       <div class="item-desc">${job.description || 'ไม่มีรายละเอียดเพิ่มเติม'}</div>
       <div class="item-actions">
         ${applied
-          ? '<span style="color:#35e0a1;font-weight:700">✅ สมัครแล้ว</span>'
-          : `<button class="small-btn accept-btn" onclick="acceptJob(${job.post_id})">รับงานนี้</button>`
-        }
+        ? '<span style="color:#35e0a1;font-weight:700">✅ สมัครแล้ว</span>'
+        : `<button class="small-btn accept-btn" onclick="acceptJob(${job.post_id})">รับงานนี้</button>`
+      }
       </div>
     </div>`;
   }).join('');
@@ -133,16 +133,16 @@ function renderReviews() {
 
 function addReview() {
   const title = prompt('กรอกหัวข้อรีวิว'); if (!title) return;
-  const meta  = prompt('กรอกคะแนน เช่น ⭐ 5.0');  if (!meta) return;
-  const desc  = prompt('กรอกรายละเอียด');          if (!desc) return;
+  const meta = prompt('กรอกคะแนน เช่น ⭐ 5.0'); if (!meta) return;
+  const desc = prompt('กรอกรายละเอียด'); if (!desc) return;
   reviews.unshift({ title, meta, desc });
   renderReviews();
 }
 
 function editReview(i) {
   const r = reviews[i];
-  const t = prompt('แก้ไขหัวข้อ', r.title);   if (t === null) return;
-  const m = prompt('แก้ไขคะแนน', r.meta);     if (m === null) return;
+  const t = prompt('แก้ไขหัวข้อ', r.title); if (t === null) return;
+  const m = prompt('แก้ไขคะแนน', r.meta); if (m === null) return;
   const d = prompt('แก้ไขรายละเอียด', r.desc); if (d === null) return;
   reviews[i] = { title: t, meta: m, desc: d };
   renderReviews();
@@ -155,20 +155,20 @@ function deleteReview(i) {
 }
 
 function updateStats(dashData) {
-  const availableJobs  = dashData?.available_jobs  ?? jobs.length;
-  const teachingNow    = dashData?.teaching_now    ?? 0;
-  const avgRating      = dashData?.avg_rating      ?? 0.0;
-  const monthlyIncome  = dashData?.monthly_income  ?? 0;
-  const incomeDisplay  = monthlyIncome > 0 ? monthlyIncome.toLocaleString('th-TH') + ' ฿' : '-';
+  const availableJobs = dashData?.available_jobs ?? jobs.length;
+  const teachingNow = dashData?.teaching_now ?? 0;
+  const avgRating = dashData?.avg_rating ?? 0.0;
+  const monthlyIncome = dashData?.monthly_income ?? 0;
+  const incomeDisplay = monthlyIncome > 0 ? monthlyIncome.toLocaleString('th-TH') + ' ฿' : '-';
 
-  document.getElementById('heroJobs').textContent       = availableJobs;
-  document.getElementById('heroClasses').textContent    = teachingNow;
-  document.getElementById('heroIncome').textContent     = incomeDisplay;
-  document.getElementById('heroRating').textContent     = avgRating || '-';
+  document.getElementById('heroJobs').textContent = availableJobs;
+  document.getElementById('heroClasses').textContent = teachingNow;
+  document.getElementById('heroIncome').textContent = incomeDisplay;
+  document.getElementById('heroRating').textContent = avgRating || '-';
   document.getElementById('statAvailableJobs').textContent = availableJobs;
-  document.getElementById('statTeachingNow').textContent   = teachingNow;
-  document.getElementById('statIncome').textContent        = incomeDisplay;
-  document.getElementById('statRating').textContent        = avgRating || '-';
+  document.getElementById('statTeachingNow').textContent = teachingNow;
+  document.getElementById('statIncome').textContent = incomeDisplay;
+  document.getElementById('statRating').textContent = avgRating || '-';
 }
 
 function loadJobs(subjectFilter) {
@@ -206,7 +206,7 @@ function loadSchedule() {
       schedules = data.data || [];
       renderSchedules();
       document.getElementById('statTeachingNow').textContent = schedules.length;
-      document.getElementById('heroClasses').textContent     = schedules.length;
+      document.getElementById('heroClasses').textContent = schedules.length;
     })
     .catch(() => { document.getElementById('scheduleList').innerHTML = '<div class="empty-state">โหลดตารางสอนไม่สำเร็จ</div>'; });
 }
