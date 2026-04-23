@@ -71,7 +71,21 @@ CREATE TABLE tutor_profiles (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =========================================================
--- 4) tutor_subjects
+-- 4) tutor_experiences
+-- 4NF: separated from tutor_profiles
+-- =========================================================
+
+-- CREATE TABLE tutor_experiences (
+--     experience_id INT AUTO_INCREMENT PRIMARY KEY,
+--     tutor_id INT NOT NULL,
+--     experience_detail TEXT NOT NULL,
+--     CONSTRAINT fk_tutor_experiences_tutor
+--         FOREIGN KEY (tutor_id) REFERENCES tutor_profiles(tutor_id)
+--         ON DELETE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =========================================================
+-- 5) tutor_subjects
 -- BCNF: composite PK prevents duplicate subjects per tutor
 -- =========================================================
 CREATE TABLE tutor_subjects (
@@ -84,7 +98,7 @@ CREATE TABLE tutor_subjects (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =========================================================
--- 5) student_posts
+-- 6) student_posts
 -- Student job posts + moderation fields
 -- =========================================================
 CREATE TABLE student_posts (
@@ -108,7 +122,7 @@ CREATE TABLE student_posts (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =========================================================
--- 6) applications
+-- 7) applications
 -- Unique apply per (post, tutor)
 -- Added teaching_status to support review gating after class completion
 -- =========================================================
@@ -129,7 +143,7 @@ CREATE TABLE applications (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =========================================================
--- 7) tutor_schedules
+-- 8) tutor_schedules
 -- Removed is_booked because booking status is derived from schedule_bookings
 -- =========================================================
 CREATE TABLE tutor_schedules (
@@ -145,7 +159,7 @@ CREATE TABLE tutor_schedules (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =========================================================
--- 8) schedule_bookings
+-- 9) schedule_bookings
 -- One schedule slot can only be booked once
 -- One application may book multiple schedule slots
 -- =========================================================
@@ -163,7 +177,7 @@ CREATE TABLE schedule_bookings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =========================================================
--- 9) reviews
+-- 10) reviews
 -- 3NF: reference only app_id + moderation fields
 -- =========================================================
 CREATE TABLE reviews (
@@ -181,7 +195,7 @@ CREATE TABLE reviews (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =========================================================
--- 10) payments
+-- 11) payments
 -- 3NF: reference only app_id + slip verification fields
 -- =========================================================
 CREATE TABLE payments (
@@ -207,7 +221,7 @@ CREATE TABLE payments (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =========================================================
--- 11) user_action_logs
+-- 12) user_action_logs
 -- Flexible audit trail for admin operations
 -- =========================================================
 CREATE TABLE user_action_logs (
