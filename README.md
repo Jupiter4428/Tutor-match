@@ -21,17 +21,19 @@
 ระบบผ่านการทำ **Normalization (3NF, BCNF, 4NF)** เพื่อลดความซ้ำซ้อนและรองรับความปลอดภัย
 
 <details>
-<summary><b>🔎 คลิกเพื่อดูรายละเอียด 13 ตาราง</b></summary>
+<summary><b>🔎 คลิกเพื่อดูรายละเอียด 12 ตาราง</b></summary>
 
-| หมวดหมู่ | รายชื่อตาราง (Tables) | รายละเอียดตามหลัก Normalization |
+| หมวดหมู่ | รายชื่อตาราง (Tables) | รายละเอียด |
 | :--- | :--- | :--- |
-| **Identity** | `User`, `User_Role` | ระบบบัญชีผู้ใช้: เก็บข้อมูลพื้นฐาน (ชื่อ, อีเมล, รหัสผ่าน) และกำหนดสิทธิ์ว่าใครเป็น "นักเรียน" หรือ "ติวเตอร์" |
-| **Profile** | `Student_Profile`, `Tutor_Profile` | ข้อมูลส่วนตัว: เก็บรายละเอียดเฉพาะทาง เช่น นักเรียนอยู่ชั้นไหน/โรงเรียนอะไร และติวเตอร์มีประวัติย่อ (Bio) พร้อมราคาค่าสอนเท่าไหร่ |
-| **Post** | `Student_Post` | กระดานประกาศ: พื้นที่ให้นักเรียนลงประกาศหาติวเตอร์ โดยระบุวิชาที่อยากเรียน รายละเอียด และงบประมาณที่มี |
-| **Job** | `Application`, `Schedule_Booking` | ระบบสมัครและจองตัว: ใช้บันทึกว่าติวเตอร์คนไหนสมัครสอนในโพสต์ไหนบ้าง และเมื่อตกลงกันได้แล้วจะใช้จองวัน-เวลาเรียนเพื่อไม่ให้คิวชนกัน |
-| **Review** | `Review` | ระบบประเมิน: ให้นักเรียนให้คะแนน (Rating) และเขียนคำชม/ข้อเสนอแนะหลังจากเรียนจบ เพื่อสร้างความน่าเชื่อถือให้ติวเตอร์ |
-| **Finance** | `Payment` | ระบบการเงิน: บันทึกยอดชำระเงินจากนักเรียน คํานวณค่าธรรมเนียมระบบ และติดตามสถานะว่าจ่ายเงินเรียบร้อยแล้วหรือยัง |
-| **Details** | `Tutor_Experience`, `Tutor_Subject`, `Tutor_Certificate` | แฟ้มผลงานติวเตอร์: เก็บข้อมูลเสริมที่ช่วยในการตัดสินใจ เช่น ประสบการณ์ที่เคยสอนมา, รายชื่อวิชาที่ถนัดทั้งหมด และใบเซอร์ฯ ต่างๆ |
+| **Identity** | `users` | Single-role design — เก็บชื่อ, อีเมล, bcrypt password hash และ role (`admin` / `student` / `tutor`) พร้อม account lifecycle (`active` / `suspended` / `deleted`) |
+| **Profile** | `student_profiles`, `tutor_profiles` | ข้อมูลเฉพาะทางแยกตาม role — นักเรียน: โรงเรียน, ระดับการศึกษา / ติวเตอร์: bio, ราคาค่าสอน, สถานะ verify (`pending` / `verified` / `rejected`) |
+| **Tutor Details** | `tutor_experiences`, `tutor_subjects` | 4NF: แยก multi-value attribute ออกจาก tutor_profiles — `tutor_subjects` ใช้ Composite PK `(tutor_id, subject)` ป้องกันวิชาซ้ำ (BCNF) |
+| **Post** | `student_posts` | กระดานประกาศหาติวเตอร์ — ระบุวิชา, ระดับ, รูปแบบการเรียน (`online` / `onsite` / `both`), สถานที่, เวลา, งบประมาณ และ moderation fields |
+| **Job** | `applications` | ติวเตอร์สมัครงาน — Unique constraint `(post_id, tutor_id)` ป้องกัน apply ซ้ำ มี `teaching_status` (`not_started` / `ongoing` / `completed`) เพื่อ gate การเขียนรีวิว |
+| **Schedule** | `tutor_schedules`, `schedule_bookings` | ตารางเวลาว่างของติวเตอร์ — `schedule_bookings` มี Unique constraint บน `schedule_id` ป้องกันการจองซ้ำ |
+| **Review** | `reviews` | 3NF: อ้างอิงผ่าน `app_id` เท่านั้น — rating 1–5 พร้อม moderation fields (`is_hidden`, `moderation_reason`) |
+| **Finance** | `payments` | 3NF: อ้างอิงผ่าน `app_id` — คำนวณ `platform_fee = amount × 10%` บังคับด้วย CHECK constraint, รองรับ slip verification |
+| **Audit** | `user_action_logs` | Flexible audit trail สำหรับ admin — บันทึกทุก action บน user, post, review, payment พร้อม `performed_by` |
 
 </details>
 
@@ -39,145 +41,189 @@
 
 ### วิธีการ Clone Project Using PowerShell
 
+> ⚠️ ต้องติดตั้ง **Python 3.10+** และ **MySQL 9.6** ก่อนเริ่มต้น
+> สามารถใช้ **MySQL Workbench** แทนการพิมพ์คำสั่งผ่าน PowerShell ก็ได้ ผลลัพธ์เหมือนกัน
+
 ```bash
-# git clone
+# clone เฉพาะ branch renovate ลงมาในโฟลเดอร์ชื่อ project
 git clone -b renovate https://github.com/Jupiter4428/Tutor-match.git project
 
-# ไปที่โฟลเดอร์โปรเจกต์
+# เข้าโฟลเดอร์โปรเจกต์
 cd project
 
-# สร้าง venv ใหม่
+# สร้าง virtual environment ใหม่ (แนะนำให้ทำทุกครั้งที่ clone ใหม่)
 python -m venv venv
 
-# เปิดใช้งาน
+# อนุญาตให้รัน script ใน PowerShell (ทำครั้งเดียวต่อเครื่อง)
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# เปิดใช้งาน venv — prompt จะเปลี่ยนเป็น (venv) ด้านหน้า
 .\venv\Scripts\activate
 
-
-# ติดตั้ง Library 
+# ติดตั้ง library ทั้งหมดจาก requirements.txt
+# ถ้าเพิ่ม library ใหม่ทีหลัง ให้รัน pip freeze > requirements.txt แล้ว commit ด้วย
 pip install -r requirements.txt
 
-# setup .env
+# สร้างไฟล์ .env จาก template
 copy .env.example .env
-# ห้ามลืมแก้ค่าในไฟล์ .env 
+# ⚠️ เปิดไฟล์ .env แล้วแก้ค่าต่อไปนี้ให้ตรงกับเครื่องของตัวเอง:
+#   DB_HOST     = localhost
+#   DB_PORT     = 3306
+#   DB_USER     = root
+#   DB_PASSWORD = <รหัสผ่าน MySQL ของคุณ>
+#   DB_NAME     = tutor_match
+#   SECRET_KEY  = <สตริงยาวๆ สุ่มขึ้นมาเอง เช่น openssl rand -hex 32>
 ```
-### ****** ต้องทำการติดตั้ง MySQL version 9.6 ก่อนการทดสอบระบบ ******
-### ****** สามารถติดตั้ง MySQL Workbench แทนการใช้งาน MySQL แบบ PowerShell ได้ ******
-### ****** อย่าลืมใส่ข้อมูล MySQL ของคุณในไฟล์ .env ******
+
+---
+
 ### Setup Database Using PowerShell
 
-```bash
-# ผ่าน PowerShell using MySql version 9.6
-# ทดสอบก่อนว่ามี PATH MySql ในเครื่องหรือยัง
-mysql --version
-# ถ้าไม่ขึ้น version ให้เพิ่ม PATH ก่อน
+> ⚠️ ต้องทำขั้นตอนนี้ **ก่อนรัน server** และทำแค่ **ครั้งเดียว** (ถ้า drop database แล้วสร้างใหม่ค่อยทำซ้ำ)
 
-# เพิ่ม PATH ให้ถูก version (ถ้ายังไม่มี PATH)
+```bash
+# ทดสอบก่อนว่า MySQL อยู่ใน PATH หรือยัง
+mysql --version
+# ถ้าขึ้น "mysql  Ver 9.6.x ..." แสดงว่าพร้อมแล้ว ข้ามไปขั้นถัดไปได้เลย
+
+# ถ้าไม่ขึ้น version ให้เพิ่ม PATH ชั่วคราวสำหรับ session นี้ก่อน
+# (เปลี่ยน 9.6 เป็น version ที่ติดตั้งจริงในเครื่องถ้าต่างกัน)
 $env:PATH += ";C:\Program Files\MySQL\MySQL Server 9.6\bin"
 
-# ทดสอบ
+# ลองใหม่อีกครั้ง
 mysql --version
-# ถ้าขึ้น version ไปต่อ
 
-# เข้าโฟล์เดอร์โปรเจคก่อน
-cd project
+# สร้าง Database (ถ้ามีอยู่แล้วจะข้ามไป ไม่มี error)
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS tutor_match CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+# Enter password: <รหัสผ่าน MySQL ของคุณ>
 
-# สร้าง Database ก่อน
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS tutor_match;"
-# Enter password: <your password>
-
-# รัน Schema script
+# รัน schema.sql เพื่อสร้าง table ทั้งหมด (12 ตาราง)
+# --default-character-set=utf8mb4 จำเป็นมากเพราะไฟล์มีภาษาไทย
 cmd /c "mysql --default-character-set=utf8mb4 -u root -p tutor_match < database/schema.sql"
-# Enter password: <your password>
+# Enter password: <รหัสผ่าน MySQL ของคุณ>
 
+# (ไม่บังคับ) เพิ่มข้อมูลตัวอย่างสำหรับ dev/testing
+cmd /c "mysql --default-character-set=utf8mb4 -u root -p tutor_match < database/seed.sql"
+# Enter password: <รหัสผ่าน MySQL ของคุณ>
 ```
+
+---
+
 ### Using Database in PowerShell
+
 ```bash
-# เข้าใช้งาน MySQL
+# เข้า MySQL shell
 mysql -u root -p
-# Enter password: <your password>
+# Enter password: <รหัสผ่าน MySQL ของคุณ>
 
-# run some sql qurey
+# เลือก database ที่จะใช้งาน (ต้องทำทุกครั้งที่เข้า shell ใหม่)
 USE tutor_match;
+
+# ตัวอย่าง query ที่ใช้บ่อย
 SELECT * FROM users;
+SELECT * FROM tutor_profiles;
+SELECT * FROM student_posts WHERE status = 'open';
 
-# run Script sql
-# ไปที่โฟลเดอร์ที่สคริป sql อยู่
-cd project
+# ออกจาก MySQL shell
+EXIT;
 
-# ข้างใน mysql
-source file.sql
+# รัน .sql file จากใน MySQL shell
+# (ต้องอยู่ใน mysql> prompt ก่อน และใช้ path แบบ forward slash หรือ escape backslash)
+source database/seed.sql
 
-# In PowerShell
-# ไปที่โฟลเดอร์ที่สคริป sql อยู่
-cd project
-Get-Content file.sql | <mysql -u root -p Schema_name>
-Enter password: <your password>
+# รัน .sql file จากภายนอก (PowerShell) โดยไม่ต้องเข้า shell
+Get-Content database/seed.sql | mysql -u root -p tutor_match
+# Enter password: <รหัสผ่าน MySQL ของคุณ>
 ```
+
+---
+
 ### Some Script sql for testing in MySQL
-```bash
-# คำสั่งล้างข้อมูล (ไม่ลบ table)
+
+```sql
+-- ล้างข้อมูลทั้งหมดแต่คง table structure ไว้ (ใช้ตอน reset ข้อมูล dev)
+-- ต้องปิด foreign key check ก่อนเพราะ table มี constraint ซึ่งกันและกัน
 SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE user_action_logs;
+TRUNCATE TABLE payments;
 TRUNCATE TABLE reviews;
+TRUNCATE TABLE schedule_bookings;
+TRUNCATE TABLE tutor_schedules;
 TRUNCATE TABLE applications;
 TRUNCATE TABLE student_posts;
+TRUNCATE TABLE tutor_subjects;
+TRUNCATE TABLE tutor_experiences;
 TRUNCATE TABLE tutor_profiles;
 TRUNCATE TABLE student_profiles;
 TRUNCATE TABLE users;
 SET FOREIGN_KEY_CHECKS = 1;
 
-# add super user
+-- เพิ่ม admin user สำหรับ dev (รหัสผ่าน: 1234)
+-- hash นี้เป็น bcrypt $2y$ format จาก PHP ซึ่ง backend รองรับแล้ว
 USE tutor_match;
-INSERT INTO users (name, email, password_hash, role, account_status) 
+INSERT INTO users (name, email, password_hash, role, account_status)
 VALUES (
-    'superuser', 
-    'admin@tutormatch.com', 
-    '$2y$10$Wz/1MRBMFauEtGdJNeaKq.5INBmig0Nip2urekRON8ekLkYesdj6i', -- bcrypt hash สำหรับรหัสผ่าน '1234'
-    'admin', 
+    'superuser',
+    'admin@tutormatch.com',
+    '$2y$10$Wz/1MRBMFauEtGdJNeaKq.5INBmig0Nip2urekRON8ekLkYesdj6i',
+    'admin',
     'active'
 );
-
 ```
+
+---
+
 ### Runserver
-```bash
-# ไปที่โฟลเดอร์โปรเจกต์
-cd project
 
-# รัน server
+```bash
+# ตรวจสอบก่อนว่า venv เปิดอยู่ (ต้องเห็น (venv) นำหน้า prompt)
+# ถ้ายังไม่เปิดให้รัน: .\venv\Scripts\activate
+
+# รัน Flask development server — เปิดที่ http://127.0.0.1:5000
 python run.py
+
+# หน้าเว็บที่ใช้ได้:
+#   http://127.0.0.1:5000/          → redirect ไป login
+#   http://127.0.0.1:5000/login     → หน้า login
+#   http://127.0.0.1:5000/register  → หน้าสมัครสมาชิก
+#   http://127.0.0.1:5000/home/student  → หน้าหลักนักเรียน (ต้อง login ก่อน)
+#   http://127.0.0.1:5000/home/tutor    → หน้าหลักติวเตอร์ (ต้อง login ก่อน)
+#   http://127.0.0.1:5000/home/admin    → dashboard admin (ต้อง login ก่อน)
 ```
+
+---
+
 ### ขั้นตอนการ push
 
 ```bash
-# ไปที่โฟลเดอร์โปรเจกต์
-cd project
-
-# pull ก่อน push เสมอ (update code)
-git pull หรือ
-git pull origin <ระบุชื่อ branch>
-
-# หากเจอ Merge Conflict ก็แก้ไฟล์นั้นก่อน แล้วค่อย add & commit ทีละไฟล์
-git add <ชื่อไฟล์>
-git commit -m "Resolve merge conflict in <ชื่อไฟล์>"
-
-# หากมีการติดตั้ง library เพิ่มเติม
-pip freeze > requirements.txt
-
-# ถ้าอยากสร้าง Branch ใหม่
-git checkout -b <Branch_Name>
-
-# เช็คก่อนว่าตอนนี้อยู่ Branch ไหน
+# เช็คก่อนว่าตอนนี้อยู่ branch อะไร
 git branch
-
-# หากขึ้นว่าอยู่ Branch อื่นที่ไม่ใช่ Branch นี้ก็สลับมา Branch นี (renovate)
-# หรือจะ push ขึ้น branch อื่นก็แล้วแต่เลย demo ได้อิสระ
+# ต้องเห็น * renovate — ถ้าไม่ใช่ให้สลับก่อน
 git checkout renovate
 
-# add file & commit ตามปกติ
-git add <ชื่อไฟล์>
-git commit -m "commit comments"
+# pull ก่อนทุกครั้งเพื่อ sync code ล่าสุดจาก remote
+# ป้องกัน conflict ที่ไม่จำเป็นตอน push
+git pull origin renovate
 
-# gitpush
+# ถ้าเจอ Merge Conflict หลัง pull ให้แก้ไฟล์นั้นก่อน
+# หลังแก้เสร็จให้ mark ว่า resolved ด้วย git add
+git add <ชื่อไฟล์ที่แก้ conflict>
+git commit -m "resolve merge conflict in <ชื่อไฟล์>"
+
+# ถ้าติดตั้ง library เพิ่มเติมในระหว่าง dev อย่าลืม update requirements.txt
+pip freeze > requirements.txt
+git add requirements.txt
+git commit -m "update requirements.txt"
+
+# add และ commit ทีละไฟล์ (แนะนำ) เพื่อให้ history อ่านง่าย
+git add <ชื่อไฟล์>
+git commit -m "อธิบายสั้นๆ ว่าแก้อะไร"
+
+# ถ้ามีหลายไฟล์ที่เกี่ยวกันก็ add พร้อมกันแล้ว commit ครั้งเดียวได้
+git add <ไฟล์1> <ไฟล์2>
+git commit -m "อธิบายการเปลี่ยนแปลงที่เกี่ยวข้องกัน"
+
+# push ขึ้น remote
 git push origin renovate
 ```
 <table align="center" style="width: 100%; border-collapse: collapse;">
