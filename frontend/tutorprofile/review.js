@@ -1,6 +1,6 @@
 const modal = document.getElementById('reviewModal');
 
-function openModal()  { modal.classList.add('active'); }
+function openModal() { modal.classList.add('active'); }
 function closeModal() { modal.classList.remove('active'); }
 
 window.addEventListener('click', e => { if (e.target === modal) closeModal(); });

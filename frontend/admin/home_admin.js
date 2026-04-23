@@ -12,7 +12,7 @@ let reports = [];
 const token = localStorage.getItem("token");
 const apiHeaders = {
     "Content-Type": "application/json",
-    "Authorization": `Bearer ${token}`
+    Authorization: `Bearer ${token}`,
 };
 
 // --- ส่วนที่ 1: การดึงข้อมูลจาก API (/admin/...) ---
@@ -20,7 +20,7 @@ const apiHeaders = {
 /** ดึงสถิติตัวเลขสรุปทั้งหมด */
 async function fetchStats() {
     try {
-        const response = await fetch('/admin/stats', { headers: apiHeaders });
+        const response = await fetch("/admin/stats", { headers: apiHeaders });
         const result = await response.json();
 
         if (result.status === "success") {
@@ -38,8 +38,10 @@ async function fetchStats() {
             document.getElementById("heroReports").textContent = data.reports;
 
             // อัปเดตตัวเลข Badge ด้านล่าง
-            document.getElementById("pendingBadgeCount").textContent = `${data.pending} รายการ`;
-            document.getElementById("bannedBadgeCount").textContent = `${data.banned} รายการ`;
+            document.getElementById("pendingBadgeCount").textContent =
+                `${data.pending} รายการ`;
+            document.getElementById("bannedBadgeCount").textContent =
+                `${data.banned} รายการ`;
         } else {
             console.error("Failed to fetch stats:", result.message);
         }
@@ -51,7 +53,7 @@ async function fetchStats() {
 /** ดึงรายชื่อผู้ใช้ทั้งหมด */
 async function fetchUsers() {
     try {
-        const response = await fetch('/admin/users', { headers: apiHeaders });
+        const response = await fetch("/admin/users", { headers: apiHeaders });
         const result = await response.json();
 
         if (result.status === "success") {
@@ -66,7 +68,7 @@ async function fetchUsers() {
 /** ดึงรายการรายงานปัญหา */
 async function fetchReports() {
     try {
-        const response = await fetch('/admin/reports', { headers: apiHeaders });
+        const response = await fetch("/admin/reports", { headers: apiHeaders });
         const result = await response.json();
 
         if (result.status === "success") {
@@ -82,14 +84,14 @@ async function fetchReports() {
 
 /** อนุมัติผู้ใช้ (เปลี่ยนสถานะเป็น active) */
 async function approveUser(id) {
-    const user = users.find(u => u.id === id);
+    const user = users.find((u) => u.id === id);
     if (!user) return;
 
     try {
-        const response = await fetch('/admin/users/status', {
-            method: 'POST',
+        const response = await fetch("/admin/users/status", {
+            method: "POST",
             headers: apiHeaders,
-            body: JSON.stringify({ user_id: id, status: 'approved' })
+            body: JSON.stringify({ user_id: id, status: "approved" }),
         });
         const result = await response.json();
 
@@ -106,20 +108,20 @@ async function approveUser(id) {
 
 /** ระงับการใช้งานผู้ใช้ (เปลี่ยนสถานะเป็น ban) */
 async function banUser(id) {
-    const user = users.find(u => u.id === id);
+    const user = users.find((u) => u.id === id);
     if (!user) return;
 
     if (!confirm(`ต้องการระงับผู้ใช้ ${user.name} ใช่หรือไม่?`)) return;
 
     try {
-        const response = await fetch('/admin/users/status', {
-            method: 'POST',
+        const response = await fetch("/admin/users/status", {
+            method: "POST",
             headers: apiHeaders,
-            body: JSON.stringify({ 
-                user_id: id, 
-                status: 'banned', 
-                reason: 'ถูกระงับโดยผู้ดูแลระบบ' 
-            })
+            body: JSON.stringify({
+                user_id: id,
+                status: "banned",
+                reason: "ถูกระงับโดยผู้ดูแลระบบ",
+            }),
         });
         const result = await response.json();
 
@@ -155,11 +157,14 @@ function getStatusBadge(status) {
 
 /** กรองรายชื่อผู้ใช้จากคำค้นหาและ Filter */
 function filterUsers() {
-    const search = document.getElementById("searchInput").value.toLowerCase().trim();
+    const search = document
+        .getElementById("searchInput")
+        .value.toLowerCase()
+        .trim();
     const role = document.getElementById("roleFilter").value;
     const status = document.getElementById("statusFilter").value;
 
-    filteredUsers = users.filter(user => {
+    filteredUsers = users.filter((user) => {
         const uName = (user.name || "").toLowerCase();
         const uEmail = (user.email || "").toLowerCase();
 
@@ -168,9 +173,18 @@ function filterUsers() {
 
         // ตรวจสอบเงื่อนไขสถานะให้ตรงกับ UI Filter
         let filterStatus = "all";
-        if (status === "approved" && (user.status === "active" || user.status === "approved")) filterStatus = status;
-        if (status === "banned" && (user.status === "ban" || user.status === "suspended")) filterStatus = status;
-        if (status === "pending" && user.status === "pending") filterStatus = status;
+        if (
+            status === "approved" &&
+            (user.status === "active" || user.status === "approved")
+        )
+            filterStatus = status;
+        if (
+            status === "banned" &&
+            (user.status === "ban" || user.status === "suspended")
+        )
+            filterStatus = status;
+        if (status === "pending" && user.status === "pending")
+            filterStatus = status;
 
         const matchStatus = status === "all" ? true : filterStatus === status;
 
@@ -187,13 +201,15 @@ function renderUsers() {
         tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#aab3dd; padding: 20px;">ไม่พบข้อมูลผู้ใช้</td></tr>`;
         return;
     }
-    tbody.innerHTML = filteredUsers.map(user => `
+    tbody.innerHTML = filteredUsers
+        .map(
+            (user) => `
         <tr>
             <td>${user.name}</td>
             <td>${user.email}</td>
             <td>${getRoleText(user.role)}</td>
             <td>${getStatusBadge(user.status)}</td>
-            <td>${user.createdAt || '-'}</td>
+            <td>${user.createdAt || "-"}</td>
             <td>
                 <div class="action-buttons">
                     <button class="small-btn view-btn" onclick="viewUser(${user.id})">ดู</button>
@@ -202,7 +218,9 @@ function renderUsers() {
                 </div>
             </td>
         </tr>
-    `).join("");
+    `,
+        )
+        .join("");
 }
 
 /** แสดงผลรายการรายงานปัญหา */
@@ -212,7 +230,9 @@ function renderReports() {
         reportList.innerHTML = `<div style="text-align:center; padding: 20px; color:#aab3dd;">ไม่มีรายงานปัญหาใหม่ 🎉</div>`;
         return;
     }
-    reportList.innerHTML = reports.map(item => `
+    reportList.innerHTML = reports
+        .map(
+            (item) => `
         <div class="report-card">
             <div class="report-top">
                 <div>
@@ -223,15 +243,19 @@ function renderReports() {
             </div>
             <div class="report-desc">${item.desc}</div>
         </div>
-    `).join("");
+    `,
+        )
+        .join("");
 }
 
 // --- ส่วนที่ 4: Navigation และเครื่องมือ Dashboard ---
 
 function viewUser(id) {
-    const user = users.find(u => u.id === id);
+    const user = users.find((u) => u.id === id);
     if (!user) return;
-    alert(`[ข้อมูลผู้ใช้]\nชื่อ: ${user.name}\nอีเมล: ${user.email}\nบทบาท: ${getRoleText(user.role)}\nสถานะ: ${user.status}`);
+    alert(
+        `[ข้อมูลผู้ใช้]\nชื่อ: ${user.name}\nอีเมล: ${user.email}\nบทบาท: ${getRoleText(user.role)}\nสถานะ: ${user.status}`,
+    );
 }
 
 function scrollToSection(id) {
@@ -261,12 +285,18 @@ document.getElementById("logout").addEventListener("click", function () {
 
 // ข้อมูลกิจกรรมล่าสุด (Mock ข้อมูลไว้ก่อนจนกว่าจะทำตาราง logs)
 const activities = [
-    { title: "ระบบเชื่อมต่อสำเร็จ", meta: "เมื่อสักครู่", desc: "Admin Dashboard ทำการดึงข้อมูลจาก Database เรียบร้อยแล้ว" }
+    {
+        title: "ระบบเชื่อมต่อสำเร็จ",
+        meta: "เมื่อสักครู่",
+        desc: "Admin Dashboard ทำการดึงข้อมูลจาก Database เรียบร้อยแล้ว",
+    },
 ];
 
 function renderActivities() {
     const activityList = document.getElementById("activityList");
-    activityList.innerHTML = activities.map(item => `
+    activityList.innerHTML = activities
+        .map(
+            (item) => `
         <div class="activity-card">
             <div class="activity-top">
                 <div>
@@ -277,7 +307,9 @@ function renderActivities() {
             </div>
             <div class="activity-desc">${item.desc}</div>
         </div>
-    `).join("");
+    `,
+        )
+        .join("");
 }
 
 // เรียกใช้งานฟังก์ชันเริ่มต้น

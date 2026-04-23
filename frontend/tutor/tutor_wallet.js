@@ -37,7 +37,7 @@ async function loadWalletData() {
       currentWalletBalance.textContent = formatCurrency(currentBalance);
       // รีเซ็ตการคำนวณสรุปด้านล่าง
       updateWithdrawSummary(withdrawAmountInput.value);
-      
+
       // (Option) ถ้ามีส่วนแสดงประวัติธุรกรรม สามารถเพิ่มการ render ตรงนี้ได้
       // renderTransactions(result.data.transactions);
     }
