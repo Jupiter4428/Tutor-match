@@ -1,4 +1,6 @@
 # tutor_routes.py
+import os
+import uuid
 from backend.services.tutor_service import (
     get_tutor_profile,
     update_tutor_profile
@@ -12,6 +14,7 @@ from backend.services.tutor_service import (
     get_tutor_dashboard_stats,
     get_tutor_schedule,
 )
+from werkzeug.utils import secure_filename
 
 tutor_bp = Blueprint('tutor', __name__)
 
@@ -80,6 +83,8 @@ def schedule():
 # Tutor Profile API
 # =========================
 
+
+# GET /tutor/profile — ดึงข้อมูลโปรไฟล์ติวเตอร์ของ user ที่ login อยู่
 @tutor_bp.route("/profile", methods=["GET"])
 @token_required
 @role_required("tutor")
@@ -88,19 +93,46 @@ def get_profile():
     return jsonify(result)
 
 
+# PUT /tutor/profile — อัปเดตข้อมูลโปรไฟล์ติวเตอร์ (รวมรูปโปรไฟล์)
 @tutor_bp.route("/profile", methods=["PUT"])
 @token_required
 @role_required("tutor")
 def update_profile():
-    data = request.json
 
-    bio = data.get("bio")
-    hourly_rate = data.get("hourly_rate")
+    bio = request.form.get("bio")
+    hourly_rate = request.form.get("hourly_rate")
+    profile_file = request.files.get("profile_picture")
+
+    filename = None
+
+    if profile_file:
+        original_filename = secure_filename(
+            profile_file.filename
+        )
+
+        file_ext = os.path.splitext(
+            original_filename
+        )[1]
+
+        filename = f"{uuid.uuid4()}{file_ext}"
+
+        upload_folder = "static/uploads"
+
+        if not os.path.exists(upload_folder):
+            os.makedirs(upload_folder)
+
+        upload_path = os.path.join(
+            upload_folder,
+            filename
+        )
+
+        profile_file.save(upload_path)
 
     result = update_tutor_profile(
         request.user_id,
         bio,
-        hourly_rate
+        hourly_rate,
+        filename
     )
 
     return jsonify(result)

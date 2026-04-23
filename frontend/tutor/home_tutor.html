@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tutor Home - Tutor Match</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
 
   <style>
     * {
@@ -18,7 +20,7 @@
 
     :root {
       --bg-main: linear-gradient(135deg, #0c1020 0%, #101937 28%, #1a1d4e 58%, #0a1228 100%);
-      --border: rgba(255,255,255,0.14);
+      --border: rgba(255, 255, 255, 0.14);
       --text-main: #ffffff;
       --text-soft: #d7dcff;
       --text-fade: #aab4e4;
@@ -29,7 +31,7 @@
       --green: #35e0a1;
       --yellow: #ffd54a;
       --danger: #ff5f7a;
-      --shadow: 0 24px 60px rgba(0,0,0,0.35);
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
     }
 
     body {
@@ -95,7 +97,7 @@
       flex-wrap: wrap;
       padding: 18px 22px;
       margin-bottom: 28px;
-      background: rgba(255,255,255,0.07);
+      background: rgba(255, 255, 255, 0.07);
       backdrop-filter: blur(18px);
       border: 1px solid var(--border);
       border-radius: 24px;
@@ -117,7 +119,7 @@
       align-items: center;
       justify-content: center;
       font-size: 28px;
-      box-shadow: 0 10px 28px rgba(138,99,255,0.35);
+      box-shadow: 0 10px 28px rgba(138, 99, 255, 0.35);
     }
 
     .brand-text h1 {
@@ -154,22 +156,22 @@
 
     .btn-primary {
       background: linear-gradient(135deg, var(--pink), var(--purple));
-      box-shadow: 0 10px 24px rgba(255,79,216,0.24);
+      box-shadow: 0 10px 24px rgba(255, 79, 216, 0.24);
     }
 
     .btn-secondary {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
     .btn-danger {
       background: linear-gradient(135deg, #ff5f7a, #ff2e63);
-      box-shadow: 0 10px 24px rgba(255,95,122,0.22);
+      box-shadow: 0 10px 24px rgba(255, 95, 122, 0.22);
     }
 
     .btn-edit-profile {
       background: linear-gradient(135deg, #4da8ff, #8a63ff);
-      box-shadow: 0 10px 24px rgba(77,168,255,0.24);
+      box-shadow: 0 10px 24px rgba(77, 168, 255, 0.24);
     }
 
     .hero {
@@ -182,9 +184,9 @@
     .hero-left,
     .hero-right,
     .card {
-      background: rgba(255,255,255,0.08);
+      background: rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 28px;
       box-shadow: var(--shadow);
     }
@@ -203,7 +205,7 @@
       width: 220px;
       height: 220px;
       border-radius: 50%;
-      background: linear-gradient(135deg, rgba(255,79,216,0.28), rgba(77,168,255,0.18));
+      background: linear-gradient(135deg, rgba(255, 79, 216, 0.28), rgba(77, 168, 255, 0.18));
       filter: blur(8px);
     }
 
@@ -213,8 +215,8 @@
       gap: 10px;
       padding: 10px 16px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       margin-bottom: 18px;
       font-size: 0.92rem;
     }
@@ -260,8 +262,8 @@
     .mini-stat {
       padding: 18px;
       border-radius: 20px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .mini-stat h3 {
@@ -292,8 +294,8 @@
     .highlight-box {
       padding: 18px;
       border-radius: 18px;
-      background: linear-gradient(135deg, rgba(123,97,255,0.24), rgba(55,231,255,0.15));
-      border: 1px solid rgba(255,255,255,0.12);
+      background: linear-gradient(135deg, rgba(123, 97, 255, 0.24), rgba(55, 231, 255, 0.15));
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
     .highlight-box strong {
@@ -317,8 +319,8 @@
     .quick-btn {
       padding: 16px;
       border-radius: 18px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       color: white;
       cursor: pointer;
       text-align: left;
@@ -327,7 +329,7 @@
 
     .quick-btn:hover {
       transform: translateY(-3px);
-      background: rgba(255,255,255,0.1);
+      background: rgba(255, 255, 255, 0.1);
     }
 
     .quick-btn .icon {
@@ -346,9 +348,9 @@
     .overview-card {
       padding: 24px;
       border-radius: 24px;
-      background: rgba(255,255,255,0.08);
+      background: rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       box-shadow: var(--shadow);
       transition: 0.25s ease;
     }
@@ -368,10 +370,21 @@
       margin-bottom: 14px;
     }
 
-    .pink { background: rgba(255,79,216,0.16); }
-    .blue { background: rgba(77,168,255,0.16); }
-    .green { background: rgba(53,224,161,0.16); }
-    .yellow { background: rgba(255,213,74,0.16); }
+    .pink {
+      background: rgba(255, 79, 216, 0.16);
+    }
+
+    .blue {
+      background: rgba(77, 168, 255, 0.16);
+    }
+
+    .green {
+      background: rgba(53, 224, 161, 0.16);
+    }
+
+    .yellow {
+      background: rgba(255, 213, 74, 0.16);
+    }
 
     .overview-card h3 {
       font-size: 2rem;
@@ -434,7 +447,7 @@
     }
 
     .list-box::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.18);
+      background: rgba(255, 255, 255, 0.18);
       border-radius: 999px;
     }
 
@@ -443,8 +456,8 @@
     .review-card {
       padding: 18px;
       border-radius: 20px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       transition: 0.25s ease;
     }
 
@@ -452,7 +465,7 @@
     .schedule-card:hover,
     .review-card:hover {
       transform: translateY(-3px);
-      background: rgba(255,255,255,0.09);
+      background: rgba(255, 255, 255, 0.09);
     }
 
     .item-top {
@@ -492,21 +505,21 @@
     }
 
     .badge-open {
-      background: rgba(53,224,161,0.16);
+      background: rgba(53, 224, 161, 0.16);
       color: #a9ffdb;
-      border: 1px solid rgba(53,224,161,0.24);
+      border: 1px solid rgba(53, 224, 161, 0.24);
     }
 
     .badge-warning {
-      background: rgba(255,213,74,0.14);
+      background: rgba(255, 213, 74, 0.14);
       color: #ffe68d;
-      border: 1px solid rgba(255,213,74,0.24);
+      border: 1px solid rgba(255, 213, 74, 0.24);
     }
 
     .badge-done {
-      background: rgba(77,168,255,0.16);
+      background: rgba(77, 168, 255, 0.16);
       color: #bfe1ff;
-      border: 1px solid rgba(77,168,255,0.24);
+      border: 1px solid rgba(77, 168, 255, 0.24);
     }
 
     .item-actions {
@@ -530,34 +543,34 @@
     }
 
     .view-btn {
-      background: rgba(77,168,255,0.16);
+      background: rgba(77, 168, 255, 0.16);
       color: #bfe1ff;
-      border: 1px solid rgba(77,168,255,0.24);
+      border: 1px solid rgba(77, 168, 255, 0.24);
     }
 
     .accept-btn {
-      background: rgba(53,224,161,0.16);
+      background: rgba(53, 224, 161, 0.16);
       color: #a9ffdb;
-      border: 1px solid rgba(53,224,161,0.24);
+      border: 1px solid rgba(53, 224, 161, 0.24);
     }
 
     .message-btn {
-      background: rgba(255,79,216,0.14);
+      background: rgba(255, 79, 216, 0.14);
       color: #ffc7f3;
-      border: 1px solid rgba(255,79,216,0.22);
+      border: 1px solid rgba(255, 79, 216, 0.22);
     }
 
     .delete-btn {
-      background: rgba(255,95,122,0.16);
+      background: rgba(255, 95, 122, 0.16);
       color: #ffb9c5;
-      border: 1px solid rgba(255,95,122,0.24);
+      border: 1px solid rgba(255, 95, 122, 0.24);
     }
 
     .empty-state {
       padding: 24px;
       border-radius: 18px;
-      background: rgba(255,255,255,0.06);
-      border: 1px dashed rgba(255,255,255,0.16);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px dashed rgba(255, 255, 255, 0.16);
       color: var(--text-fade);
       text-align: center;
       line-height: 1.8;
@@ -566,8 +579,8 @@
     .footer-banner {
       padding: 28px;
       border-radius: 30px;
-      background: linear-gradient(135deg, rgba(255,79,216,0.16), rgba(77,168,255,0.12), rgba(53,224,161,0.12));
-      border: 1px solid rgba(255,255,255,0.12);
+      background: linear-gradient(135deg, rgba(255, 79, 216, 0.16), rgba(77, 168, 255, 0.12), rgba(53, 224, 161, 0.12));
+      border: 1px solid rgba(255, 255, 255, 0.12);
       box-shadow: var(--shadow);
       display: flex;
       justify-content: space-between;
@@ -587,6 +600,7 @@
     }
 
     @media (max-width: 1280px) {
+
       .hero,
       .main-grid {
         grid-template-columns: 1fr;
@@ -598,6 +612,7 @@
     }
 
     @media (max-width: 900px) {
+
       .hero-stats,
       .quick-actions {
         grid-template-columns: 1fr;
@@ -628,6 +643,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="floating-glow"></div>
 
@@ -644,7 +660,9 @@
       <div class="topbar-actions">
         <button class="btn btn-secondary" onclick="scrollToSection('job-section')">📚 งานสอน</button>
         <button class="btn btn-secondary" onclick="scrollToSection('schedule-section')">📅 ตารางสอน</button>
-        <button class="btn btn-edit-profile" onclick="goToEditProfile()">✏️ Edit Profile</button>
+        <a href="/profile/tutor/edit" class="action-btn edit-btn">
+          ✏️ Edit Profile
+        </a>
         <button class="btn btn-primary" onclick="refreshDashboard()">🔄 รีเฟรช</button>
         <button class="btn btn-danger" id="logout">🚪 Logout</button>
       </div>
@@ -693,7 +711,8 @@
           <div class="title">🌟 ไฮไลต์สำหรับติวเตอร์</div>
           <div class="highlight-box">
             <strong>ยิ่งโปรไฟล์ชัด ยิ่งได้งานง่าย</strong>
-            <span>เพิ่มความเชี่ยวชาญ วิชาที่สอน ประสบการณ์ และสไตล์การสอนให้ครบ จะช่วยให้นักเรียนตัดสินใจเลือกคุณเร็วขึ้นมาก</span>
+            <span>เพิ่มความเชี่ยวชาญ วิชาที่สอน ประสบการณ์ และสไตล์การสอนให้ครบ
+              จะช่วยให้นักเรียนตัดสินใจเลือกคุณเร็วขึ้นมาก</span>
           </div>
         </div>
 
@@ -829,7 +848,7 @@
     }
 
     function formatMap(val) {
-      return { online:"ออนไลน์", onsite:"ออนไซต์", both:"ออนไลน์ / ออนไซต์" }[val] || val;
+      return { online: "ออนไลน์", onsite: "ออนไซต์", both: "ออนไลน์ / ออนไซต์" }[val] || val;
     }
 
     function getJobBadge(status) {
@@ -867,9 +886,9 @@
 
           <div class="item-actions">
             ${applied
-              ? '<span style="color:#35e0a1;font-weight:700">✅ สมัครแล้ว</span>'
-              : `<button class="small-btn accept-btn" onclick="acceptJob(${job.post_id})">รับงานนี้</button>`
-            }
+            ? '<span style="color:#35e0a1;font-weight:700">✅ สมัครแล้ว</span>'
+            : `<button class="small-btn accept-btn" onclick="acceptJob(${job.post_id})">รับงานนี้</button>`
+          }
           </div>
         </div>`;
       }).join("");
@@ -883,7 +902,7 @@
         return;
       }
 
-      const formatMode = v => ({ online:"ออนไลน์", onsite:"ออนไซต์", both:"ออนไลน์ / ออนไซต์" }[v] || v);
+      const formatMode = v => ({ online: "ออนไลน์", onsite: "ออนไซต์", both: "ออนไลน์ / ออนไซต์" }[v] || v);
 
       list.innerHTML = schedules.map(item => `
         <div class="schedule-card">
@@ -997,23 +1016,23 @@
     }
 
     function updateStats(dashData) {
-      const availableJobs  = dashData?.available_jobs  ?? jobs.length;
-      const teachingNow    = dashData?.teaching_now    ?? 0;
-      const avgRating      = dashData?.avg_rating      ?? 0.0;
-      const monthlyIncome  = dashData?.monthly_income  ?? 0;
-      const incomeDisplay  = monthlyIncome > 0
+      const availableJobs = dashData?.available_jobs ?? jobs.length;
+      const teachingNow = dashData?.teaching_now ?? 0;
+      const avgRating = dashData?.avg_rating ?? 0.0;
+      const monthlyIncome = dashData?.monthly_income ?? 0;
+      const incomeDisplay = monthlyIncome > 0
         ? monthlyIncome.toLocaleString('th-TH') + " ฿"
         : "-";
 
-      document.getElementById("heroJobs").textContent    = availableJobs;
+      document.getElementById("heroJobs").textContent = availableJobs;
       document.getElementById("heroClasses").textContent = teachingNow;
-      document.getElementById("heroIncome").textContent  = incomeDisplay;
-      document.getElementById("heroRating").textContent  = avgRating || "-";
+      document.getElementById("heroIncome").textContent = incomeDisplay;
+      document.getElementById("heroRating").textContent = avgRating || "-";
 
       document.getElementById("statAvailableJobs").textContent = availableJobs;
-      document.getElementById("statTeachingNow").textContent   = teachingNow;
-      document.getElementById("statIncome").textContent        = incomeDisplay;
-      document.getElementById("statRating").textContent        = avgRating || "-";
+      document.getElementById("statTeachingNow").textContent = teachingNow;
+      document.getElementById("statIncome").textContent = incomeDisplay;
+      document.getElementById("statRating").textContent = avgRating || "-";
     }
 
     function loadJobs(subjectFilter) {
@@ -1055,15 +1074,15 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tutor_id: USER_ID, post_id })
       })
-      .then(res => res.json())
-      .then(data => {
-        alert(data.message || "สมัครเรียบร้อย");
-        if (data.status === "success") {
-          loadMyApplications().then(() => renderJobs());
-          loadDashboard();
-        }
-      })
-      .catch(() => alert("เกิดข้อผิดพลาด ไม่สามารถสมัครได้"));
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message || "สมัครเรียบร้อย");
+          if (data.status === "success") {
+            loadMyApplications().then(() => renderJobs());
+            loadDashboard();
+          }
+        })
+        .catch(() => alert("เกิดข้อผิดพลาด ไม่สามารถสมัครได้"));
     }
 
     function refreshDashboard() {
@@ -1086,4 +1105,5 @@
     });
   </script>
 </body>
+
 </html>

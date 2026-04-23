@@ -259,29 +259,47 @@ def get_tutor_profile(user_id):
         }
 
 
-def update_tutor_profile(user_id, bio, hourly_rate):
+def update_tutor_profile(user_id, bio, hourly_rate, filename=None):
     try:
         connection = db.get_connection()
 
         with connection.cursor() as cursor:
-            sql = """
-                UPDATE tutor_profiles
-                SET bio = %s,
-                    hourly_rate = %s
-                WHERE user_id = %s
-            """
 
-            cursor.execute(sql, (
-                bio,
-                hourly_rate,
-                user_id
-            ))
+            if filename:
+                sql = """
+                    UPDATE tutor_profiles
+                    SET bio=%s,
+                        hourly_rate=%s,
+                        profile_picture_url=%s
+                    WHERE user_id=%s
+                """
+
+                cursor.execute(sql, (
+                    bio,
+                    hourly_rate,
+                    f"static/uploads/{filename}",
+                    user_id
+                ))
+
+            else:
+                sql = """
+                    UPDATE tutor_profiles
+                    SET bio=%s,
+                        hourly_rate=%s
+                    WHERE user_id=%s
+                """
+
+                cursor.execute(sql, (
+                    bio,
+                    hourly_rate,
+                    user_id
+                ))
 
             connection.commit()
 
             return {
                 "status": "success",
-                "message": "อัปเดตโปรไฟล์สำเร็จ"
+                "message": "อัปเดตสำเร็จ"
             }
 
     except Exception as e:

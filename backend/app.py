@@ -33,11 +33,19 @@ def create_app():
     @app.route("/home/tutor")
     def tutor_home():
         return send_from_directory("../frontend/tutor", "home_tutor.html")
+    @app.route("/profile/tutor")
+    def tutor_profile():
+        return send_from_directory("../frontend/tutorprofile", "profile.html")
+
+
+    @app.route("/profile/tutor/edit")
+    def tutor_profile_edit():
+        return send_from_directory("../frontend/tutorprofile", "edit.html")
     
     # ฟังก์ชันสำหรับส่งหน้าเว็บแก้ไขโปรไฟล์ของนักเรียน
-    @app.route("/profile/student/edit")
-    def student_profile_edit_page():
-        return send_from_directory("../frontend/student", "edit_profile_student.html")
+    # @app.route("/profile/student/edit")
+    # def student_profile_edit_page():
+    #     return send_from_directory("../frontend/student", "edit_profile_student.html")
     
     # register blueprint
     from backend.routes.auth import auth_bp
