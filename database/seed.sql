@@ -1,7 +1,7 @@
 -- ============================================================
 -- seed.sql — ข้อมูลตัวอย่างสำหรับ tutor_match
--- รหัสผ่านทุก account คือ: password
--- bcrypt hash ของ 'password' (rounds=12)
+-- รหัสผ่านทุก account คือ: 1234
+-- bcrypt hash ของ '1234' (rounds=12)
 -- ============================================================
 
 USE tutor_match;
@@ -12,16 +12,16 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- 1. users
 -- ============================================================
 INSERT INTO users (user_id, name, email, password_hash, role, account_status) VALUES
-(1,  'แอดมิน ระบบ',      'admin@tutor.com',     '$2b$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin',   'active'),
-(2,  'สมชาย ใจดี',        'somchai@test.com',    '$2b$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 'active'),
-(3,  'สมหญิง รักเรียน',    'somying@test.com',    '$2b$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 'active'),
-(4,  'มะลิ หวานใจ',       'mali@test.com',       '$2b$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 'active'),
-(5,  'กล้า นำชัย',         'kla@test.com',        '$2b$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 'active'),
-(6,  'มานี มีสุข',         'manee@test.com',      '$2b$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'tutor',   'active'),
-(7,  'ชูใจ วิไล',          'choojai@test.com',    '$2b$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'tutor',   'active'),
-(8,  'อาร์ท ฟิสิกส์',      'art_tutor@test.com',  '$2b$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'tutor',   'active'),
-(9,  'นิด รอพิจารณา',      'nid_tutor@test.com',  '$2b$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'tutor',   'active'),
-(10, 'แบน ถูกระงับ',       'banned@test.com',     '$2b$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 'ban');
+(1,  'แอดมิน ระบบ',      'admin@tutor.com',     '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'admin',   'active'),
+(2,  'สมชาย ใจดี',        'somchai@test.com',    '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'student', 'active'),
+(3,  'สมหญิง รักเรียน',    'somying@test.com',    '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'student', 'active'),
+(4,  'มะลิ หวานใจ',       'mali@test.com',       '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'student', 'active'),
+(5,  'กล้า นำชัย',         'kla@test.com',        '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'student', 'active'),
+(6,  'มานี มีสุข',         'manee@test.com',      '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'tutor',   'active'),
+(7,  'ชูใจ วิไล',          'choojai@test.com',    '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'tutor',   'active'),
+(8,  'อาร์ท ฟิสิกส์',      'art_tutor@test.com',  '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'tutor',   'active'),
+(9,  'นิด รอพิจารณา',      'nid_tutor@test.com',  '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'tutor',   'active'),
+(10, 'แบน ถูกระงับ',       'banned@test.com',     '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'student', 'ban');
 
 -- ============================================================
 -- 2. student_profiles
