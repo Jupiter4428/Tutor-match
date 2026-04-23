@@ -9,7 +9,7 @@ if (!TOKEN || ROLE !== 'tutor') {
 const hourlyRateInput = document.getElementById('hourly_rate');
 const previewRate     = document.getElementById('previewRate');
 const form            = document.getElementById('editTutorForm');
-const defaultImage    = '/static/uploads/default_profile.jpg';
+const defaultImage    = '/uploads/default_profile.jpg';
 
 hourlyRateInput.addEventListener('input', function () {
   previewRate.textContent = this.value.trim() ? `฿${this.value.trim()} / hr` : '฿0 / hr';
@@ -21,6 +21,10 @@ function previewProfileImage(event) {
   const reader = new FileReader();
   reader.onload = e => { document.getElementById('previewImage').src = e.target.result; };
   reader.readAsDataURL(file);
+}
+
+function goToProfile() {
+  window.location.href = '/profile/tutor';
 }
 
 function resetPreview() {
