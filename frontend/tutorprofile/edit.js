@@ -24,7 +24,7 @@ function previewProfileImage(event) {
 }
 
 function goToProfile() {
-  window.location.href = '/profile/tutor';
+  window.location.href = '/home/tutor';
 }
 
 function resetPreview() {
