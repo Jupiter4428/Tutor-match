@@ -151,6 +151,11 @@ body::after{
   border:1px solid rgba(255,255,255,0.14);
 }
 
+.btn-danger{
+  background:linear-gradient(135deg,#ff7b92,#ff5fd2,#8b6bff);
+  box-shadow:0 12px 26px rgba(255,123,146,0.35);
+}
+
 .hero{
   display:grid;
   grid-template-columns:1.15fr .85fr;
@@ -361,7 +366,8 @@ body::after{
   margin-bottom:18px;
 }
 
-.amount-btn{
+.amount-btn,
+.withdraw-btn{
   border:none;
   cursor:pointer;
   padding:15px 12px;
@@ -375,10 +381,16 @@ body::after{
 }
 
 .amount-btn:hover,
-.amount-btn.active{
+.amount-btn.active,
+.withdraw-btn:hover,
+.withdraw-btn.active{
   transform:translateY(-2px);
   background:linear-gradient(135deg, rgba(255,95,210,0.26), rgba(139,107,255,0.22), rgba(66,216,255,0.20));
   box-shadow:0 10px 24px rgba(0,0,0,0.2);
+}
+
+.withdraw-btn.active{
+  background:linear-gradient(135deg, rgba(255,123,146,0.28), rgba(255,95,210,0.24), rgba(139,107,255,0.20));
 }
 
 .input-group{
@@ -462,6 +474,10 @@ body::after{
   border:1px solid rgba(255,255,255,0.12);
 }
 
+.withdraw-summary{
+  border:1px solid rgba(255,123,146,0.18);
+}
+
 .summary-row{
   display:flex;
   justify-content:space-between;
@@ -477,6 +493,12 @@ body::after{
   border-top:1px solid rgba(255,255,255,0.08);
   font-weight:800;
   font-size:1.05rem;
+}
+
+.section-divider{
+  height:1px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  margin:30px 0;
 }
 
 .flow-grid{
