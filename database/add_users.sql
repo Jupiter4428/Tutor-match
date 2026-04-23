@@ -1,6 +1,6 @@
 -- ============================================================
 -- add_users.sql — เพิ่ม user ทดสอบเพิ่มเติม (ไม่ซ้ำกับ seed.sql)
--- รหัสผ่านทุก account คือ: password
+-- รหัสผ่านทุก account คือ: 1234
 -- ============================================================
 
 USE tutor_match;
@@ -10,7 +10,7 @@ SET NAMES utf8mb4;
 -- นักเรียนใหม่
 -- ============================================================
 INSERT INTO users (name, email, password_hash, role, account_status) VALUES
-('พลอย ทดสอบ', 'ploy@test.com', '$2b$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 'active');
+('พลอย ทดสอบ', 'ploy@test.com', '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'student', 'active');
 
 INSERT INTO student_profiles (user_id, grade_level, school_name, education_level)
 VALUES (LAST_INSERT_ID(), 'ม.5', 'โรงเรียนทดสอบ', 'มัธยมศึกษาตอนปลาย');
@@ -22,7 +22,7 @@ VALUES ((SELECT user_id FROM users WHERE email = 'ploy@test.com'), 0.00, 'active
 -- ติวเตอร์ใหม่ (verified)
 -- ============================================================
 INSERT INTO users (name, email, password_hash, role, account_status) VALUES
-('ปิ่น ครูคณิต', 'pin_tutor@test.com', '$2b$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'tutor', 'active');
+('ปิ่น ครูคณิต', 'pin_tutor@test.com', '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2', 'tutor', 'active');
 
 SET @new_tutor_user_id = LAST_INSERT_ID();
 
