@@ -25,7 +25,7 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
     role ENUM('admin','student','tutor') NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    account_status ENUM('active','suspended','deleted') NOT NULL DEFAULT 'active',
+    account_status ENUM('active','suspended','ban') NOT NULL DEFAULT 'active',
     status_updated_at DATETIME NULL,
     status_reason TEXT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
