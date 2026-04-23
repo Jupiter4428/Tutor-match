@@ -128,15 +128,19 @@ def get_tutor_dashboard_stats(user_id):
 
             cursor.execute("""
                 SELECT
+                
                     (SELECT COUNT(*) FROM applications
                      WHERE tutor_id = %s AND status = 'accepted') AS teaching_now,
+                     
                     (SELECT COUNT(*) FROM student_posts
                      WHERE status = 'open' AND is_hidden = FALSE) AS available_jobs,
+                     
                     (SELECT COALESCE(SUM(p.budget), 0)
                      FROM applications a JOIN student_posts p ON a.post_id = p.post_id
                      WHERE a.tutor_id = %s AND a.status = 'accepted'
                        AND MONTH(a.applied_at) = MONTH(CURDATE())
                        AND YEAR(a.applied_at)  = YEAR(CURDATE())) AS monthly_income,
+                       
                     (SELECT ROUND(AVG(r.rating), 1)
                      FROM reviews r JOIN applications a ON r.app_id = a.app_id
                      WHERE a.tutor_id = %s) AS avg_rating
