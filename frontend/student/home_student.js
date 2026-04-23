@@ -425,6 +425,10 @@ const SUBJECT_GROUPS = [
   },
 ];
 
+function goToWallet() {
+  window.location.href = "/student/wallet";
+}
+
 function populateSubjectFilter() {
   const sel = document.getElementById("tutorSubjectFilter");
   sel.innerHTML = `<option value="">📚 ทุกวิชา</option>`;
@@ -674,6 +678,3 @@ document.getElementById("logout").addEventListener("click", function () {
 // โหลดโพสต์และติวเตอร์ตอนเปิดหน้า
 loadMyPosts();
 loadTutors();
-function goToWallet() {
-  window.location.href = "/student/wallet";
-}
