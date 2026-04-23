@@ -259,4 +259,39 @@ CREATE TABLE reports (
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- =========================================================
+-- 14) wallets
+-- อ้างอิงจากเอกสารระบบการเงิน [cite: 2, 3]
+-- =========================================================
+CREATE TABLE wallets (
+    wallet_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNIQUE NOT NULL,
+    balance DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    status ENUM('active', 'frozen', 'closed') NOT NULL DEFAULT 'active',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_wallets_user
+        FOREIGN KEY (user_id) REFERENCES users(user_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =========================================================
+-- 15) transaction_logs
+-- เก็บประวัติการเงินอย่างละเอียดเพื่อตรวจสอบย้อนหลัง 
+-- =========================================================
+CREATE TABLE transaction_logs (
+    transaction_id INT AUTO_INCREMENT PRIMARY KEY,
+    wallet_id INT NOT NULL,
+    transaction_type ENUM('deposit', 'withdrawal', 'payment', 'refund', 'platform_fee', 'tutor_earnings') NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    balance_after DECIMAL(10,2) NOT NULL,
+    reference_type ENUM('application', 'withdrawal_request', 'deposit_slip') NULL,
+    reference_id INT NULL,
+    description VARCHAR(255) NULL,
+    transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_transaction_logs_wallet
+        FOREIGN KEY (wallet_id) REFERENCES wallets(wallet_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 SET FOREIGN_KEY_CHECKS = 1;
