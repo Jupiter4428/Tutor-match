@@ -2,6 +2,7 @@
 import bcrypt
 import jwt
 import datetime
+from datetime import timezone
 from backend.utils.db import get_connection
 from backend.config import SECRET_KEY
 
@@ -40,17 +41,13 @@ def register_user(name, email, password, role):
                             )      
 
             conn.commit()
-            return {"status": "success", "message": "สมัครสมาชิกสำเร็จ"}
+            return {"status": "success", "message": "สมัครสมาชิกสำเร็จ", "data": None}
 
     except Exception as e:
         conn.rollback()
         return {"status": "error", "message": str(e)}
     finally:
         conn.close()
-
-
-# from backend.extensions import db  (นำเข้า db จามที่ได้ตั้งค่าไว้ใน extensions.py)
-# SECRET_KEY = "your_secret_key" (อย่าลืมตั้งค่า SECRET_KEY )
 
 def login_user(email, password):
     conn = get_connection()
@@ -69,18 +66,15 @@ def login_user(email, password):
             # 2. เช็ค password
             db_password = user["password_hash"]
             
-            # เพิ่ม $2y$ เข้าไปในเงื่อนไข เพื่อให้ระบบรู้จัก Hash ตัวนี้
-            if db_password.startswith(("$2b$", "$2a$", "$2y$")):
-                # แปลง Hash ก่อนตรวจเช็ค (บางเวอร์ชันของ bcrypt ใน Python ต้องการ $2b$)
-                if db_password.startswith("$2y$"):
-                    db_password = db_password.replace("$2y$", "$2b$", 1)
+            # รองรับ hash prefix $2y$ จาก PHP bcrypt
+            if db_password.startswith("$2y$"):
+                db_password = db_password.replace("$2y$", "$2b$", 1)
 
-                if not bcrypt.checkpw(password.encode("utf-8"), db_password.encode("utf-8")):
-                    return {"status": "error", "message": "รหัสผ่านไม่ถูกต้อง"}
-            else:
-                # กรณีเป็น User เก่าที่ยังไม่ได้เข้ารหัส (เช่น สมชาย 1234)
-                if db_password != password:
-                    return {"status": "error", "message": "รหัสผ่านไม่ถูกต้อง"}
+            if not db_password.startswith(("$2b$", "$2a$")):
+                return {"status": "error", "message": "รหัสผ่านไม่ถูกต้อง"}
+
+            if not bcrypt.checkpw(password.encode("utf-8"), db_password.encode("utf-8")):
+                return {"status": "error", "message": "รหัสผ่านไม่ถูกต้อง"}
 
             # 3. ดึง role จาก user ได้เลย ไม่ต้อง Query ใหม่แล้ว
             user_role = user["role"]
@@ -89,7 +83,7 @@ def login_user(email, password):
             token = jwt.encode({
                 "user_id": user["user_id"],
                 "role": user_role,
-                "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1)
+                "exp": datetime.datetime.now(timezone.utc) + datetime.timedelta(days=1)
             }, SECRET_KEY, algorithm="HS256")
 
             return {
