@@ -59,7 +59,7 @@ tutor-match/
 │   │   └── base.html                  # base template สำหรับหน้าติวเตอร์
 │   │
 │   ├── tutorprofile/
-│   │   ├── proflie.html               # หน้าโปรไฟล์ติวเตอร์ (fetch GET /tutor/profile)
+│   │   ├── profile.html               # หน้าโปรไฟล์ติวเตอร์ (fetch GET /tutor/profile)
 │   │   ├── edit.html                  # แก้ไขโปรไฟล์ (fetch PUT /tutor/profile)
 │   │   └── review.html                # รีวิวของติวเตอร์ (fetch GET /tutor/<id>/reviews)
 │   │

@@ -42,6 +42,10 @@ Thumbs.db
 instance/
 .webassets-cache
 
+# User uploaded files (profile pictures, certificates)
+static/uploads/*
+!static/uploads/default_profile.jpg
+
 # Secrets
 *.pem
 *.key
