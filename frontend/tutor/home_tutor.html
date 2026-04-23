@@ -27,6 +27,7 @@
 
       <div class="topbar-actions">
         <button class="btn btn-secondary" onclick="scrollToSection('job-section')">📚 งานสอน</button>
+        <button class="btn btn-wallet" onclick="goToWallet()">💼 วอเลท</button>
         <button class="btn btn-secondary" onclick="scrollToSection('schedule-section')">📅 ตารางสอน</button>
         <a href="/profile/tutor/edit" class="action-btn edit-btn">
           ✏️ Edit Profile
@@ -95,13 +96,13 @@
               <span class="icon">📅</span>
               ตารางสอน
             </button>
+            <button class="quick-btn" onclick="goToWallet()">
+              <span class="icon">💼</span>
+              วอเลท
+            </button>
             <button class="quick-btn" onclick="goToEditProfile()">
               <span class="icon">✏️</span>
               แก้ไขโปรไฟล์
-            </button>
-            <button class="quick-btn" onclick="refreshDashboard()">
-              <span class="icon">🔄</span>
-              รีเฟรชข้อมูล
             </button>
           </div>
         </div>
