@@ -49,7 +49,14 @@ async function loadCurrentProfile() {
   }
 
   const data = await res.json();
-  if (data.status !== 'success') { alert(data.message); return; }
+  console.log(data);
+
+  if (data.status === 'success') {
+    alert('อัปเดตโปรไฟล์สำเร็จ');
+    window.location.href = '/profile/tutor';
+  } else {
+    alert(data.message || 'อัปเดตไม่สำเร็จ');
+  }
 
   const p = data.data;
   document.getElementById('tutorName').innerText = p.name;
@@ -83,12 +90,16 @@ form.addEventListener('submit', async function (e) {
   });
 
   const data = await res.json();
+  console.log("UPDATE RESPONSE:", data);
+
   if (data.status === 'success') {
     alert('อัปเดตโปรไฟล์สำเร็จ');
+
+    // force reload profile page
     window.location.href = '/profile/tutor';
   } else {
-    alert(data.message);
+    alert(data.message || 'อัปเดตไม่สำเร็จ');
   }
-});
 
-loadCurrentProfile();
+  loadCurrentProfile();
+});

@@ -1,5 +1,5 @@
 const TOKEN = localStorage.getItem('token');
-const ROLE  = localStorage.getItem('user_role');
+const ROLE = localStorage.getItem('user_role');
 
 if (!TOKEN || ROLE !== 'tutor') {
   localStorage.clear();
@@ -23,14 +23,15 @@ async function loadProfile() {
   if (data.status === 'success') {
     const p = data.data;
 
-    document.getElementById('tutorName').innerText  = p.name;
-    document.getElementById('hourlyRate').innerText = `฿${p.hourly_rate}/hr`;
-    document.getElementById('tutorId').innerText    = p.tutor_id;
-    document.getElementById('tutorBio').innerText   = p.bio || '-';
+    document.getElementById('tutorName').innerText = p.name;
+    document.getElementById('hourlyRate').innerText =
+      p.hourly_rate ? `฿${p.hourly_rate}/hr` : 'ยังไม่ได้กำหนดราคา';
+    document.getElementById('tutorId').innerText = p.tutor_id;
+    document.getElementById('tutorBio').innerText = p.bio || '-';
 
     const statusEl = document.getElementById('verifyStatus');
     const statusMap = {
-      pending:  '<div class="status-badge status-pending">⏳ Pending</div>',
+      pending: '<div class="status-badge status-pending">⏳ Pending</div>',
       verified: '<div class="status-badge status-verified">✅ Verified</div>',
       rejected: '<div class="status-badge status-rejected">❌ Rejected</div>',
     };
@@ -56,7 +57,7 @@ document.getElementById('profileUpload').addEventListener('change', async functi
   }
 
   const formData = new FormData();
-  formData.append('bio',         profileData.data.bio);
+  formData.append('bio', profileData.data.bio);
   formData.append('hourly_rate', profileData.data.hourly_rate);
   formData.append('profile_picture', file);
 
