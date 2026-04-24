@@ -550,7 +550,43 @@ body{
     width:100%;
   }
 
-  .tutor-box{
-    flex-direction:column;
-  }
+  
+  
+}
+.status-badge {
+  height: fit-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 13px;
+  border-radius: 999px;
+  font-size: .85rem;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, .22);
+}
+
+.status-badge.pending,
+.status-badge.pending_payment {
+  background: rgba(255, 215, 92, .14);
+  color: #ffe79d;
+  border: 1px solid rgba(255, 215, 92, .35);
+}
+
+.status-badge.active {
+  background: rgba(46, 230, 166, .14);
+  color: #9effd8;
+  border: 1px solid rgba(46, 230, 166, .35);
+}
+
+.status-badge.completed {
+  background: rgba(66, 216, 255, .14);
+  color: #bdeeff;
+  border: 1px solid rgba(66, 216, 255, .35);
+}
+
+.status-badge.cancelled {
+  background: rgba(255, 123, 146, .14);
+  color: #ffc4ce;
+  border: 1px solid rgba(255, 123, 146, .35);
 }
