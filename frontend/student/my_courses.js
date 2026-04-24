@@ -198,28 +198,6 @@ function renderCourses() {
     ดูรายละเอียด
   </button>
 
-</div>
-        <button 
-          class="btn review-btn" 
-          onclick="reviewCourse(${course.id})"
-          ${course.status !== "completed" ? "disabled" : ""}
-        >
-          ${course.review ? "✏️ แก้ไขรีวิว" : "⭐ Review"}
-        </button>
-
-        <button class="btn detail-btn" onclick="viewDetail(${course.id})">
-          ดูรายละเอียด
-        </button>
-      </div>
-
-      ${course.review ? `
-        <div class="review-text">
-          <strong>รีวิวของคุณ:</strong>
-          <div class="rating-text">${renderStars(course.rating)}</div>
-          <div>${course.review}</div>
-        </div>
-      ` : ""}
-    </div>
   `).join("");
 
   updateStats();
