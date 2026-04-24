@@ -5,12 +5,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard - Tutor Match</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="/assets/admin/home_admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+  <link rel="stylesheet" href="./home_admin.css">
 </head>
 
 <body>
@@ -28,6 +28,7 @@
 
       <div class="topbar-actions">
         <button class="btn btn-secondary" onclick="scrollToSection('user-management')">👥 จัดการผู้ใช้</button>
+        <button class="btn btn-secondary" onclick="scrollToSection('admin-review-section')">⭐ จัดการรีวิว</button>
         <button class="btn btn-secondary" onclick="scrollToSection('system-reports')">🚨 ดูรายงาน</button>
         <button class="btn btn-primary" onclick="refreshDashboard()">🔄 รีเฟรชระบบ</button>
         <button class="btn btn-danger" id="logout">🚪 Logout</button>
@@ -37,18 +38,15 @@
     <section class="hero">
       <div class="hero-left">
         <div class="welcome-badge">✨ Admin Mode Activated</div>
-        <h2>
-          จัดการ<span class="gradient-text">ทั้งระบบ</span>
-          <br>ได้ในหน้าเดียวแบบอลังการ
-        </h2>
+        <h2>จัดการ<span class="gradient-text">ทั้งระบบ</span><br>ได้ในหน้าเดียวแบบอลังการ</h2>
         <p>
-          ตรวจสอบนักเรียน ติวเตอร์ โพสต์ รายงานปัญหา และสถานะระบบได้แบบเรียลไทม์
+          ตรวจสอบนักเรียน ติวเตอร์ โพสต์ รายงานปัญหา รีวิวจากนักเรียน และสถานะระบบได้แบบเรียลไทม์
           พร้อมเครื่องมือจัดการที่ใช้งานง่าย ดูดี และมืออาชีพสุด ๆ
         </p>
 
         <div class="hero-buttons">
           <button class="btn btn-primary" onclick="scrollToSection('user-management')">🚀 ไปที่จัดการผู้ใช้</button>
-          <button class="btn btn-secondary" onclick="scrollToSection('recent-activity')">📈 ดูกิจกรรมล่าสุด</button>
+          <button class="btn btn-secondary" onclick="scrollToSection('admin-review-section')">⭐ ดูรีวิวทั้งหมด</button>
         </div>
 
         <div class="hero-stats">
@@ -76,8 +74,7 @@
           <div class="title">🌟 ไฮไลต์ระบบ</div>
           <div class="highlight-box">
             <strong>ระบบกำลังทำงานปกติ</strong>
-            <span>แอดมินสามารถตรวจสอบสถานะผู้ใช้ อนุมัติบัญชี จัดการโพสต์ผิดกฎ
-              และตอบสนองต่อรายงานปัญหาได้จากหน้านี้ทันที</span>
+            <span>แอดมินสามารถตรวจสอบสถานะผู้ใช้ จัดการโพสต์ผิดกฎ ตรวจสอบรีวิว และตอบสนองต่อรายงานปัญหาได้ทันที</span>
           </div>
         </div>
 
@@ -85,20 +82,16 @@
           <div class="title">⚡ เมนูลัดผู้ดูแล</div>
           <div class="quick-actions">
             <button class="quick-btn" onclick="scrollToSection('user-management')">
-              <span class="icon">👥</span>
-              จัดการผู้ใช้
+              <span class="icon">👥</span>จัดการผู้ใช้
             </button>
-            <button class="quick-btn" onclick="scrollToSection('recent-activity')">
-              <span class="icon">📊</span>
-              กิจกรรมล่าสุด
+            <button class="quick-btn" onclick="scrollToSection('admin-review-section')">
+              <span class="icon">⭐</span>จัดการรีวิว
             </button>
             <button class="quick-btn" onclick="scrollToSection('system-reports')">
-              <span class="icon">🚨</span>
-              รายงานปัญหา
+              <span class="icon">🚨</span>รายงานปัญหา
             </button>
             <button class="quick-btn" onclick="scrollToSection('announcement-section')">
-              <span class="icon">📢</span>
-              ประกาศระบบ
+              <span class="icon">📢</span>ประกาศระบบ
             </button>
           </div>
         </div>
@@ -186,7 +179,6 @@
               <div class="card-subtitle">ความเคลื่อนไหวสำคัญของระบบ</div>
             </div>
           </div>
-
           <div class="list-box" id="activityList"></div>
         </div>
 
@@ -197,10 +189,84 @@
               <div class="card-subtitle">รายการร้องเรียนหรือปัญหาที่ระบบแจ้งมา</div>
             </div>
           </div>
-
           <div class="list-box" id="reportList"></div>
         </div>
       </div>
+    </section>
+
+    <section class="card admin-review-section" id="admin-review-section">
+      <div class="card-header">
+        <div>
+          <div class="card-title">⭐ จัดการรีวิวจากนักเรียน</div>
+          <div class="card-subtitle">รีวิวจาก Student Review ถูกนำมาแสดงในหน้า Admin เพื่อให้ตรวจสอบ ซ่อน หรือลบได้</div>
+        </div>
+        <button class="btn btn-primary" onclick="refreshAdminReviews()">รีเฟรชรีวิว</button>
+      </div>
+
+      <div class="admin-review-stats">
+        <div class="review-score-card">
+          <h2 id="adminAvgRating">0.0</h2>
+          <div id="adminAvgStars" class="admin-stars">☆☆☆☆☆</div>
+          <p id="adminTotalReviews">จากทั้งหมด 0 รีวิว</p>
+        </div>
+
+        <div class="review-rating-bars">
+          <div class="review-rating-row">
+            <span>5 ดาว</span>
+            <div class="bar"><div id="adminBar5"></div></div>
+            <strong id="adminCount5">0 รีวิว</strong>
+          </div>
+          <div class="review-rating-row">
+            <span>4 ดาว</span>
+            <div class="bar"><div id="adminBar4"></div></div>
+            <strong id="adminCount4">0 รีวิว</strong>
+          </div>
+          <div class="review-rating-row">
+            <span>3 ดาว</span>
+            <div class="bar"><div id="adminBar3"></div></div>
+            <strong id="adminCount3">0 รีวิว</strong>
+          </div>
+          <div class="review-rating-row">
+            <span>2 ดาว</span>
+            <div class="bar"><div id="adminBar2"></div></div>
+            <strong id="adminCount2">0 รีวิว</strong>
+          </div>
+          <div class="review-rating-row">
+            <span>1 ดาว</span>
+            <div class="bar"><div id="adminBar1"></div></div>
+            <strong id="adminCount1">0 รีวิว</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-review-filter">
+        <input type="text" id="adminReviewSearch" placeholder="ค้นหาชื่อนักเรียน / ติวเตอร์ / วิชา / ข้อความรีวิว...">
+        <select id="adminReviewSubject">
+          <option value="all">ทุกวิชา</option>
+          <option value="คณิตศาสตร์">คณิตศาสตร์</option>
+          <option value="ภาษาอังกฤษ">ภาษาอังกฤษ</option>
+          <option value="ฟิสิกส์">ฟิสิกส์</option>
+          <option value="เคมี">เคมี</option>
+          <option value="ชีววิทยา">ชีววิทยา</option>
+          <option value="Programming">Programming</option>
+        </select>
+        <select id="adminReviewRating">
+          <option value="all">คะแนนทั้งหมด</option>
+          <option value="5">5 ดาว</option>
+          <option value="4">4 ดาวขึ้นไป</option>
+          <option value="3">3 ดาวขึ้นไป</option>
+          <option value="2">2 ดาวขึ้นไป</option>
+          <option value="1">1 ดาวขึ้นไป</option>
+        </select>
+        <select id="adminReviewSort">
+          <option value="latest">ล่าสุด</option>
+          <option value="highest">คะแนนสูงสุด</option>
+          <option value="lowest">คะแนนต่ำสุด</option>
+          <option value="student">ชื่อนักเรียน</option>
+        </select>
+      </div>
+
+      <div class="admin-review-grid" id="adminReviewGrid"></div>
     </section>
 
     <section class="bottom-grid">
@@ -218,8 +284,7 @@
             ระบบ Tutor Match เปิดใช้งานฟีเจอร์ใหม่สำหรับจับคู่นักเรียนและติวเตอร์อัตโนมัติ
             รวมถึงหน้าจัดการผู้ใช้ที่เร็วขึ้นและสวยงามขึ้น เพื่อให้แอดมินสามารถดูแลระบบได้สะดวกกว่าเดิม
           </p>
-          <button class="btn btn-primary"
-            onclick="alert('ตรงนี้ค่อยเชื่อม backend ส่งประกาศจริงได้เลย')">สร้างประกาศใหม่</button>
+          <button class="btn btn-primary" onclick="alert('ตรงนี้ค่อยเชื่อม backend ส่งประกาศจริงได้เลย')">สร้างประกาศใหม่</button>
         </div>
       </div>
 
@@ -240,9 +305,7 @@
               </div>
               <span class="badge badge-pending" id="pendingBadgeCount">0 รายการ</span>
             </div>
-            <div class="activity-desc">
-              ติวเตอร์ใหม่ที่สมัครเข้าระบบอาจต้องได้รับการอนุมัติจากแอดมินก่อนเริ่มรับงานสอน
-            </div>
+            <div class="activity-desc">ติวเตอร์ใหม่ที่สมัครเข้าระบบอาจต้องได้รับการอนุมัติจากแอดมินก่อนเริ่มรับงานสอน</div>
           </div>
 
           <div class="activity-card">
@@ -253,9 +316,7 @@
               </div>
               <span class="badge badge-banned" id="bannedBadgeCount">0 รายการ</span>
             </div>
-            <div class="activity-desc">
-              กรณีมีการกระทำผิดกฎหรือได้รับรายงานซ้ำหลายครั้ง แอดมินสามารถระงับบัญชีได้จากตารางด้านบน
-            </div>
+            <div class="activity-desc">กรณีมีการกระทำผิดกฎหรือได้รับรายงานซ้ำหลายครั้ง แอดมินสามารถระงับบัญชีได้จากตารางด้านบน</div>
           </div>
 
           <div class="activity-card">
@@ -266,9 +327,7 @@
               </div>
               <span class="badge badge-approved">ONLINE</span>
             </div>
-            <div class="activity-desc">
-              หากต้องการทำงานต่อ สามารถเชื่อมต่อกับ API จริงเพื่อดึงข้อมูล users, posts, reports และ analytics ได้ทันที
-            </div>
+            <div class="activity-desc">สามารถเชื่อมต่อกับ API จริงเพื่อดึงข้อมูล users, posts, reports, reviews และ analytics ได้ทันที</div>
           </div>
         </div>
       </div>
@@ -277,12 +336,13 @@
     <section class="footer-banner">
       <div>
         <h3>🔥 Admin Dashboard พร้อมต่อ backend จริง</h3>
-        <p>ตอนนี้หน้าแอดมินใช้งานเดโม่ได้แล้ว และสามารถเอาไปเชื่อม Flask / API / Database ต่อได้ทันที</p>
+        <p>ตอนนี้หน้าแอดมินรวมกล่องจัดการรีวิวจากนักเรียนเรียบร้อยแล้ว</p>
       </div>
       <button class="btn btn-primary" onclick="refreshDashboard()">รีเฟรชข้อมูลอีกครั้ง</button>
     </section>
   </div>
-  <script src="/assets/admin/home_admin.js"></script>
+
+  <script src="./home_admin.js"></script>
 </body>
 
 </html>
