@@ -58,13 +58,13 @@ def login_user(email, password):
             # หา user จาก email
             cursor.execute(
                 """
-                SELECT 
+                SELECT
                     user_id,
                     name,
                     email,
                     password_hash,
                     role,
-                    status
+                    account_status
                 FROM users
                 WHERE email = %s
                 """,
@@ -75,8 +75,7 @@ def login_user(email, password):
             if not user:
                 return {"status": "error", "message": "ไม่พบอีเมลนี้ในระบบ"}
 
-            # เช็ค status
-            if user["status"] == "banned":
+            if user["account_status"] in ("ban", "suspended"):
                 return {"status": "error", "message": "บัญชีนี้ถูกระงับการใช้งาน"}
 
             # เช็ค password
