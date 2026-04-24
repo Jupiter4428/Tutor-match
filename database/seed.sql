@@ -330,4 +330,106 @@ INSERT INTO user_action_logs (user_id, action_type, target_type, target_id, reas
 (10, 'account_banned',  'user',          10, 'ละเมิดข้อกำหนดการใช้งานซ้ำหลายครั้ง ส่งข้อความ spam ถึงติวเตอร์',         1),
 (20, 'account_suspended', 'user',        20, 'รายงานพฤติกรรมไม่เหมาะสมในระบบแชท พักบัญชีชั่วคราวระหว่างตรวจสอบ',        1);
 
+-- ------------------------------------------------------------
+-- FLOW 1: จบงานและแบ่งรายได้ (Completed & Split Earnings)
+-- ตรรกะ: ติวเตอร์ได้ 90%, แพลตฟอร์มหัก 10% [cite: 62, 63]
+-- ------------------------------------------------------------
+-- 1.1 คอร์สวิทย์พื้นฐาน: 1000 บาท (Tutor 900, Admin 100)
+INSERT INTO payments (app_id, amount, platform_fee, status) VALUES (19, 1000.00, 100.00, 'completed');
+INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, reference_type, reference_id, description) VALUES 
+(18, 'tutor_earnings', 900.00, 2700.00, 'application', 19, 'รายได้จากการสอนวิชาวิทยาศาสตร์ (หัก GP 10%)'), -- [cite: 25, 83]
+(1, 'platform_fee', 100.00, 700.00, 'application', 19, 'ค่าธรรมเนียมแพลตฟอร์ม 10% วิทยาศาสตร์'); -- [cite: 24]
+
+-- 1.2 คอร์สเปียโน: 2000 บาท (Tutor 1800, Admin 200)
+INSERT INTO payments (app_id, amount, platform_fee, status) VALUES (20, 2000.00, 200.00, 'completed');
+INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, reference_type, reference_id, description) VALUES 
+(7, 'tutor_earnings', 1800.00, 4050.00, 'application', 20, 'รายได้จากการสอนเปียโน (หัก GP 10%)'),
+(1, 'platform_fee', 200.00, 900.00, 'application', 20, 'ค่าธรรมเนียมแพลตฟอร์ม 10% เปียโน');
+
+-- 1.3 คอร์สเขียนโปรแกรม: 5000 บาท (Tutor 4500, Admin 500)
+INSERT INTO payments (app_id, amount, platform_fee, status) VALUES (21, 5000.00, 500.00, 'completed');
+INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, reference_type, reference_id, description) VALUES 
+(6, 'tutor_earnings', 4500.00, 5850.00, 'application', 21, 'รายได้จากการสอน Python (หัก GP 10%)'),
+(1, 'platform_fee', 500.00, 1400.00, 'application', 21, 'ค่าธรรมเนียมแพลตฟอร์ม 10% Python');
+
+-- 1.4 คอร์สวาดรูป: 800 บาท (Tutor 720, Admin 80)
+INSERT INTO payments (app_id, amount, platform_fee, status) VALUES (22, 800.00, 80.00, 'completed');
+INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, reference_type, reference_id, description) VALUES 
+(15, 'tutor_earnings', 720.00, 720.00, 'application', 22, 'รายได้จากการสอนวาดรูป (หัก GP 10%)'),
+(1, 'platform_fee', 80.00, 1480.00, 'application', 22, 'ค่าธรรมเนียมแพลตฟอร์ม 10% วาดรูป');
+
+-- 1.5 คอร์สฟิสิกส์ ม.ปลาย: 1500 บาท (Tutor 1350, Admin 150)
+INSERT INTO payments (app_id, amount, platform_fee, status) VALUES (23, 1500.00, 150.00, 'completed');
+INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, reference_type, reference_id, description) VALUES 
+(8, 'tutor_earnings', 1350.00, 1350.00, 'application', 23, 'รายได้จากการสอนฟิสิกส์ (หัก GP 10%)'),
+(1, 'platform_fee', 150.00, 1630.00, 'application', 23, 'ค่าธรรมเนียมแพลตฟอร์ม 10% ฟิสิกส์');
+
+
+-- ------------------------------------------------------------
+-- FLOW 2: การคืนเงินตามสัดส่วน (Prorated Refund)
+-- ตรรกะ: สมมติจอง 3 ชม. เรียนจริง 1 ชม. แล้วขอยกเลิก [cite: 69-73]
+-- ------------------------------------------------------------
+-- 2.1 เรียนไป 1/3 ชม. (ยอดเต็ม 900): ติวเตอร์ได้ 270, แอดมิน 30, คืนนักเรียน 600 [cite: 71-73]
+INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, reference_type, reference_id, description) VALUES 
+(2, 'refund', 600.00, 900.00, 'application', 24, 'รับเงินคืนจากคอร์สคณิตศาสตร์ (Prorated)'), -- [cite: 22, 81]
+(6, 'tutor_earnings', 270.00, 6120.00, 'application', 24, 'รายได้จากการสอนคณิตศาสตร์ 1 ชม. (หัก GP)'),
+(1, 'platform_fee', 30.00, 1660.00, 'application', 24, 'ค่าธรรมเนียมแพลตฟอร์ม (สอนจริง 1 ชม.)');
+
+-- 2.2 ยกเลิกก่อนเรียน (Cancel Before Start): คืนเงิน 100% หักค่าธรรมเนียม Gateway 3% [cite: 67, 68]
+-- ยอด 1000 บาท: คืนนักเรียน 970 บาท
+INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, reference_type, reference_id, description) VALUES 
+(3, 'refund', 970.00, 1970.00, 'application', 25, 'รับเงินคืน 100% (หักค่าธรรมเนียม Gateway 3%)');
+
+-- 2.3-2.5 เพิ่ม Transaction Refund กรณีอื่นๆ
+INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, reference_type, reference_id, description) VALUES 
+(11, 'refund', 450.00, 650.00, 'application', 26, 'คืนเงินส่วนต่างคอร์สภาษาจีน'),
+(12, 'refund', 1200.00, 1700.00, 'application', 27, 'รับเงินคืนเนื่องจากติวเตอร์ยกเลิกคลาส'),
+(19, 'refund', 300.00, 800.00, 'application', 28, 'คืนเงินค่าเรียน (Prorated) ตามชั่วโมงที่เหลือ');
+
+
+-- ------------------------------------------------------------
+-- FLOW 3: การถอนเงินออกจากระบบ (Withdrawal)
+-- ตรรกะ: ทั้งนักเรียนและติวเตอร์สามารถถอนเงินออกจาก Wallet ได้ [cite: 77]
+-- ------------------------------------------------------------
+INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, reference_type, reference_id, description) VALUES 
+(6, 'withdrawal', 1000.00, 5120.00, 'withdrawal_request', 101, 'ถอนเงินออกจาก Wallet ไปยังบัญชีธนาคาร'), -- [cite: 19]
+(7, 'withdrawal', 2000.00, 2050.00, 'withdrawal_request', 102, 'ถอนรายได้จากการสอน'),
+(18, 'withdrawal', 500.00, 2200.00, 'withdrawal_request', 103, 'ถอนเงินคืนเข้าบัญชีหลัก'),
+(2, 'withdrawal', 300.00, 600.00, 'withdrawal_request', 104, 'ถอนเงินคงเหลือในระบบ'),
+(12, 'withdrawal', 500.00, 1200.00, 'withdrawal_request', 105, 'ถอนเงินเข้าบัญชีธนาคารกสิกรไทย');
+
+
+-- ------------------------------------------------------------
+-- FLOW 4: การชำระเงินมัดจำ (Escrow Payment)
+-- ตรรกะ: นักเรียนจ่ายเต็มจำนวน เงินอยู่ในระบบ (Pending) ก่อนเริ่มเรียน [cite: 49, 50]
+-- ------------------------------------------------------------
+-- 4.1 จองคอร์สเคมี: 1200 บาท
+INSERT INTO payments (app_id, amount, platform_fee, status) VALUES (29, 1200.00, 120.00, 'pending');
+INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, reference_type, reference_id, description) VALUES 
+(11, 'payment', 1200.00, 0.00, 'application', 29, 'ชำระค่าเรียนวิชาเคมี (Escrow Hold)'); -- [cite: 20, 80]
+
+-- 4.2-4.5 รายการ Escrow อื่นๆ
+INSERT INTO payments (app_id, amount, platform_fee, status) VALUES (30, 900.00, 90.00, 'pending'), (31, 600.00, 60.00, 'pending'), (32, 1500.00, 150.00, 'pending'), (33, 400.00, 40.00, 'pending');
+INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, reference_type, reference_id, description) VALUES 
+(12, 'payment', 900.00, 300.00, 'application', 30, 'ชำระค่าเรียนวิชาสถิติ'),
+(13, 'payment', 600.00, 400.00, 'application', 31, 'ชำระค่าเรียนวิชาภาษาไทย'),
+(19, 'payment', 400.00, 400.00, 'application', 32, 'ชำระค่าเรียนวาดภาพเบื้องต้น'),
+(4, 'payment', 500.00, 0.00, 'application', 33, 'ชำระค่าเรียนเตรียมสอบ ม.1');
+
+
+-- ------------------------------------------------------------
+-- FLOW 5: การจัดการโดยแอดมิน (Admin & Audit)
+-- ตรรกะ: อายัดกระเป๋าเงินกรณีทุจริต หรือตรวจสอบระบบ 
+-- ------------------------------------------------------------
+-- 5.1 อายัดกระเป๋าเงินผู้ใช้ ID 13 (ณัฐพล) เนื่องจากต้องสงสัยโกงเงิน
+UPDATE wallets SET status = 'frozen' WHERE wallet_id = 13; -- [cite: 8]
+INSERT INTO user_action_logs (user_id, action_type, target_type, target_id, reason, performed_by) VALUES 
+(13, 'wallet_frozen', 'user', 13, 'พบธุรกรรมต้องสงสัย การเติมเงินไม่ตรงกับสลิป', 1); -- [cite: 10]
+
+-- 5.2-5.5 บันทึก Audit Log อื่นๆ
+INSERT INTO user_action_logs (user_id, action_type, target_type, target_id, reason, performed_by) VALUES 
+(11, 'payment_verified', 'payment', 2, 'ตรวจสอบสลิปการโอนเงินเรียบร้อย', 1),
+(14, 'tutor_verified', 'tutor_profile', 5, 'ยืนยันวุฒิการศึกษาเพิ่มเติม', 1),
+(6, 'audit_check', 'user', 6, 'สุ่มตรวจความถูกต้องของยอดเงินรายได้', 1),
+(1, 'fee_update', 'payment', 1, 'ปรับปรุงยอดค่าธรรมเนียมให้ถูกต้องตามระบบ', 1);
 SET FOREIGN_KEY_CHECKS = 1;
