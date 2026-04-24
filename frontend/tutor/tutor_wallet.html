@@ -52,12 +52,12 @@
 
         <div class="hero-stats">
           <div class="stat-box">
-            <h3>฿ 8,450</h3>
+            <h3 id="heroBalance">฿0.00</h3>
             <p>ยอดรายได้คงเหลือที่ถอนออกได้</p>
           </div>
           <div class="stat-box">
-            <h3>27 รายการ</h3>
-            <p>ธุรกรรมรายได้และการถอนในเดือนนี้</p>
+            <h3 id="heroTxCount">0 รายการ</h3>
+            <p>จำนวนธุรกรรมทั้งหมด</p>
           </div>
           <div class="stat-box">
             <h3>10%</h3>
@@ -69,30 +69,30 @@
       <div class="hero-right card">
         <div class="wallet-highlight">
           <span>Available Tutor Balance</span>
-          <h3 id="currentWalletBalance">฿8,450.00</h3>
+          <h3 id="currentWalletBalance">฿0.00</h3>
           <div class="wallet-meta">
-            <div class="pill active">● Wallet Active</div>
-            <div class="pill">Tutor ID: #TTR-2048</div>
-            <div class="pill">Updated: 24 Apr 2026</div>
+            <div class="pill active" id="walletStatusPill">● Wallet Active</div>
+            <div class="pill" id="walletIdPill">Wallet ID: #WLT-—</div>
+            <div class="pill" id="walletUpdatedPill">Updated: —</div>
           </div>
         </div>
 
         <div class="summary-mini-grid">
           <div class="mini-card">
             <span class="mini-label">รายได้ล่าสุด</span>
-            <div class="mini-value">+ ฿810</div>
+            <div class="mini-value" id="miniLastEarnings">—</div>
           </div>
           <div class="mini-card">
             <span class="mini-label">ถอนล่าสุด</span>
-            <div class="mini-value">- ฿1,500</div>
+            <div class="mini-value" id="miniLastWithdraw">—</div>
           </div>
           <div class="mini-card">
-            <span class="mini-label">สถานะล่าสุด</span>
-            <div class="mini-value">Completed</div>
+            <span class="mini-label">รายการล่าสุด</span>
+            <div class="mini-value" id="miniLastTxType">—</div>
           </div>
           <div class="mini-card">
             <span class="mini-label">Wallet Status</span>
-            <div class="mini-value">Active</div>
+            <div class="mini-value" id="miniWalletStatus">—</div>
           </div>
         </div>
       </div>

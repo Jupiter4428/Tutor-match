@@ -16,6 +16,7 @@ from backend.services.tutor_service import (
     get_available_tutors,
     get_tutor_profile_public,
     get_tutor_wallet,
+    get_tutor_transactions,
     request_withdrawal
 )
 
@@ -37,7 +38,16 @@ def get_wallet():
     return jsonify(result), 200
 
 
+@tutor_bp.route('/api/wallet/transactions', methods=['GET'])
+@token_required
+@role_required('tutor')
+def get_transactions():
+    result = get_tutor_transactions(request.user_id)
+    return jsonify(result), 200
+
+
 @tutor_bp.route('/wallet/withdraw', methods=['POST'])
+@tutor_bp.route('/api/wallet/withdraw', methods=['POST'])
 @token_required
 @role_required('tutor')
 def request_withdraw():
