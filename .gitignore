@@ -31,11 +31,6 @@ htmlcov/
 # Logs
 *.log
 
-# Database dump / backup (ไม่ commit ข้อมูลจริง)
-*.sql.bak
-*.db
-*.sqlite3
-
 # IDE / Editor
 .vscode/
 .idea/
