@@ -2,10 +2,10 @@ const TOKEN = localStorage.getItem('token');
 const USER_ID = localStorage.getItem('user_id');
 const ROLE = localStorage.getItem('user_role');
 
-// if (!TOKEN || ROLE !== 'tutor') {
-//   localStorage.clear();
-//   window.location.href = '/login';
-// }
+if (!TOKEN || ROLE !== 'tutor') {
+  localStorage.clear();
+  window.location.href = '/login';
+}
 
 function authHeader() {
   return { Authorization: `Bearer ${TOKEN}` };
@@ -23,19 +23,8 @@ function handleAuthError(res) {
 let jobs = [];
 let myApplications = [];
 let schedules = [];
-
-let reviews = [
-  {
-    title: "รีวิวจากนักเรียน A",
-    meta: "⭐ 5.0 คะแนน",
-    desc: "ติวเตอร์สอนเข้าใจง่ายมาก ใจเย็น และอธิบายละเอียดสุด ๆ"
-  },
-  {
-    title: "รีวิวจากนักเรียน B",
-    meta: "⭐ 4.8 คะแนน",
-    desc: "สอนสนุก เป็นกันเอง มีเทคนิคจำที่ช่วยให้ทำโจทย์ได้เร็วขึ้น"
-  }
-];
+let reviews = [];
+let tutorId = null;
 
 function goToEditProfile() {
   window.location.href = '/profile/tutor/edit';
@@ -160,36 +149,50 @@ function renderReviews() {
   const reviewList = document.getElementById('reviewList');
   if (!reviewList) return;
 
-  if (reviews.length === 0) {
+  if (!reviews.length) {
     reviewList.innerHTML = '<div class="empty-state">ยังไม่มีรีวิว</div>';
     return;
   }
 
-  reviewList.innerHTML = reviews.map((item, i) => `
-    <div class="review-card">
-      <div class="item-top">
-        <div>
-          <div class="item-title">${item.title}</div>
-          <div class="item-meta">${item.meta}</div>
+  reviewList.innerHTML = reviews.map(r => {
+    const rating = Number(r.rating || 0);
+    const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+    const safeName = String(r.student_name || 'นักเรียน').replace(/</g, '&lt;');
+    const safeComment = String(r.comment || 'ไม่มีความคิดเห็น').replace(/</g, '&lt;');
+    const safeSubject = String(r.subject || '-').replace(/</g, '&lt;');
+    return `
+      <div class="review-card">
+        <div class="item-top">
+          <div>
+            <div class="item-title">${safeName}</div>
+            <div class="item-meta">${stars} ${rating}.0 | วิชา${safeSubject}</div>
+          </div>
+          <span class="badge badge-done">Review</span>
         </div>
-        <span class="badge badge-done">Review</span>
+        <div class="item-desc">${safeComment}</div>
       </div>
-      <div class="item-desc">${item.desc}</div>
-      <div class="item-actions">
-        <button class="small-btn delete-btn" onclick="reportReview(${i})">🚨 แจ้งลบ</button>
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
-function reportReview(i) {
-  const review = reviews[i];
-  if (!review) return;
+async function loadReviews() {
+  try {
+    if (!tutorId) {
+      const res = await fetch('/tutor/profile', { headers: authHeader() });
+      const data = await res.json();
+      if (data.status === 'success') tutorId = data.data.tutor_id;
+    }
+    if (!tutorId) return;
 
-  const confirmed = confirm(`ต้องการแจ้งลบ "${review.title}" ใช่หรือไม่?`);
-  if (!confirmed) return;
-
-  alert('ส่งคำขอแจ้งลบเรียบร้อย');
+    const res = await fetch(`/reviews/tutor/${tutorId}`, { headers: authHeader() });
+    const data = await res.json();
+    reviews = data.data || [];
+    renderReviews();
+  } catch (err) {
+    console.error('loadReviews error:', err);
+    document.getElementById('reviewList').innerHTML =
+      '<div class="empty-state">โหลดรีวิวไม่สำเร็จ</div>';
+  }
 }
 
 function updateStats(dashData) {
@@ -230,49 +233,41 @@ function loadJobs(subjectFilter) {
     });
 }
 
-function loadMyApplications() {
-  return fetch('/tutor/my-applications', { headers: authHeader() })
-    .then(res => {
-      if (handleAuthError(res)) return null;
-      return res.json();
-    })
-    .then(data => {
-      if (data) myApplications = data.data || [];
-    })
-    .catch(() => {
-      myApplications = [];
-    });
+async function loadMyApplications() {
+  try {
+    const res = await fetch('/tutor/my-applications', { headers: authHeader() });
+    if (handleAuthError(res)) return;
+    const data = await res.json();
+    myApplications = data.data || [];
+  } catch {
+    myApplications = [];
+  }
 }
 
-function loadDashboard() {
-  return fetch('/tutor/dashboard', { headers: authHeader() })
-    .then(res => {
-      if (handleAuthError(res)) return null;
-      return res.json();
-    })
-    .then(data => {
-      if (data) updateStats(data.data || {});
-    })
-    .catch(() => updateStats({}));
+async function loadDashboard() {
+  try {
+    const res = await fetch('/tutor/dashboard', { headers: authHeader() });
+    if (handleAuthError(res)) return;
+    const data = await res.json();
+    updateStats(data.data || {});
+  } catch {
+    updateStats({});
+  }
 }
 
-function loadSchedule() {
-  return fetch('/tutor/schedule', { headers: authHeader() })
-    .then(res => {
-      if (handleAuthError(res)) return null;
-      return res.json();
-    })
-    .then(data => {
-      if (!data) return;
-      schedules = data.data || [];
-      renderSchedules();
-      document.getElementById('statTeachingNow').textContent = schedules.length;
-      document.getElementById('heroClasses').textContent = schedules.length;
-    })
-    .catch(() => {
-      document.getElementById('scheduleList').innerHTML =
-        '<div class="empty-state">โหลดตารางสอนไม่สำเร็จ</div>';
-    });
+async function loadSchedule() {
+  try {
+    const res = await fetch('/tutor/schedule', { headers: authHeader() });
+    if (handleAuthError(res)) return;
+    const data = await res.json();
+    schedules = data.data || [];
+    renderSchedules();
+    document.getElementById('statTeachingNow').textContent = schedules.length;
+    document.getElementById('heroClasses').textContent = schedules.length;
+  } catch {
+    document.getElementById('scheduleList').innerHTML =
+      '<div class="empty-state">โหลดตารางสอนไม่สำเร็จ</div>';
+  }
 }
 
 async function startClass(app_id) {
@@ -326,10 +321,10 @@ function acceptJob(post_id) {
     .catch(() => alert('เกิดข้อผิดพลาด ไม่สามารถสมัครได้'));
 }
 
-function refreshDashboard() {
-  Promise.allSettled([loadMyApplications(), loadDashboard(), loadSchedule()])
-    .then(() => loadJobs())
-    .then(() => renderReviews());
+async function refreshDashboard() {
+  await Promise.allSettled([loadMyApplications(), loadDashboard(), loadSchedule()]);
+  loadJobs();
+  loadReviews();
 }
 
 document.getElementById('logout').addEventListener('click', function () {
@@ -339,6 +334,5 @@ document.getElementById('logout').addEventListener('click', function () {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-  renderReviews();
   refreshDashboard();
 });
