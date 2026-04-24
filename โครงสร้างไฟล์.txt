@@ -5,8 +5,8 @@ tutor-match/
 ├── .env.example                        # ตัวอย่าง env variables
 ├── .gitignore                          # venv/, .env, __pycache__/
 ├── README.md                           # เอกสารโปรเจกต์
-├── base.html                           # (ไฟล์กำพร้า — ยังไม่ได้ใช้งาน)
-├── create_post.html                    # (ไฟล์กำพร้า — ยังไม่ได้ใช้งาน)
+├── base.html                           # (ยังไม่ได้ใช้งาน)
+├── create_post.html                    # (ยังไม่ได้ใช้งาน)
 │
 ├── backend/
 │   ├── app.py                          # สร้าง Flask app, register Blueprint ทุกตัว, CORS
