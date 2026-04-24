@@ -184,7 +184,6 @@ def update_user_status():
     try:
         data = request.get_json()
 
-        # ตรวจสอบข้อมูลที่จำเป็น
         user_id = data.get("user_id")
         status = data.get("status")
 
@@ -214,5 +213,88 @@ def update_user_status():
             "status": "error",
             "message": str(e)
         }), 500
+    finally:
+        connection.close()
+
+
+@admin_bp.route("/tutors/verify", methods=["POST"])
+@token_required
+@role_required("admin")
+def verify_tutor():
+    """Admin อนุมัติหรือปฏิเสธ tutor"""
+    connection = db.get_connection()
+    try:
+        data = request.get_json()
+        tutor_id = data.get("tutor_id")
+        action = data.get("action")  # 'verified' | 'rejected'
+        reject_reason = data.get("reject_reason", "")
+
+        if not tutor_id or action not in ("verified", "rejected"):
+            return jsonify({
+                "status": "error",
+                "message": "ต้องส่ง tutor_id และ action (verified/rejected)"
+            }), 400
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT tutor_id FROM tutor_profiles WHERE tutor_id = %s",
+                (tutor_id,)
+            )
+            if not cursor.fetchone():
+                return jsonify({"status": "error", "message": "ไม่พบ tutor นี้"}), 404
+
+            cursor.execute("""
+                UPDATE tutor_profiles
+                SET verification_status = %s,
+                    verified_by = %s,
+                    verified_at = NOW(),
+                    reject_reason = %s
+                WHERE tutor_id = %s
+            """, (action, request.user_id, reject_reason if action == "rejected" else None, tutor_id))
+
+        connection.commit()
+
+        msg = "อนุมัติ tutor สำเร็จ" if action == "verified" else "ปฏิเสธ tutor สำเร็จ"
+        return jsonify({"status": "success", "message": msg})
+
+    except Exception as e:
+        connection.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        connection.close()
+
+
+@admin_bp.route("/tutors/pending", methods=["GET"])
+@token_required
+@role_required("admin")
+def get_pending_tutors():
+    """ดึงรายชื่อ tutor ที่รอการอนุมัติ"""
+    connection = db.get_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT
+                    tp.tutor_id,
+                    tp.verification_status,
+                    tp.bio,
+                    tp.hourly_rate,
+                    tp.profile_picture_url,
+                    tp.verification_submitted_at,
+                    tp.reject_reason,
+                    u.user_id,
+                    u.name,
+                    u.email,
+                    u.created_at
+                FROM tutor_profiles tp
+                JOIN users u ON tp.user_id = u.user_id
+                WHERE tp.verification_status = 'pending'
+                ORDER BY tp.verification_submitted_at ASC, u.created_at ASC
+            """)
+            data = cursor.fetchall()
+
+        return jsonify({"status": "success", "data": data})
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
     finally:
         connection.close()
