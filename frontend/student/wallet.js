@@ -11,15 +11,11 @@ if (!TOKEN) {
 }
 
 function goToStuHome() {
-  // Live Server
-  window.location.href = "home_student.html";
-
-  // Flask จริง ถ้าต้องการใช้ route
-  // window.location.href = "/home/student";
+  window.location.href = "/home/student";
 }
 
 function goToMyCourses() {
-  window.location.href = "my_courses.html";
+  window.location.href = "/student/courses";
 }
 
 function scrollToSection(id) {
@@ -50,6 +46,10 @@ const confirmDepositBtn = document.getElementById('confirmDepositBtn');
 const confirmWithdrawBtn = document.getElementById('confirmWithdrawBtn');
 const bankName = document.getElementById('bankName');
 const accountNumber = document.getElementById('accountNumber');
+
+accountNumber.addEventListener('input', () => {
+  accountNumber.value = accountNumber.value.replace(/\D/g, '').slice(0, 10);
+});
 
 function formatCurrency(amount) {
   return `฿${Number(amount).toLocaleString('en-US', {
