@@ -1,4 +1,8 @@
-# Environment variables
+# ============================================================
+# Tutor Match — Flask + MySQL + Vanilla JS
+# ============================================================
+
+# Environment — ห้าม commit ค่า secret ลง repo
 .env
 .env.*
 !.env.example
@@ -7,16 +11,17 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyo
 
 # Virtual environment
 venv/
-.env/
 .venv/
+env/
 
-# Packages
-*.egg-info/
-dist/
-build/
+# Flask
+instance/
+flask_session/
+.webassets-cache
 
 # Testing
 .pytest_cache/
@@ -26,29 +31,32 @@ htmlcov/
 # Logs
 *.log
 
-# Database
+# Database dump / backup (ไม่ commit ข้อมูลจริง)
+*.sql.bak
 *.db
 *.sqlite3
 
 # IDE / Editor
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Flask specific
-instance/
-.webassets-cache
-
-# User uploaded files (profile pictures, certificates)
+# User uploaded files (เก็บแค่ default)
 static/uploads/*
 !static/uploads/default_profile.jpg
 
-# Secrets
+# Secrets / Certificates
 *.pem
 *.key
+*.p12
 
-# Misc
-*.swp
+# Python build artifacts
+*.egg-info/
+dist/
+build/
