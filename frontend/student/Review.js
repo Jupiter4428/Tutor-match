@@ -135,7 +135,7 @@ reviewForm.addEventListener("submit", (event) => {
 updateStarDisplay(0);
 sortReviews();
 filterReviews();
-=======
+=====
 const token = localStorage.getItem('token') || '';
 const currentUserId = Number(localStorage.getItem('user_id') || 0);
 const userRole = localStorage.getItem('user_role') || 'student';
