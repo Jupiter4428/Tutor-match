@@ -178,14 +178,16 @@ def get_tutor_schedule(user_id):
 
             sql = """
                 SELECT
-                    a.app_id, a.applied_at,
+                    a.app_id, a.applied_at, a.teaching_status,
                     p.post_id, p.subject, p.grade_level, p.learning_format,
                     p.location, p.preferred_time, p.budget,
-                    u.name AS student_name
+                    u.name AS student_name,
+                    pay.payment_id, pay.status AS payment_status
                 FROM applications a
-                JOIN student_posts p ON a.post_id = p.post_id
+                JOIN student_posts p    ON a.post_id    = p.post_id
                 JOIN student_profiles sp ON p.student_id = sp.student_id
-                JOIN users u ON sp.user_id = u.user_id
+                JOIN users u            ON sp.user_id   = u.user_id
+                LEFT JOIN payments pay  ON a.app_id     = pay.app_id
                 WHERE a.tutor_id = %s AND a.status = 'accepted'
                 ORDER BY a.applied_at DESC
             """
@@ -364,32 +366,53 @@ def get_tutor_wallet(user_id):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
-            # ดึงยอดเงินปัจจุบันจากตาราง wallets
-            cursor.execute("""
-                SELECT w.balance 
-                FROM wallets w
-                JOIN users u ON w.user_id = u.user_id
-                WHERE u.user_id = %s
-            """, (user_id,))
+            cursor.execute(
+                "SELECT wallet_id, balance, status, updated_at FROM wallets WHERE user_id = %s",
+                (user_id,)
+            )
             wallet = cursor.fetchone()
-            
-            # ดึงประวัติธุรกรรมล่าสุด
-            cursor.execute("""
-                SELECT transaction_type, amount, balance_after, description, transaction_date
-                FROM transaction_logs tl
-                JOIN wallets w ON tl.wallet_id = w.wallet_id
-                WHERE w.user_id = %s
-                ORDER BY transaction_date DESC LIMIT 10
-            """, (user_id,))
-            transactions = cursor.fetchall()
 
-            return {
-                "status": "success", 
-                "balance": float(wallet['balance']) if wallet else 0,
-                "transactions": transactions
-            }
+            if not wallet:
+                cursor.execute(
+                    "INSERT INTO wallets (user_id, balance, status) VALUES (%s, 0.00, 'active')",
+                    (user_id,)
+                )
+                connection.commit()
+                cursor.execute(
+                    "SELECT wallet_id, balance, status, updated_at FROM wallets WHERE user_id = %s",
+                    (user_id,)
+                )
+                wallet = cursor.fetchone()
+
+            return {"status": "success", "data": wallet}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+    finally:
+        connection.close()
+
+
+def get_tutor_transactions(user_id):
+    connection = db.get_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT wallet_id FROM wallets WHERE user_id = %s", (user_id,))
+            wallet = cursor.fetchone()
+            if not wallet:
+                return {"status": "success", "data": []}
+
+            cursor.execute("""
+                SELECT transaction_id, transaction_type, amount, balance_after, description,
+                       DATE_FORMAT(transaction_date, '%%d %%b %%Y %%H:%%i') AS formatted_date
+                FROM transaction_logs
+                WHERE wallet_id = %s
+                ORDER BY transaction_date DESC
+            """, (wallet['wallet_id'],))
+
+            return {"status": "success", "data": cursor.fetchall()}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+    finally:
+        connection.close()
 
 def request_withdrawal(user_id, amount, bank_name, account_number):
     connection = db.get_connection()

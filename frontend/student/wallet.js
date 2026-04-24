@@ -57,16 +57,15 @@ async function fetchWalletData() {
       baseBalance = parseFloat(data.data.balance);
       walletId = data.data.wallet_id;
 
-      // อัปเดตตัวเลขบนหน้าเว็บ
       currentWalletBalance.textContent = formatCurrency(baseBalance);
+      document.getElementById('heroBalance').textContent = formatCurrency(baseBalance);
+      document.getElementById('heroWalletStatus').textContent = data.data.status || 'active';
 
-      // อัปเดต Wallet ID ตรงป้ายบอกสถานะ
       const pillElements = document.querySelectorAll('.pill');
       if (pillElements.length > 1) {
         pillElements[1].textContent = `Wallet ID: #WLT-${walletId}`;
       }
 
-      // รีเซ็ตค่าเริ่มต้นในช่องกรอกเงิน
       updateDepositSummary(depositAmountInput.value || 500);
       updateWithdrawSummary(withdrawAmountInput.value || 100);
     }
@@ -85,45 +84,109 @@ async function fetchTransactions() {
     const listContainer = document.querySelector('.transaction-list');
 
     if (data.status === 'success' && data.data.length > 0) {
+      document.getElementById('heroTxCount').textContent = `${data.data.length} รายการ`;
+
+      const lastDeposit = data.data.find(t => t.transaction_type === 'deposit');
+      const lastPayment = data.data.find(t => t.transaction_type === 'payment');
+      const lastRefund  = data.data.find(t => t.transaction_type === 'refund');
+      const lastTx      = data.data[0];
+
+      if (lastDeposit) document.getElementById('miniLastDeposit').textContent = `+ ${formatCurrency(lastDeposit.amount)}`;
+      if (lastPayment) document.getElementById('miniLastPayment').textContent = `- ${formatCurrency(lastPayment.amount)}`;
+      if (lastRefund)  document.getElementById('miniLastRefund').textContent  = `+ ${formatCurrency(lastRefund.amount)}`;
+      if (lastTx)      document.getElementById('miniLastType').textContent    = lastTx.transaction_type;
+
+      const thaiMonths = {
+        'Jan':'ม.ค.','Feb':'ก.พ.','Mar':'มี.ค.','Apr':'เม.ย.',
+        'May':'พ.ค.','Jun':'มิ.ย.','Jul':'ก.ค.','Aug':'ส.ค.',
+        'Sep':'ก.ย.','Oct':'ต.ค.','Nov':'พ.ย.','Dec':'ธ.ค.'
+      };
+
+      const titleMap = {
+        deposit:        'ฝากเงินเข้า Wallet',
+        withdrawal:     'ถอนเงินคงเหลือกลับบัญชี',
+        payment:        'ชำระค่าเรียน',
+        refund:         'รับเงินคืน',
+        tutor_earnings: 'รายได้จากการสอน',
+        platform_fee:   'ค่าธรรมเนียมแพลตฟอร์ม',
+      };
+
+      const iconMap = {
+        deposit: '💸', withdrawal: '🏦', payment: '📚',
+        refund: '↩️', tutor_earnings: '💼', platform_fee: '💠',
+      };
+
+      const iconBgMap = {
+        deposit:        'linear-gradient(135deg,rgba(255,95,210,.35),rgba(139,107,255,.25))',
+        withdrawal:     'linear-gradient(135deg,rgba(255,123,146,.3),rgba(255,215,92,.2))',
+        payment:        'linear-gradient(135deg,rgba(66,216,255,.3),rgba(139,107,255,.25))',
+        refund:         'linear-gradient(135deg,rgba(46,230,166,.3),rgba(66,216,255,.25))',
+        tutor_earnings: 'linear-gradient(135deg,rgba(46,230,166,.3),rgba(139,107,255,.2))',
+        platform_fee:   'linear-gradient(135deg,rgba(255,215,92,.3),rgba(255,95,210,.2))',
+      };
+
+      const chipMap = {
+        deposit: 'completed', withdrawal: 'completed', refund: 'completed',
+        payment: 'pending', platform_fee: 'pending', tutor_earnings: 'completed',
+      };
+
+      const isInMap = { deposit: true, refund: true, tutor_earnings: true };
+
+      const refPrefixMap = {
+        deposit_slip:        'DPS',
+        withdrawal_request:  'WDR',
+        application:         'APP',
+        deposit_slip_manual: 'DPS',
+      };
+
       listContainer.innerHTML = data.data.map(t => {
-        // กำหนดรูปแบบ Icon, สี และเครื่องหมาย (+/-) ตามประเภทธุรกรรม
-        let icon = '💸'; let typeClass = 'completed'; let moneyClass = 'in'; let sign = '+';
+        const type      = t.transaction_type;
+        const isIn      = !!isInMap[type];
+        const sign      = isIn ? '+' : '-';
+        const moneyClass = isIn ? 'in' : 'out';
 
-        if (t.transaction_type === 'withdrawal') {
-          icon = '🏦'; typeClass = 'completed'; moneyClass = 'out'; sign = '-';
-        } else if (t.transaction_type === 'payment') {
-          icon = '📚'; typeClass = 'pending'; moneyClass = 'out'; sign = '-';
-        } else if (t.transaction_type === 'refund') {
-          icon = '↩️'; typeClass = 'completed'; moneyClass = 'in'; sign = '+';
+        // จัดรูปแบบวันที่เป็นภาษาไทย
+        const parts    = (t.formatted_date || '').split(' ');
+        const month    = thaiMonths[parts[1]] || parts[1] || '';
+        const dateText = `${parts[0] || ''} ${month} ${parts[2] || ''}`;
+        const timeText = parts[3] || '';
+
+        // จัดรูปแบบ reference
+        let refText = '';
+        if (t.reference_type) {
+          const prefix = refPrefixMap[t.reference_type] || t.reference_type.toUpperCase().slice(0, 3);
+          const refId  = t.reference_id ? t.reference_id : t.transaction_id;
+          refText = `${t.reference_type} #${prefix}-${refId}`;
+        } else {
+          refText = `TXN-${t.transaction_id}`;
         }
-
-        // แยกวันที่และเวลาออกจากกัน
-        const dateParts = t.formatted_date.split(' ');
-        const dateText = `${dateParts[0]} ${dateParts[1]} ${dateParts[2]}`;
-        const timeText = dateParts[3];
+        const noteText  = t.description || '';
+        const refLine   = noteText ? `${refText} • ${noteText}` : refText;
 
         return `
-                <div class="transaction-item">
-                  <div class="transaction-icon">${icon}</div>
-                  <div class="transaction-main">
-                    <h4>${t.description || t.transaction_type}</h4>
-                    <p>อ้างอิง: TXN-${t.transaction_id}</p>
-                  </div>
-                  <div class="transaction-type">
-                    <div class="status-chip ${typeClass}">${t.transaction_type}</div>
-                  </div>
-                  <div class="transaction-balance">
-                    <div class="money ${moneyClass}">${sign} ${formatCurrency(t.amount)}</div>
-                    <div style="color:var(--text-fade); font-size:.86rem;">Balance After: ${formatCurrency(t.balance_after)}</div>
-                  </div>
-                  <div class="transaction-date">
-                    ${dateText}<br>
-                    <span style="color:var(--text-fade); font-size:.86rem;">${timeText} น.</span>
-                  </div>
-                </div>`;
+          <div class="transaction-item">
+            <div class="transaction-icon" style="background:${iconBgMap[type] || iconBgMap.deposit}">
+              ${iconMap[type] || '💳'}
+            </div>
+            <div class="transaction-main">
+              <h4>${titleMap[type] || type}</h4>
+              <p>อ้างอิง: ${refLine}</p>
+            </div>
+            <div class="transaction-type">
+              <div class="status-chip ${chipMap[type] || 'completed'}">${type}</div>
+            </div>
+            <div class="transaction-balance">
+              <div class="money ${moneyClass}">${sign} ${formatCurrency(t.amount)}</div>
+              <div style="color:var(--muted);font-size:.86rem;">Balance After: ${formatCurrency(t.balance_after)}</div>
+            </div>
+            <div class="transaction-date">
+              ${dateText}<br>
+              <span style="color:var(--muted);font-size:.86rem;">${timeText} น.</span>
+            </div>
+          </div>`;
       }).join('');
     } else {
-      listContainer.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-fade);">ไม่มีประวัติการทำรายการในระบบ</div>`;
+      listContainer.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted);">ไม่มีประวัติการทำรายการในระบบ</div>`;
     }
   } catch (error) {
     console.error("Error fetching transactions:", error);

@@ -7,11 +7,16 @@ from backend.services.student_service import (
     get_student_post_history,
     update_student_profile,
     delete_student_post,
-    # นำเข้าฟังก์ชัน Wallet จาก Service
-    get_student_wallet, 
-    get_wallet_transactions, 
-    process_deposit, 
-    process_withdraw
+    get_student_wallet,
+    get_wallet_transactions,
+    process_deposit,
+    process_withdraw,
+    submit_report
+)
+from backend.services.payment_service import (
+    pay_for_application,
+    confirm_class,
+    cancel_booking
 )
 from backend.utils.auth_helper import token_required, role_required
 
@@ -110,6 +115,70 @@ def delete_post(post_id):
     )
     status_code = 200 if result["status"] == "success" else 400
     return jsonify(result), status_code
+
+
+# ==========================================
+# ระบบ Payment Flow
+# ==========================================
+
+# POST /student/api/pay — นักเรียนชำระเงิน Escrow
+@student_bp.route('/api/pay', methods=['POST'])
+@token_required
+@role_required('student')
+def pay():
+    data   = request.get_json()
+    app_id = data.get('app_id')
+    if not app_id:
+        return jsonify({"status": "error", "message": "ต้องส่ง app_id"}), 400
+    result = pay_for_application(request.user_id, app_id)
+    return jsonify(result), 200 if result['status'] == 'success' else 400
+
+# POST /student/api/confirm-class — นักเรียน Confirm การเรียน → Payout
+@student_bp.route('/api/confirm-class', methods=['POST'])
+@token_required
+@role_required('student')
+def confirm():
+    data   = request.get_json()
+    app_id = data.get('app_id')
+    if not app_id:
+        return jsonify({"status": "error", "message": "ต้องส่ง app_id"}), 400
+    result = confirm_class(request.user_id, app_id)
+    return jsonify(result), 200 if result['status'] == 'success' else 400
+
+# POST /student/api/cancel-booking — ยกเลิกและรับเงินคืน
+@student_bp.route('/api/cancel-booking', methods=['POST'])
+@token_required
+@role_required('student')
+def cancel():
+    data   = request.get_json()
+    app_id = data.get('app_id')
+    if not app_id:
+        return jsonify({"status": "error", "message": "ต้องส่ง app_id"}), 400
+    result = cancel_booking(request.user_id, app_id)
+    return jsonify(result), 200 if result['status'] == 'success' else 400
+
+
+# POST /student/report — ส่งรายงานปัญหา
+@student_bp.route('/report', methods=['POST'])
+@token_required
+def report():
+    data = request.get_json()
+    target_type = data.get('target_type')
+    target_id   = data.get('target_id')
+    title       = data.get('title')
+    description = data.get('description', '')
+
+    if not all([target_type, title]):
+        return jsonify({"status": "error", "message": "กรุณากรอกข้อมูลให้ครบถ้วน"}), 400
+
+    result = submit_report(
+        user_id=request.user_id,
+        target_type=target_type,
+        target_id=target_id,
+        title=title,
+        description=description
+    )
+    return jsonify(result), 200 if result['status'] == 'success' else 400
 
 
 # ==========================================
