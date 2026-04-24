@@ -30,7 +30,10 @@ INSERT INTO tutor_profiles (user_id, bio, hourly_rate, verification_status, prof
 VALUES (@new_tutor_user_id, 'สอนคณิตศาสตร์ระดับ ม.ปลาย เน้นสอบ ONET', 280.00, 'verified', 'static/uploads/default_profile.jpg');
 
 INSERT INTO tutor_subjects (tutor_id, subject)
-VALUES (LAST_INSERT_ID(), 'คณิตศาสตร์');
+VALUES
+  (LAST_INSERT_ID(), 'คณิตศาสตร์'),
+  (LAST_INSERT_ID(), 'สถิติ'),
+  (LAST_INSERT_ID(), 'ความน่าจะเป็น');
 
 INSERT INTO wallets (user_id, balance, status)
 VALUES (@new_tutor_user_id, 0.00, 'active');
