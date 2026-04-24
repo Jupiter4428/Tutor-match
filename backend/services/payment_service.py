@@ -293,6 +293,13 @@ def cancel_booking(user_id, app_id):
             cursor.execute(
                 "UPDATE applications SET status = 'rejected' WHERE app_id = %s", (app_id,)
             )
+            # คืน post กลับเป็น open เพื่อให้นักเรียนหาติวเตอร์คนใหม่ได้
+            cursor.execute("""
+                UPDATE student_posts SET status = 'open'
+                WHERE post_id = (
+                    SELECT post_id FROM applications WHERE app_id = %s
+                )
+            """, (app_id,))
             connection.commit()
 
             return {
