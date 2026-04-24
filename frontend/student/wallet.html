@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
 
-  <link rel="stylesheet" href="/assets/student/wallet.css">
+  <link rel="stylesheet" href="./wallet.css">
 </head>
 
 <body>
@@ -27,7 +27,7 @@
 
       <div class="nav-actions">
         <button class="btn btn-secondary" onclick="goToStuHome()">🏠 Home Student</button>
-        <button class="btn btn-secondary" onclick="goToStuHome()">📚 My Courses</button>
+        <button class="btn btn-secondary" onclick="goToMyCourses()">📚 My Courses</button>
         <button class="btn btn-primary" onclick="scrollToSection('deposit-section')">➕ ฝากเงิน</button>
       </div>
     </nav>
@@ -61,13 +61,14 @@
       <div class="card hero-right">
         <div class="wallet-balance">
           <span>Current Wallet Balance</span>
-          <h3 id="currentWalletBalance">฿ 2,450.00</h3>
+          <h3 id="currentWalletBalance">฿0.00</h3>
           <div class="wallet-meta">
             <div class="pill active">● Wallet Active</div>
-            <div class="pill">Wallet ID: #WLT-10024</div>
-            <div class="pill">Updated: 23 Apr 2026</div>
+            <div class="pill">Wallet ID: -</div>
+            <div class="pill">Updated: -</div>
           </div>
         </div>
+
         <div class="mini-summary">
           <div class="mini-card">
             <span class="label">เงินฝากล่าสุด</span>
@@ -148,7 +149,7 @@
         <div class="summary-box">
           <div class="summary-row">
             <span>จำนวนเงินฝาก</span>
-            <strong id="summaryDeposit">฿500.00</strong>
+            <strong id="summaryDeposit">฿0.00</strong>
           </div>
           <div class="summary-row">
             <span>ประเภทธุรกรรม</span>
@@ -160,7 +161,7 @@
           </div>
           <div class="summary-row">
             <span>ยอดคงเหลือหลังฝาก</span>
-            <strong id="summaryBalance">฿2,950.00</strong>
+            <strong id="summaryBalance">฿0.00</strong>
           </div>
         </div>
 
@@ -216,7 +217,7 @@
         <div class="summary-box withdraw-summary">
           <div class="summary-row">
             <span>จำนวนเงินถอน</span>
-            <strong id="summaryWithdraw">฿100.00</strong>
+            <strong id="summaryWithdraw">฿0.00</strong>
           </div>
           <div class="summary-row">
             <span>ประเภทธุรกรรม</span>
@@ -228,13 +229,13 @@
           </div>
           <div class="summary-row">
             <span>ยอดคงเหลือหลังถอน</span>
-            <strong id="summaryWithdrawBalance">฿2,350.00</strong>
+            <strong id="summaryWithdrawBalance">฿0.00</strong>
           </div>
         </div>
 
         <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:18px;">
           <button class="btn btn-danger" id="confirmWithdrawBtn">🏦 Confirm Withdraw</button>
-          <button class="btn btn-secondary">📄 ดูประวัติการถอน</button>
+          <button class="btn btn-secondary" onclick="scrollToSection('transaction-section')">📄 ดูประวัติการถอน</button>
         </div>
       </div>
 
@@ -250,28 +251,19 @@
           <div class="flow-card">
             <div class="flow-step">1</div>
             <h4>จองและจ่ายเงินเต็มจำนวน</h4>
-            <p>
-              นักเรียนกดจองคอร์ส แล้วระบบหักเงินเต็มจำนวนจาก Wallet
-              เพื่อถือไว้เป็น Escrow ก่อนเริ่มเรียน
-            </p>
+            <p>นักเรียนกดจองคอร์ส แล้วระบบหักเงินเต็มจำนวนจาก Wallet เพื่อถือไว้เป็น Escrow ก่อนเริ่มเรียน</p>
           </div>
 
           <div class="flow-card">
             <div class="flow-step">2</div>
             <h4>ติวเตอร์เริ่ม-จบคลาส</h4>
-            <p>
-              ติวเตอร์กด Start Class และ End Class
-              จากนั้นนักเรียนกดยืนยันว่าเรียนครบจริงตามเวลาที่กำหนด
-            </p>
+            <p>ติวเตอร์กด Start Class และ End Class จากนั้นนักเรียนกดยืนยันว่าเรียนครบจริงตามเวลาที่กำหนด</p>
           </div>
 
           <div class="flow-card">
             <div class="flow-step">3</div>
             <h4>ระบบปล่อยเงินอัตโนมัติ</h4>
-            <p>
-              เมื่อมีการ confirm หรือ auto-confirm ระบบจะแบ่งเงินให้ติวเตอร์
-              และหัก platform fee ตามเปอร์เซ็นต์ที่ตั้งไว้
-            </p>
+            <p>เมื่อมีการ confirm หรือ auto-confirm ระบบจะแบ่งเงินให้ติวเตอร์ และหัก platform fee ตามเปอร์เซ็นต์ที่ตั้งไว้</p>
           </div>
         </div>
 
@@ -296,7 +288,7 @@
       </div>
     </section>
 
-    <section class="transaction-section">
+    <section class="transaction-section" id="transaction-section">
       <div class="transaction-toolbar">
         <h3>Transaction Log</h3>
         <div class="filter-pills">
@@ -308,79 +300,7 @@
         </div>
       </div>
 
-      <div class="transaction-list">
-        <div class="transaction-item">
-          <div class="transaction-icon">💸</div>
-          <div class="transaction-main">
-            <h4>ฝากเงินเข้า Wallet</h4>
-            <p>อ้างอิง: deposit_slip #DPS-2001 • เติมเงินเพื่อใช้จองคอร์ส</p>
-          </div>
-          <div class="transaction-type">
-            <div class="status-chip completed">deposit</div>
-          </div>
-          <div class="transaction-balance">
-            <div class="money in">+ ฿500.00</div>
-            <div style="color:var(--muted); font-size:.86rem;">Balance After: ฿2,950.00</div>
-          </div>
-          <div class="transaction-date">
-            23 เม.ย. 2026<br><span style="color:var(--muted); font-size:.86rem;">14:40 น.</span>
-          </div>
-        </div>
-
-        <div class="transaction-item">
-          <div class="transaction-icon">📚</div>
-          <div class="transaction-main">
-            <h4>ชำระค่าเรียนคอร์สคณิตศาสตร์ ม.4</h4>
-            <p>อ้างอิง: application #APP-1142 • ระบบถือเงินแบบ escrow</p>
-          </div>
-          <div class="transaction-type">
-            <div class="status-chip pending">payment</div>
-          </div>
-          <div class="transaction-balance">
-            <div class="money out">- ฿900.00</div>
-            <div style="color:var(--muted); font-size:.86rem;">Balance After: ฿2,050.00</div>
-          </div>
-          <div class="transaction-date">
-            22 เม.ย. 2026<br><span style="color:var(--muted); font-size:.86rem;">18:10 น.</span>
-          </div>
-        </div>
-
-        <div class="transaction-item">
-          <div class="transaction-icon">↩️</div>
-          <div class="transaction-main">
-            <h4>รับเงินคืนจากคอร์สภาษาอังกฤษ</h4>
-            <p>อ้างอิง: application #APP-1098 • refund จากการยกเลิกบางส่วน</p>
-          </div>
-          <div class="transaction-type">
-            <div class="status-chip completed">refund</div>
-          </div>
-          <div class="transaction-balance">
-            <div class="money in">+ ฿600.00</div>
-            <div style="color:var(--muted); font-size:.86rem;">Balance After: ฿2,950.00</div>
-          </div>
-          <div class="transaction-date">
-            21 เม.ย. 2026<br><span style="color:var(--muted); font-size:.86rem;">09:25 น.</span>
-          </div>
-        </div>
-
-        <div class="transaction-item">
-          <div class="transaction-icon">🏦</div>
-          <div class="transaction-main">
-            <h4>ถอนเงินคงเหลือกลับบัญชี</h4>
-            <p>อ้างอิง: withdrawal_request #WDR-882 • คืนเงินส่วนที่ไม่ได้ใช้</p>
-          </div>
-          <div class="transaction-type">
-            <div class="status-chip completed">withdrawal</div>
-          </div>
-          <div class="transaction-balance">
-            <div class="money out">- ฿300.00</div>
-            <div style="color:var(--muted); font-size:.86rem;">Balance After: ฿1,750.00</div>
-          </div>
-          <div class="transaction-date">
-            18 เม.ย. 2026<br><span style="color:var(--muted); font-size:.86rem;">16:52 น.</span>
-          </div>
-        </div>
-      </div>
+      <div class="transaction-list"></div>
     </section>
 
     <section class="policy-grid">
@@ -388,8 +308,7 @@
         <h3>นโยบายการคืนเงิน</h3>
         <div class="policy-list">
           <div class="policy-item">
-            <strong>ยกเลิกก่อนเริ่มเรียน:</strong> นักเรียนได้เงินคืน 100% โดยอาจหักเฉพาะค่าธรรมเนียม gateway
-            ตามที่ระบบกำหนด
+            <strong>ยกเลิกก่อนเริ่มเรียน:</strong> นักเรียนได้เงินคืน 100% โดยอาจหักเฉพาะค่าธรรมเนียม gateway ตามที่ระบบกำหนด
           </div>
           <div class="policy-item">
             <strong>ยกเลิกกลางคัน:</strong> ระบบคำนวณคืนเงินตามจำนวนชั่วโมงที่ยังไม่ได้เรียนจริง
@@ -417,12 +336,12 @@
     </section>
 
     <div class="footer-note">
-      หน้านี้เป็น Frontend สำหรับฝั่งนักเรียนก่อน โดยสามารถนำไปเชื่อมกับตาราง <strong>Wallet</strong> และ
-      <strong>Transaction_Log</strong> รวมถึง API สำหรับ deposit / refund / payment / withdrawal ได้ภายหลัง
+      หน้านี้เป็น Frontend สำหรับฝั่งนักเรียน โดยเชื่อมกับตาราง <strong>Wallet</strong> และ
+      <strong>Transaction_Log</strong> ผ่าน API สำหรับ deposit / refund / payment / withdrawal
     </div>
   </div>
 
-  <script src="/assets/student/wallet.js"></script>
+  <script src="./wallet.js"></script>
 </body>
 
 </html>
