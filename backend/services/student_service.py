@@ -505,6 +505,9 @@ def process_withdraw(user_id, amount, bank_name, account_number, note):
             cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s FOR UPDATE", (user_id,))
             wallet = cursor.fetchone()
 
+            if not wallet:
+                return {"status": "error", "message": "ไม่พบกระเป๋าเงิน"}
+
             if float(wallet['balance']) < float(amount):
                 return {"status": "error", "message": "ยอดเงินคงเหลือไม่เพียงพอ"}
 
