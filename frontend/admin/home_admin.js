@@ -230,22 +230,34 @@ function renderReports() {
         reportList.innerHTML = `<div style="text-align:center; padding: 20px; color:#aab3dd;">ไม่มีรายงานปัญหาใหม่ 🎉</div>`;
         return;
     }
-    reportList.innerHTML = reports
-        .map(
-            (item) => `
+
+    const statusBadge = {
+        pending:       `<span class="badge badge-pending">รอตรวจสอบ</span>`,
+        investigating: `<span class="badge badge-pending">กำลังตรวจสอบ</span>`,
+        resolved:      `<span class="badge badge-approved">แก้ไขแล้ว</span>`,
+        dismissed:     `<span class="badge badge-banned">ยกเลิก</span>`,
+    };
+
+    const targetLabel = {
+        user: 'ผู้ใช้', post: 'โพสต์', review: 'รีวิว', other: 'อื่นๆ'
+    };
+
+    reportList.innerHTML = reports.map((item) => `
         <div class="report-card">
             <div class="report-top">
                 <div>
                     <div class="report-title">${item.title}</div>
-                    <div class="report-meta">${item.meta}</div>
+                    <div class="report-meta">
+                        รายงานโดย: ${item.reporter_name} (${item.reporter_email}) &nbsp;•&nbsp;
+                        เป้าหมาย: ${targetLabel[item.target_type] || item.target_type} #${item.target_id || '-'} &nbsp;•&nbsp;
+                        ${item.created_at || ''}
+                    </div>
                 </div>
-                <span class="badge badge-pending">ตรวจสอบ</span>
+                ${statusBadge[item.status] || statusBadge.pending}
             </div>
-            <div class="report-desc">${item.desc}</div>
+            <div class="report-desc">${item.description || ''}</div>
         </div>
-    `,
-        )
-        .join("");
+    `).join("");
 }
 
 // --- ส่วนที่ 4: Navigation และเครื่องมือ Dashboard ---
