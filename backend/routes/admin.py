@@ -46,10 +46,17 @@ def get_admin_stats():
             cursor.execute("""
                 SELECT COUNT(*) as total
                 FROM users
-                WHERE account_status = 'banned'
+                WHERE account_status IN ('ban', 'suspended')
             """)
             banned = cursor.fetchone()["total"]
-            
+
+            cursor.execute("""
+                SELECT COUNT(*) as total
+                FROM reports
+                WHERE status = 'pending'
+            """)
+            reports = cursor.fetchone()["total"]
+
         return jsonify({
             "status": "success",
             "data": {
@@ -57,7 +64,7 @@ def get_admin_stats():
                 "students": students,
                 "tutors": tutors,
                 "posts": posts,
-                "reports": 0,
+                "reports": reports,
                 "pending": pending,
                 "banned": banned
             }
@@ -111,11 +118,61 @@ def get_all_users():
 @token_required
 @role_required("admin")
 def get_reports():
-    """ดึงรายการรายงานที่ผ่านมา"""
-    return jsonify({
-        "status": "success",
-        "data": []
-    })
+    """ดึงรายการรายงานทั้งหมด"""
+    connection = db.get_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT
+                    r.report_id,
+                    r.title,
+                    r.description,
+                    r.target_type,
+                    r.target_id,
+                    r.status,
+                    r.created_at,
+                    u.name  AS reporter_name,
+                    u.email AS reporter_email
+                FROM reports r
+                JOIN users u ON r.reporter_id = u.user_id
+                ORDER BY r.created_at DESC
+            """)
+            data = cursor.fetchall()
+
+        return jsonify({"status": "success", "data": data})
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        connection.close()
+
+
+@admin_bp.route("/reports/<int:report_id>/status", methods=["POST"])
+@token_required
+@role_required("admin")
+def update_report_status(report_id):
+    """อัปเดตสถานะรายงาน"""
+    connection = db.get_connection()
+    try:
+        data = request.get_json()
+        status = data.get("status")
+        if status not in ("pending", "investigating", "resolved", "dismissed"):
+            return jsonify({"status": "error", "message": "สถานะไม่ถูกต้อง"}), 400
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE reports SET status = %s WHERE report_id = %s",
+                (status, report_id)
+            )
+        connection.commit()
+
+        return jsonify({"status": "success", "message": "อัปเดตสถานะเรียบร้อย"})
+
+    except Exception as e:
+        connection.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        connection.close()
 
 
 @admin_bp.route("/users/status", methods=["POST"])
