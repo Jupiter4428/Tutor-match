@@ -1,82 +1,11 @@
-const courses = [
-  {
-    id: 1,
-    subject: "คณิตศาสตร์ ม.6",
-    title: "ติวเข้มแคลคูลัสและโจทย์สอบ",
-    status: "active",
-    statusText: "กำลังเรียน",
-    price: 900,
-    schedule: "จันทร์ / พุธ 18:00 - 19:30",
-    format: "Online",
-    progress: 65,
-    tutor: {
-      name: "ครูเมย์ อภิญญา",
-      email: "may.tutor@email.com",
-      bio: "ติวเตอร์คณิตศาสตร์ ประสบการณ์ 5 ปี เน้นอธิบายเป็นขั้นตอนและสรุปสูตรจำง่าย",
-      pic: "https://cdn-icons-png.flaticon.com/512/4140/4140047.png"
-    },
-    review: ""
-  },
-  {
-    id: 2,
-    subject: "ภาษาอังกฤษ",
-    title: "Speaking & Grammar สำหรับนักศึกษา",
-    status: "completed",
-    statusText: "เรียนจบแล้ว",
-    price: 1200,
-    schedule: "เสาร์ 10:00 - 12:00",
-    format: "Online",
-    progress: 100,
-    tutor: {
-      name: "Teacher Ploy",
-      email: "ploy.english@email.com",
-      bio: "สอนภาษาอังกฤษแบบเป็นกันเอง เน้นพูดจริง ใช้จริง พร้อมแก้จุดอ่อนรายบุคคล",
-      pic: "https://cdn-icons-png.flaticon.com/512/6997/6997662.png"
-    },
-    review: "สอนดีมาก เข้าใจง่าย กล้าพูดภาษาอังกฤษมากขึ้น"
-  },
-  {
-    id: 3,
-    subject: "ฟิสิกส์ ม.5",
-    title: "แรง การเคลื่อนที่ และพลังงาน",
-    status: "pending",
-    statusText: "รอยืนยัน",
-    price: 750,
-    schedule: "ศุกร์ 19:00 - 20:30",
-    format: "Onsite",
-    progress: 10,
-    tutor: {
-      name: "พี่ต้น ฟิสิกส์",
-      email: "ton.physics@email.com",
-      bio: "ถนัดสอนฟิสิกส์แบบเข้าใจภาพรวมก่อนลงโจทย์ เหมาะกับนักเรียนที่พื้นฐานยังไม่แน่น",
-      pic: "https://cdn-icons-png.flaticon.com/512/921/921071.png"
-    },
-    review: ""
-  },
-  {
-    id: 4,
-    subject: "Programming",
-    title: "พื้นฐาน Python สำหรับผู้เริ่มต้น",
-    status: "completed",
-    statusText: "เรียนจบแล้ว",
-    price: 1500,
-    schedule: "อาทิตย์ 13:00 - 15:00",
-    format: "Online",
-    progress: 100,
-    tutor: {
-      name: "พี่เกม Developer",
-      email: "game.dev@email.com",
-      bio: "สอนเขียนโค้ดแบบจับมือทำ เหมาะกับผู้เริ่มต้นและคนที่อยากเข้าใจพื้นฐานจริง ๆ",
-      pic: "https://cdn-icons-png.flaticon.com/512/236/236831.png"
-    },
-    review: ""
-  }
-];
+let courses = [];
 
 const courseGrid = document.getElementById("courseGrid");
 const searchInput = document.getElementById("searchInput");
 const statusFilter = document.getElementById("statusFilter");
 const refreshBtn = document.getElementById("refreshBtn");
+
+let selectedReviewCourseId = null;
 
 function goToStuHome() {
   window.location.href = "/home/student";
@@ -86,11 +15,100 @@ function goToStuWallet() {
   window.location.href = "/student/wallet";
 }
 
-function formatMoney(amount){
-  return `฿${Number(amount).toLocaleString("th-TH")}`;
+function formatMoney(amount) {
+  return `฿${Number(amount || 0).toLocaleString("th-TH")}`;
 }
 
-function renderCourses(){
+function getAuthToken() {
+  return localStorage.getItem("token") || localStorage.getItem("access_token");
+}
+
+function renderStars(rating) {
+  if (!rating) return "";
+  return "⭐".repeat(Number(rating));
+}
+
+function mapCourseFromDB(item) {
+  return {
+    id: item.course_id || item.id || item.app_id,
+    app_id: item.app_id,
+    subject: item.subject || "-",
+    title: item.title || item.course_title || item.description || "-",
+    status: item.status || "pending",
+    statusText: getStatusText(item.status),
+    price: item.price || item.budget || 0,
+    schedule: item.schedule || item.schedule_time || "-",
+    format: item.format || item.learning_format || "Online",
+    progress: item.progress || getProgressByStatus(item.status),
+    tutor: {
+      name: item.tutor_name || item.name || "-",
+      email: item.tutor_email || item.email || "-",
+      bio: item.tutor_bio || item.bio || "-",
+      pic: item.tutor_pic || item.user_profile || "https://cdn-icons-png.flaticon.com/512/4140/4140047.png"
+    },
+    rating: item.rating || null,
+    review: item.review || item.comment || ""
+  };
+}
+
+function getStatusText(status) {
+  if (status === "active") return "กำลังเรียน";
+  if (status === "completed") return "เรียนจบแล้ว";
+  if (status === "pending") return "รอยืนยัน";
+  if (status === "pending_payment") return "รอชำระเงิน";
+  if (status === "cancelled") return "ยกเลิก";
+  return "รอยืนยัน";
+}
+
+function getProgressByStatus(status) {
+  if (status === "completed") return 100;
+  if (status === "active") return 50;
+  if (status === "pending") return 10;
+  if (status === "pending_payment") return 0;
+  return 0;
+}
+
+async function loadCoursesFromDB() {
+  const token = getAuthToken();
+
+  if (!token) {
+    alert("กรุณาเข้าสู่ระบบก่อนดูคอร์สของฉัน");
+    window.location.href = "/login";
+    return;
+  }
+
+  try {
+    courseGrid.innerHTML = `<div class="empty-state">กำลังโหลดคอร์สจาก database...</div>`;
+
+    const response = await fetch("/student/my-courses", {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || result.status !== "success") {
+      courseGrid.innerHTML = `<div class="empty-state">โหลดข้อมูลคอร์สไม่สำเร็จ</div>`;
+      alert(result.message || "โหลดข้อมูลคอร์สไม่สำเร็จ");
+      return;
+    }
+
+    const data = result.data || result.courses || [];
+
+    courses = data.map(mapCourseFromDB);
+
+    renderCourses();
+
+  } catch (error) {
+    console.error(error);
+    courseGrid.innerHTML = `<div class="empty-state">เชื่อมต่อ backend ไม่สำเร็จ</div>`;
+    alert("เชื่อมต่อ backend ไม่สำเร็จ");
+  }
+}
+
+function renderCourses() {
   const keyword = searchInput.value.trim().toLowerCase();
   const status = statusFilter.value;
 
@@ -110,20 +128,20 @@ function renderCourses(){
     return matchKeyword && matchStatus;
   });
 
-  if(filtered.length === 0){
+  if (filtered.length === 0) {
     courseGrid.innerHTML = `<div class="empty-state">ไม่พบคอร์สที่ตรงกับเงื่อนไขที่ค้นหา</div>`;
     updateStats();
     return;
   }
 
-  courseGrid.innerHTML = filtered.map((course, index) => `
+  courseGrid.innerHTML = filtered.map(course => `
     <div class="course-card">
       <div class="course-top">
         <div class="course-title">
           <h4>${course.subject}</h4>
           <p>${course.title}</p>
         </div>
-        <div class="status ${course.status}">${course.statusText}</div>
+        <div class="status-badge ${course.status}">${course.statusText}</div>
       </div>
 
       <div class="course-info">
@@ -161,20 +179,33 @@ function renderCourses(){
       </div>
 
       <div class="course-actions">
-        <button class="btn review-btn" onclick="reviewCourse(${course.id})">
+        <button 
+          class="btn review-btn" 
+          onclick="reviewCourse(${course.id})"
+          ${course.status !== "completed" ? "disabled" : ""}
+        >
           ${course.review ? "✏️ แก้ไขรีวิว" : "⭐ Review"}
         </button>
-        <button class="btn detail-btn" onclick="viewDetail(${course.id})">ดูรายละเอียด</button>
+
+        <button class="btn detail-btn" onclick="viewDetail(${course.id})">
+          ดูรายละเอียด
+        </button>
       </div>
 
-      ${course.review ? `<div class="review-text"><strong>รีวิวของคุณ:</strong> ${course.review}</div>` : ""}
+      ${course.review ? `
+        <div class="review-text">
+          <strong>รีวิวของคุณ:</strong>
+          <div class="rating-text">${renderStars(course.rating)}</div>
+          <div>${course.review}</div>
+        </div>
+      ` : ""}
     </div>
   `).join("");
 
   updateStats();
 }
 
-function updateStats(){
+function updateStats() {
   document.getElementById("totalCourses").textContent = courses.length;
   document.getElementById("activeCourses").textContent = courses.filter(c => c.status === "active").length;
   document.getElementById("completedCourses").textContent = courses.filter(c => c.status === "completed").length;
@@ -185,20 +216,103 @@ function updateStats(){
   localStorage.setItem("student_completed_course_count", courses.filter(c => c.status === "completed").length);
 }
 
-function reviewCourse(id){
-  const course = courses.find(c => c.id === id);
-  if(!course) return;
+function reviewCourse(id) {
+  const course = courses.find(c => Number(c.id) === Number(id));
+  if (!course) return;
 
-  const text = prompt("เขียนหรือแก้ไขรีวิวของคุณ", course.review || "");
-  if(text === null) return;
+  if (course.status !== "completed") {
+    alert("รีวิวได้เฉพาะคอร์สที่เรียนจบแล้ว");
+    return;
+  }
 
-  course.review = text.trim();
-  renderCourses();
+  selectedReviewCourseId = id;
+
+  document.getElementById("reviewCourseTitle").textContent =
+    `${course.subject} - ${course.tutor.name}`;
+
+  document.getElementById("reviewRating").value = course.rating || "5";
+  document.getElementById("reviewComment").value = course.review || "";
+
+  document.getElementById("reviewModal").style.display = "flex";
 }
 
-function viewDetail(id){
-  const course = courses.find(c => c.id === id);
-  if(!course) return;
+function closeReviewModal() {
+  selectedReviewCourseId = null;
+  document.getElementById("reviewModal").style.display = "none";
+}
+
+async function submitReview() {
+  const course = courses.find(c => Number(c.id) === Number(selectedReviewCourseId));
+
+  if (!course) {
+    alert("ไม่พบคอร์สที่ต้องการรีวิว");
+    return;
+  }
+
+  const token = getAuthToken();
+
+  if (!token) {
+    alert("กรุณาเข้าสู่ระบบก่อนรีวิว");
+    window.location.href = "/login";
+    return;
+  }
+
+  const rating = Number(document.getElementById("reviewRating").value);
+  const comment = document.getElementById("reviewComment").value.trim();
+
+  if (!rating || rating < 1 || rating > 5) {
+    alert("กรุณาเลือกคะแนน 1-5 ดาว");
+    return;
+  }
+
+  if (!comment) {
+    alert("กรุณาเขียนข้อความรีวิว");
+    return;
+  }
+
+  if (!course.app_id) {
+    alert("คอร์สนี้ยังไม่มี app_id จึงยังบันทึกรีวิวลงฐานข้อมูลไม่ได้");
+    return;
+  }
+
+  try {
+    const response = await fetch("/reviews", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        app_id: course.app_id,
+        rating: rating,
+        comment: comment
+      })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || result.status !== "success") {
+      alert(result.message || "บันทึกรีวิวไม่สำเร็จ");
+      return;
+    }
+
+    course.rating = rating;
+    course.review = comment;
+
+    closeReviewModal();
+    renderCourses();
+
+    alert("บันทึกรีวิวลง database สำเร็จ");
+
+  } catch (error) {
+    console.error(error);
+    alert("เชื่อมต่อ backend ไม่สำเร็จ");
+  }
+}
+
+function viewDetail(id) {
+  const course = courses.find(c => Number(c.id) === Number(id));
+  if (!course) return;
 
   alert(
     `รายละเอียดคอร์ส\n` +
@@ -215,8 +329,7 @@ searchInput.addEventListener("input", renderCourses);
 statusFilter.addEventListener("change", renderCourses);
 
 refreshBtn.addEventListener("click", () => {
-  renderCourses();
-  alert("รีเฟรชรายการคอร์สแล้ว");
+  loadCoursesFromDB();
 });
 
-document.addEventListener("DOMContentLoaded", renderCourses);
+document.addEventListener("DOMContentLoaded", loadCoursesFromDB);
