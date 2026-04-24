@@ -37,7 +37,7 @@ def pay_for_application(user_id, app_id):
             amount       = float(app['budget'])
             platform_fee = round(amount * PLATFORM_FEE_RATE, 2)
 
-            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s", (user_id,))
+            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s FOR UPDATE", (user_id,))
             wallet = cursor.fetchone()
             if not wallet:
                 return {"status": "error", "message": "ไม่พบกระเป๋าเงิน"}
@@ -181,14 +181,13 @@ def confirm_class(user_id, app_id):
             subject      = app['subject']
 
             # โอนเงินให้ติวเตอร์
-            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s",
+            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s FOR UPDATE",
                            (app['tutor_user_id'],))
             tutor_wallet = cursor.fetchone()
             if not tutor_wallet:
                 cursor.execute("INSERT INTO wallets (user_id, balance) VALUES (%s, 0.00)",
                                (app['tutor_user_id'],))
-                connection.commit()
-                cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s",
+                cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s FOR UPDATE",
                                (app['tutor_user_id'],))
                 tutor_wallet = cursor.fetchone()
 
@@ -204,7 +203,7 @@ def confirm_class(user_id, app_id):
                   f"รายได้จากการสอน{subject} (หัก GP {int(PLATFORM_FEE_RATE*100)}%)"))
 
             # Platform fee → admin wallet (user_id = 1)
-            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = 1")
+            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = 1 FOR UPDATE")
             admin_wallet = cursor.fetchone()
             if admin_wallet:
                 new_admin_balance = float(admin_wallet['balance']) + platform_fee
@@ -275,7 +274,7 @@ def cancel_booking(user_id, app_id):
             gateway_fee   = round(amount * GATEWAY_FEE_RATE, 2)
             refund_amount = round(amount - gateway_fee, 2)
 
-            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s", (user_id,))
+            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s FOR UPDATE", (user_id,))
             wallet = cursor.fetchone()
             if not wallet:
                 return {"status": "error", "message": "ไม่พบกระเป๋าเงิน"}
