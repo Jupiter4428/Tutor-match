@@ -8,6 +8,14 @@ const apiHeaders = {
   Authorization: `Bearer ${token}`,
 };
 
+document.getElementById("logout").addEventListener("click", function () {
+  if (!confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) return;
+  localStorage.removeItem("token");
+  localStorage.removeItem("user_role");
+  localStorage.removeItem("user_id");
+  window.location.href = "/login";
+});
+
 async function fetchStats() {
   try {
     const response = await fetch("/admin/stats", { headers: apiHeaders });
