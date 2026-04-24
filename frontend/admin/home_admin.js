@@ -188,8 +188,9 @@ function renderUsers() {
       <td>
         <div class="action-buttons">
           <button class="small-btn view-btn" onclick="viewUser(${user.id})">ดู</button>
-          <button class="small-btn approve-btn" onclick="approveUser(${user.id})">อนุมัติ</button>
-          <button class="small-btn ban-btn" onclick="banUser(${user.id})">ระงับ</button>
+<button class="small-btn approve-btn" onclick="approveUser(${user.id})">อนุมัติ</button>
+<button class="small-btn reject-btn" onclick="rejectUser(${user.id})">ไม่อนุมัติ</button>
+<button class="small-btn ban-btn" onclick="banUser(${user.id})">ระงับ</button>
         </div>
       </td>
     </tr>
@@ -533,3 +534,31 @@ document.getElementById("logout").addEventListener("click", function () {
 renderActivities();
 refreshData();
 renderAdminReviews();
+async function rejectUser(id) {
+  const user = users.find((u) => u.id === id);
+  if (!user) return;
+
+  if (!confirm(`ต้องการไม่อนุมัติ ${user.name} ใช่หรือไม่?`)) return;
+
+  try {
+    const response = await fetch("/admin/users/status", {
+      method: "POST",
+      headers: apiHeaders,
+      body: JSON.stringify({
+        user_id: id,
+        status: "rejected"
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.status === "success") {
+      alert(`ไม่อนุมัติ ${user.name} เรียบร้อย`);
+      refreshData();
+    } else {
+      alert(result.message || "ไม่สำเร็จ");
+    }
+  } catch (error) {
+    alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+  }
+}
