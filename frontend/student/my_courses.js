@@ -179,6 +179,26 @@ function renderCourses() {
       </div>
 
       <div class="course-actions">
+
+  ${course.status === "pending_payment" ? `
+    <button class="btn pay-btn" onclick="payCourse(${course.id})">
+      💳 จ่ายเงิน
+    </button>
+  ` : ""}
+
+  <button 
+    class="btn review-btn" 
+    onclick="reviewCourse(${course.id})"
+    ${course.status !== "completed" ? "disabled" : ""}
+  >
+    ${course.review ? "✏️ แก้ไขรีวิว" : "⭐ Review"}
+  </button>
+
+  <button class="btn detail-btn" onclick="viewDetail(${course.id})">
+    ดูรายละเอียด
+  </button>
+
+</div>
         <button 
           class="btn review-btn" 
           onclick="reviewCourse(${course.id})"
@@ -333,3 +353,13 @@ refreshBtn.addEventListener("click", () => {
 });
 
 document.addEventListener("DOMContentLoaded", loadCoursesFromDB);
+function payCourse(id) {
+  const course = courses.find(c => Number(c.id) === Number(id));
+  if (!course) return;
+
+  // ไปหน้า wallet
+  window.location.href = "/student/wallet";
+
+  // หรือส่ง id ไปด้วย
+  // window.location.href = `/student/wallet?course_id=${id}`;
+}
