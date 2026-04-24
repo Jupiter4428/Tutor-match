@@ -258,6 +258,99 @@ function showApplicantsModal(post_id, applicants) {
   document.body.appendChild(modal);
 }
 
+// ---- สร้าง action buttons ตามสถานะของ application --------
+function buildAppActions(a) {
+  const s  = a.application_status;
+  const ts = a.teaching_status  || 'not_started';
+  const ps = a.payment_status   || null;
+  const id = a.app_id;
+  const btn = (label, onclick, bg) =>
+    `<button onclick="${onclick}" style="background:${bg};color:#fff;border:none;padding:8px 18px;
+      border-radius:10px;cursor:pointer;font-weight:600;font-size:0.9rem">${label}</button>`;
+
+  if (s === 'pending') {
+    return `<div style="display:flex;gap:10px">
+      ${btn('✅ ยอมรับ', `respondApp(${id},'accept')`, 'linear-gradient(135deg,#35e0a1,#4da8ff)')}
+      ${btn('❌ ปฏิเสธ', `respondApp(${id},'reject')`, 'linear-gradient(135deg,#ff5f7a,#ff2e63)')}
+    </div>`;
+  }
+
+  if (s === 'rejected') {
+    return `<span style="color:#ff5f7a;font-weight:700">❌ ปฏิเสธแล้ว</span>`;
+  }
+
+  // accepted — แสดงตาม teaching_status + payment_status
+  if (s === 'accepted') {
+    if (ts === 'not_started' && !ps) {
+      return `<div style="display:flex;gap:10px;flex-wrap:wrap">
+        ${btn('💳 ชำระเงิน (Escrow)', `payForApp(${id})`, 'linear-gradient(135deg,#8b6bff,#4da8ff)')}
+        ${btn('🚫 ยกเลิก', `cancelBooking(${id})`, 'linear-gradient(135deg,#ff5f7a,#ff2e63)')}
+      </div>`;
+    }
+    if (ts === 'not_started' && ps === 'pending') {
+      return `<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <span style="color:#ffd75c;font-weight:700">⏳ รอติวเตอร์เริ่มคลาส</span>
+        ${btn('🚫 ยกเลิก (คืน 97%)', `cancelBooking(${id})`, 'linear-gradient(135deg,#ff5f7a,#ff2e63)')}
+      </div>`;
+    }
+    if (ts === 'ongoing') {
+      return `<span style="color:#42d8ff;font-weight:700">📖 ติวเตอร์กำลังสอน...</span>`;
+    }
+    if (ts === 'completed' && ps !== 'completed') {
+      return `<div style="display:flex;gap:10px">
+        ${btn('✅ ยืนยันการเรียน (Confirm)', `confirmClass(${id})`, 'linear-gradient(135deg,#35e0a1,#4da8ff)')}
+      </div>`;
+    }
+    if (ts === 'completed' && ps === 'completed') {
+      return `<span style="color:#35e0a1;font-weight:700">🎉 เรียนเสร็จสมบูรณ์</span>`;
+    }
+    return `<span style="color:#35e0a1;font-weight:700">✅ ยอมรับแล้ว</span>`;
+  }
+
+  return '';
+}
+
+// ---- ชำระเงิน Escrow ----------------------------------------
+async function payForApp(app_id) {
+  const res = await fetch('/student/api/pay', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeader() },
+    body: JSON.stringify({ app_id })
+  }).then(r => r.json()).catch(() => ({ status: 'error', message: 'เชื่อมต่อไม่สำเร็จ' }));
+
+  document.getElementById('applicantsModal')?.remove();
+  showMessage(res.message || 'เกิดข้อผิดพลาด', res.status === 'success' ? 'success' : 'error');
+  if (res.status === 'success') loadMyPosts();
+}
+
+// ---- ยืนยันการเรียน → Payout --------------------------------
+async function confirmClass(app_id) {
+  if (!confirm('ยืนยันว่าเรียนครบตามเวลาจริงใช่หรือไม่?\nระบบจะโอนเงินให้ติวเตอร์ทันที')) return;
+  const res = await fetch('/student/api/confirm-class', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeader() },
+    body: JSON.stringify({ app_id })
+  }).then(r => r.json()).catch(() => ({ status: 'error', message: 'เชื่อมต่อไม่สำเร็จ' }));
+
+  document.getElementById('applicantsModal')?.remove();
+  showMessage(res.message || 'เกิดข้อผิดพลาด', res.status === 'success' ? 'success' : 'error');
+  if (res.status === 'success') loadMyPosts();
+}
+
+// ---- ยกเลิกและรับเงินคืน -------------------------------------
+async function cancelBooking(app_id) {
+  if (!confirm('ยกเลิกการจองนี้?\nถ้ายังไม่เรียนจะได้รับเงินคืน 97% (หัก Gateway Fee 3%)')) return;
+  const res = await fetch('/student/api/cancel-booking', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeader() },
+    body: JSON.stringify({ app_id })
+  }).then(r => r.json()).catch(() => ({ status: 'error', message: 'เชื่อมต่อไม่สำเร็จ' }));
+
+  document.getElementById('applicantsModal')?.remove();
+  showMessage(res.message || 'เกิดข้อผิดพลาด', res.status === 'success' ? 'success' : 'error');
+  if (res.status === 'success') loadMyPosts();
+}
+
 // ---- ยอมรับ/ปฏิเสธใบสมัคร → POST /student/respond ---------
 function respondApp(app_id, action) {
   fetch("/student/respond", {
