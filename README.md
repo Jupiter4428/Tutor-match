@@ -181,13 +181,6 @@ VALUES (
 # รัน Flask development server — เปิดที่ http://127.0.0.1:5000
 python run.py
 
-# หน้าเว็บที่ใช้ได้:
-#   http://127.0.0.1:5000/          → redirect ไป login
-#   http://127.0.0.1:5000/login     → หน้า login
-#   http://127.0.0.1:5000/register  → หน้าสมัครสมาชิก
-#   http://127.0.0.1:5000/home/student  → หน้าหลักนักเรียน (ต้อง login ก่อน)
-#   http://127.0.0.1:5000/home/tutor    → หน้าหลักติวเตอร์ (ต้อง login ก่อน)
-#   http://127.0.0.1:5000/home/admin    → dashboard admin (ต้อง login ก่อน)
 ```
 
 ---
