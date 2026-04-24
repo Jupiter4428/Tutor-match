@@ -19,6 +19,7 @@ from backend.services.tutor_service import (
     get_tutor_transactions,
     request_withdrawal
 )
+from backend.services.payment_service import start_class, end_class
 
 tutor_bp = Blueprint('tutor', __name__)
 
@@ -36,6 +37,34 @@ def get_wallet():
     """ดึงข้อมูลกระเป๋าเงินของติวเตอร์"""
     result = get_tutor_wallet(request.user_id)
     return jsonify(result), 200
+
+
+# =========================
+# Payment Flow API
+# =========================
+
+@tutor_bp.route('/api/class/start', methods=['POST'])
+@token_required
+@role_required('tutor')
+def class_start():
+    data   = request.get_json()
+    app_id = data.get('app_id')
+    if not app_id:
+        return jsonify({"status": "error", "message": "ต้องส่ง app_id"}), 400
+    result = start_class(request.user_id, app_id)
+    return jsonify(result), 200 if result['status'] == 'success' else 400
+
+
+@tutor_bp.route('/api/class/end', methods=['POST'])
+@token_required
+@role_required('tutor')
+def class_end():
+    data   = request.get_json()
+    app_id = data.get('app_id')
+    if not app_id:
+        return jsonify({"status": "error", "message": "ต้องส่ง app_id"}), 400
+    result = end_class(request.user_id, app_id)
+    return jsonify(result), 200 if result['status'] == 'success' else 400
 
 
 @tutor_bp.route('/api/wallet/transactions', methods=['GET'])
