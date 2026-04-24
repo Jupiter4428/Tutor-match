@@ -47,9 +47,6 @@ const confirmWithdrawBtn = document.getElementById('confirmWithdrawBtn');
 const bankName = document.getElementById('bankName');
 const accountNumber = document.getElementById('accountNumber');
 
-accountNumber.addEventListener('input', () => {
-  accountNumber.value = accountNumber.value.replace(/\D/g, '').slice(0, 10);
-});
 
 function formatCurrency(amount) {
   return `฿${Number(amount).toLocaleString('en-US', {
