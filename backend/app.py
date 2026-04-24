@@ -60,6 +60,10 @@ def create_app():
     def tutor_profile():
         return send_from_directory("../frontend/tutorprofile", "profile.html")
 
+    @app.route('/profile/tutor/reviews')
+    def tutor_profile_reviews():
+        return send_from_directory("../frontend/tutorprofile", "review.html")
+
     @app.route('/frontend/tutorprofile/<path:filename>')
     def tutorprofile_assets(filename):
         return send_from_directory("../frontend/tutorprofile", filename)
