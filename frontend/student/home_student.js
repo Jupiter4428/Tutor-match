@@ -28,6 +28,7 @@ const postMessage = document.getElementById("post-message");
 const myPostsList = document.getElementById("myPostsList");
 
 let myPosts = [];
+let appliedTutorIds = new Set();
 
 // ---- Utility -----------------------------------------------
 function scrollToSection(id) {
@@ -167,7 +168,7 @@ function loadMyPosts() {
       if (!data) return;
       myPosts = data.data || [];
       renderPosts();
-      updateMatchedTutors();
+      loadAppliedTutorIds().then(() => updateMatchedTutors());
     })
     .catch(err => {
       console.error(err);
@@ -221,20 +222,7 @@ function showApplicantsModal(post_id, applicants) {
           <div style="font-weight:700;font-size:1rem">${a.tutor_name}</div>
           <div style="color:#aeb8e8;font-size:0.9rem;margin:6px 0">ค่าสอน: ${a.hourly_rate || "-"} บาท/ชม.</div>
           <div style="color:#d7dcff;font-size:0.92rem;margin-bottom:12px">${a.bio || "ไม่มีข้อมูลเพิ่มเติม"}</div>
-          ${a.application_status === "pending" ? `
-            <div style="display:flex;gap:10px">
-              <button onclick="respondApp(${a.app_id},'accept')"
-                style="background:linear-gradient(135deg,#35e0a1,#4da8ff);color:#fff;border:none;padding:8px 18px;border-radius:10px;cursor:pointer;font-weight:600">
-                ✅ ยอมรับ
-              </button>
-              <button onclick="respondApp(${a.app_id},'reject')"
-                style="background:linear-gradient(135deg,#ff5f7a,#ff2e63);color:#fff;border:none;padding:8px 18px;border-radius:10px;cursor:pointer;font-weight:600">
-                ❌ ปฏิเสธ
-              </button>
-            </div>
-          ` : `<span style="color:${a.application_status === 'accepted' ? '#35e0a1' : '#ff5f7a'};font-weight:700">
-            ${a.application_status === 'accepted' ? '✅ ยอมรับแล้ว' : '❌ ปฏิเสธแล้ว'}
-          </span>`}
+          ${buildAppActions(a)}
         </div>
       `).join("");
 
@@ -372,52 +360,6 @@ function respondApp(app_id, action) {
 // ============================================================
 let allTutors = [];
 
-const TOY_TUTORS = [
-  {
-    tutor_id: 1,
-    name: "พี่มิน",
-    subjects: ["คณิตศาสตร์", "ฟิสิกส์"],
-    format: "สอนออนไลน์",
-    experience_years: 3,
-    avg_rating: 4.9,
-    review_count: 12,
-    hourly_rate: 350,
-    bio: "เชี่ยวชาญเนื้อหา ม.ปลาย และสอบเข้าหาวิทยาลัย อธิบายละเอียด ใจเย็น และมีเอกสารสรุปให้"
-  },
-  {
-    tutor_id: 2,
-    name: "พี่บอส",
-    subjects: ["Java", "Python", "Web Dev"],
-    format: "ออนไลน์ / ออนไซต์",
-    experience_years: 2,
-    avg_rating: 5.0,
-    review_count: 8,
-    hourly_rate: 400,
-    bio: "เหมาะกับนักศึกษาที่ต้องการปูพื้นฐานเขียนโปรแกรม ทำโปรเจกต์ และเตรียมสอบวิชาเขียนโค้ด"
-  },
-  {
-    tutor_id: 3,
-    name: "พี่นิ้ง",
-    subjects: ["ภาษาอังกฤษ", "IELTS"],
-    format: "สอนออนไลน์",
-    experience_years: 5,
-    avg_rating: 4.7,
-    review_count: 20,
-    hourly_rate: 300,
-    bio: "ติวสอบ IELTS และพูดคุยได้ทุกเรื่อง เน้นการสื่อสารจริง ไม่ใช่แค่ไวยากรณ์"
-  },
-  {
-    tutor_id: 4,
-    name: "พี่เจมส์",
-    subjects: ["เคมี", "ชีววิทยา"],
-    format: "ออนไซต์ (กรุงเทพ)",
-    experience_years: 4,
-    avg_rating: 4.8,
-    review_count: 15,
-    hourly_rate: 380,
-    bio: "ผ่านประสบการณ์สอน PAT2 มาหลายรุ่น มีชีทสรุปและโจทย์ข้อสอบเก่าครบครัน"
-  }
-];
 
 function loadTutors() {
   fetch("/tutor/list", {
@@ -565,20 +507,51 @@ function updateMatchedTutors() {
     )
   );
 
+  const display = matched.length ? matched : allTutors;
+
   document.getElementById("tutorSectionLabel").textContent =
     matched.length
       ? `ติวเตอร์ที่ตรงกับโพสต์ของคุณ (${matched.length} คน)`
       : "ติวเตอร์ที่แนะนำ";
 
-  renderTutors(matched.length ? matched : allTutors, openSubjects);
+  renderTutors(sortByApplied(display), openSubjects);
+}
+
+async function loadAppliedTutorIds() {
+  appliedTutorIds.clear();
+  const openWithApplicants = myPosts.filter(p => p.status === "open" && p.applicant_count > 0);
+  await Promise.all(openWithApplicants.map(async post => {
+    try {
+      const res = await fetch(`/student/applications/${post.post_id}`, { headers: authHeader() });
+      const data = await res.json();
+      if (data.status === "success") {
+        data.data.forEach(a => { if (a.tutor_id) appliedTutorIds.add(Number(a.tutor_id)); });
+      }
+    } catch (err) {
+      console.error("loadAppliedTutorIds error:", err);
+    }
+  }));
+}
+
+function sortByApplied(tutors) {
+  return [...tutors].sort((a, b) => {
+    const aApplied = appliedTutorIds.has(Number(a.tutor_id)) ? 0 : 1;
+    const bApplied = appliedTutorIds.has(Number(b.tutor_id)) ? 0 : 1;
+    return aApplied - bApplied;
+  });
 }
 
 function filterTutors() {
   const subj = document.getElementById("tutorSubjectFilter").value;
-  const filtered = !subj
-    ? allTutors
-    : allTutors.filter(t => (t.subjects || []).includes(subj));
-  renderTutors(filtered, []);
+  const fmt  = document.getElementById("tutorFormatFilter").value;
+
+  const filtered = allTutors.filter(t => {
+    const matchSubj = !subj || (t.subjects || []).includes(subj);
+    const matchFmt  = !fmt  || !t.format || t.format === fmt;
+    return matchSubj && matchFmt;
+  });
+
+  renderTutors(sortByApplied(filtered), []);
 }
 
 function renderTutors(tutors, matchedSubjects = []) {
@@ -611,9 +584,12 @@ function renderTutors(tutors, matchedSubjects = []) {
     }).join(" ");
 
     // badge
-    const badge = (t.avg_rating >= 4.8 && t.review_count > 2)
-      ? `<span class="badge badge-progress">🔥 Popular</span>`
-      : `<span class="badge badge-open">Available</span>`;
+    const isApplied = appliedTutorIds.has(Number(t.tutor_id));
+    const badge = isApplied
+      ? `<span class="badge badge-progress">📩 สมัครแล้ว</span>`
+      : (t.avg_rating >= 4.8 && t.review_count > 2)
+        ? `<span class="badge badge-progress">🔥 Popular</span>`
+        : `<span class="badge badge-open">Available</span>`;
 
     // match tag
     const matchTag = matchedSubjects.length &&
