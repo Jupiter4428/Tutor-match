@@ -75,14 +75,14 @@ CREATE TABLE tutor_profiles (
 -- 4NF: separated from tutor_profiles
 -- =========================================================
 
--- CREATE TABLE tutor_experiences (
---     experience_id INT AUTO_INCREMENT PRIMARY KEY,
---     tutor_id INT NOT NULL,
---     experience_detail TEXT NOT NULL,
---     CONSTRAINT fk_tutor_experiences_tutor
---         FOREIGN KEY (tutor_id) REFERENCES tutor_profiles(tutor_id)
---         ON DELETE CASCADE
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE tutor_experiences (
+    experience_id INT AUTO_INCREMENT PRIMARY KEY,
+    tutor_id INT NOT NULL,
+    experience_detail TEXT NOT NULL,
+    CONSTRAINT fk_tutor_experiences_tutor
+        FOREIGN KEY (tutor_id) REFERENCES tutor_profiles(tutor_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =========================================================
 -- 5) tutor_subjects
