@@ -78,6 +78,14 @@ const searchInput = document.getElementById("searchInput");
 const statusFilter = document.getElementById("statusFilter");
 const refreshBtn = document.getElementById("refreshBtn");
 
+function goToStuHome() {
+  window.location.href = "/home/student";
+}
+
+function goToStuWallet() {
+  window.location.href = "/student/wallet";
+}
+
 function formatMoney(amount){
   return `฿${Number(amount).toLocaleString("th-TH")}`;
 }
