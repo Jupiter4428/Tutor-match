@@ -31,22 +31,6 @@ CREATE TABLE users (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =========================================================
--- 2) student_profiles
--- Student-specific profile
--- =========================================================
-CREATE TABLE student_profiles (
-    student_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL UNIQUE,
-    grade_level VARCHAR(50) NULL,
-    school_name VARCHAR(100) NULL,
-    education_level VARCHAR(100) NULL,
-    profile_picture_url VARCHAR(512) NULL,
-    CONSTRAINT fk_student_profiles_user
-        FOREIGN KEY (user_id) REFERENCES users(user_id)
-        ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- =========================================================
 -- 3) tutor_profiles
 -- Tutor verification workflow + audit fields
 -- =========================================================
