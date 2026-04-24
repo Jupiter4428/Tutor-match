@@ -590,3 +590,14 @@ body{
   color: #ffc4ce;
   border: 1px solid rgba(255, 123, 146, .35);
 }
+/* 💳 ปุ่มจ่ายเงิน */
+.pay-btn {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  box-shadow: 0 10px 25px rgba(0, 150, 255, 0.4);
+  font-weight: 800;
+}
+
+.pay-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 14px 30px rgba(0, 150, 255, 0.6);
+}
