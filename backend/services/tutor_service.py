@@ -419,7 +419,7 @@ def request_withdrawal(user_id, amount, bank_name, account_number):
     try:
         with connection.cursor() as cursor:
             # 1. เช็คยอดเงินว่าพอไหม
-            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s", (user_id,))
+            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s FOR UPDATE", (user_id,))
             wallet = cursor.fetchone()
             if not wallet or wallet['balance'] < amount:
                 return {"status": "error", "message": "ยอดเงินไม่เพียงพอ"}

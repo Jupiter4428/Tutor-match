@@ -264,7 +264,7 @@ def process_deposit(user_id, amount, note):
     try:
         with connection.cursor() as cursor:
             # ดึงข้อมูล wallet ปัจจุบัน
-            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s", (user_id,))
+            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s FOR UPDATE", (user_id,))
             wallet = cursor.fetchone()
             if not wallet:
                 return {"status": "error", "message": "ไม่พบกระเป๋าเงิน"}
@@ -293,9 +293,9 @@ def process_withdraw(user_id, amount, bank_name, account_number, note):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s", (user_id,))
+            cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s FOR UPDATE", (user_id,))
             wallet = cursor.fetchone()
-            
+
             if float(wallet['balance']) < float(amount):
                 return {"status": "error", "message": "ยอดเงินคงเหลือไม่เพียงพอ"}
 
