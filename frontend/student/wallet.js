@@ -2,12 +2,7 @@ const TOKEN = localStorage.getItem('token');
 
 if (!TOKEN) {
   alert("กรุณาเข้าสู่ระบบก่อนใช้งาน Wallet");
-
-  // ถ้าเปิดด้วย Live Server ใช้บรรทัดนี้
-  window.location.href = '../auth/login.html';
-
-  // ถ้ารันผ่าน Flask จริง ให้ใช้ /login แทน
-  // window.location.href = '/login';
+  window.location.href = '/login';
 }
 
 function goToStuHome() {
