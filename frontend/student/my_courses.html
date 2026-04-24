@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Courses - Tutor Match</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="my_courses.css">
+</head>
+<body>
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+  <div class="glow glow-3"></div>
+
+  <div class="container">
+    <nav class="navbar">
+      <div class="brand">
+        <div class="brand-icon">📚</div>
+        <div>
+          <h1>My Courses</h1>
+          <p>คอร์สเรียนทั้งหมดของนักเรียน</p>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <a href="home_student.html" class="btn btn-secondary">🏠 Home</a>
+        <a href="wallet.html" class="btn btn-secondary">💳 Wallet</a>
+        <button class="btn btn-primary" id="refreshBtn">🔄 Refresh</button>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-left">
+        <div class="tag">✨ Student Learning Dashboard</div>
+        <h2>รวมคอร์สเรียนของคุณ<br>ดูติวเตอร์ รีวิว และสถานะได้ในที่เดียว</h2>
+        <p>
+          หน้านี้ใช้สำหรับดูคอร์สทั้งหมดที่นักเรียนเคยจองหรือกำลังเรียนอยู่
+          พร้อมข้อมูลติวเตอร์ รายละเอียดคอร์ส สถานะการเรียน และปุ่มรีวิวหลังเรียน
+        </p>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3 id="totalCourses">0</h3>
+            <p>คอร์สทั้งหมด</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="activeCourses">0</h3>
+            <p>กำลังเรียน</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="completedCourses">0</h3>
+            <p>เรียนจบแล้ว</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="reviewedCourses">0</h3>
+            <p>รีวิวแล้ว</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-card">
+          <span>🎯 Learning Progress</span>
+          <h3>พร้อมเรียนต่อแล้ว!</h3>
+          <p>ดูคอร์สที่กำลังเรียน ติดตามความคืบหน้า และรีวิวติวเตอร์ได้ง่าย ๆ</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="filter-section">
+      <div>
+        <h3>ค้นหาคอร์ส</h3>
+        <p>ค้นหาตามชื่อวิชา ชื่อติวเตอร์ หรือสถานะคอร์ส</p>
+      </div>
+
+      <div class="filter-controls">
+        <input type="text" id="searchInput" placeholder="ค้นหาวิชา / ชื่อติวเตอร์ / อีเมล...">
+        <select id="statusFilter">
+          <option value="all">ทุกสถานะ</option>
+          <option value="active">กำลังเรียน</option>
+          <option value="completed">เรียนจบแล้ว</option>
+          <option value="pending">รอยืนยัน</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="courses-section">
+      <div class="section-title">
+        <h3>รายการคอร์สของฉัน</h3>
+        <p>คอร์สทั้งหมดที่เกี่ยวข้องกับบัญชีนักเรียนของคุณ</p>
+      </div>
+
+      <div class="course-grid" id="courseGrid"></div>
+    </section>
+  </div>
+
+  <script src="my_courses.js"></script>
+</body>
+</html>
