@@ -19,6 +19,11 @@ function updateStarDisplay(value) {
   });
 }
 
+function goTo() {
+  window.location.href = "/student/courses";
+}
+
+
 stars.forEach((star) => {
   star.addEventListener("click", () => {
     const value = Number(star.dataset.value);
@@ -135,7 +140,10 @@ reviewForm.addEventListener("submit", (event) => {
 updateStarDisplay(0);
 sortReviews();
 filterReviews();
+<<<<<<< Updated upstream
 =====
+=======
+>>>>>>> Stashed changes
 const token = localStorage.getItem('token') || '';
 const currentUserId = Number(localStorage.getItem('user_id') || 0);
 const userRole = localStorage.getItem('user_role') || 'student';
