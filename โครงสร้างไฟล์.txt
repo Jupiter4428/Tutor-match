@@ -2,6 +2,7 @@ tutor-match/
 ├── requirements.txt                    # flask, flask-bcrypt, flask-jwt-extended, pymysql, flask-cors
 ├── run.py                              # python run.py เพื่อเริ่ม server
 ├── .env                                # DB config, SECRET_KEY
+├── .env.example                        # ตัวอย่าง env variables
 ├── .gitignore                          # venv/, .env, __pycache__/
 ├── README.md                           # เอกสารโปรเจกต์
 ├── base.html                           # (ไฟล์กำพร้า — ยังไม่ได้ใช้งาน)
