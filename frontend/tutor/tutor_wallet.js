@@ -2,20 +2,13 @@ const TOKEN = localStorage.getItem('token');
 
 if (!TOKEN) {
   alert("กรุณาเข้าสู่ระบบก่อนใช้งาน Wallet");
-
-  // Live Server
-  window.location.href = '../auth/login.html';
-
-  // Flask จริง ใช้อันนี้แทน
-  // window.location.href = '/login';
+  window.location.href = '/login';
 }
 
 function goToTutorHome() {
-  // Live Server
-  window.location.href = "home_tutor.html";
 
-  // Flask จริง ใช้อันนี้แทน
-  // window.location.href = "/home/tutor";
+  window.location.href = "/home/tutor";
+
 }
 
 function scrollToSection(id) {
@@ -39,6 +32,10 @@ const confirmWithdrawBtn = document.getElementById('confirmWithdrawBtn');
 const bankName = document.getElementById('bankName');
 const accountName = document.getElementById('accountName');
 const accountNumber = document.getElementById('accountNumber');
+
+accountNumber.addEventListener('input', () => {
+  accountNumber.value = accountNumber.value.replace(/\D/g, '').slice(0, 10);
+});
 
 function formatCurrency(amount) {
   return `฿${Number(amount).toLocaleString('en-US', {
