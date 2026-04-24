@@ -772,3 +772,13 @@ td {
     grid-template-columns: 1fr;
   }
 }
+.reject-btn {
+  background: rgba(255, 149, 0, 0.18);
+  color: #ffb347;
+  border: 1px solid rgba(255, 149, 0, 0.35);
+}
+
+.reject-btn:hover {
+  background: rgba(255, 149, 0, 0.28);
+  transform: translateY(-2px);
+}
