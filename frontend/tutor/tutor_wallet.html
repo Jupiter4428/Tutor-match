@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="./wallet.css">
+  <link rel="stylesheet" href="/assets/tutor/tutor_wallet.css">
 </head>
 
 <body>
@@ -144,7 +144,7 @@
 
         <div class="input-group">
           <label for="accountNumber">เลขบัญชีปลายทาง</label>
-          <input id="accountNumber" type="text" placeholder="เช่น 123-4-56789-0">
+          <input id="accountNumber" type="text" inputmode="numeric" maxlength="10" pattern="\d{10}" placeholder="เช่น 1234567890 (10 หลัก)">
         </div>
 
         <div class="input-group">
@@ -260,6 +260,6 @@
     </div>
   </div>
 
-  <script src="./wallet.js"></script>
+  <script src="/assets/tutor/tutor_wallet.js"></script>
 </body>
 </html>
