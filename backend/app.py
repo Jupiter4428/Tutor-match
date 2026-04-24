@@ -46,7 +46,12 @@ def create_app():
     @app.route("/student/wallet")
     def student_wallet_page():
         return send_from_directory("../frontend/student", "wallet.html")
-
+    @app.route("/student/reviews")
+    
+    @app.route("/home/student/reviews")
+    def student_review_page():
+        return send_from_directory("../frontend/student", "Review.html")
+    
     @app.route("/home/tutor")
     def tutor_home():
         return send_from_directory("../frontend/tutor", "home_tutor.html")
@@ -76,12 +81,15 @@ def create_app():
     from backend.routes.auth import auth_bp
     from backend.routes.student import student_bp
     from backend.routes.tutor import tutor_bp
-    
+    from backend.routes.review import review_bp
+
     # อิงตาม auth, student, tutor ตรงๆ
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(student_bp, url_prefix='/student')
     app.register_blueprint(tutor_bp, url_prefix='/tutor')
     app.register_blueprint(admin_bp, url_prefix='/admin')
+    app.register_blueprint(review_bp, url_prefix="/reviews")
+
     return app
 
 
