@@ -331,13 +331,46 @@ refreshBtn.addEventListener("click", () => {
 });
 
 document.addEventListener("DOMContentLoaded", loadCoursesFromDB);
-function payCourse(id) {
+async function payCourse(id) {
   const course = courses.find(c => Number(c.id) === Number(id));
   if (!course) return;
 
-  // ไปหน้า wallet
-  window.location.href = "/student/wallet";
+  if (!course.app_id) {
+    alert("ไม่พบ app_id ของคอร์สนี้");
+    return;
+  }
 
-  // หรือส่ง id ไปด้วย
-  // window.location.href = `/student/wallet?course_id=${id}`;
+  const token = getAuthToken();
+  if (!token) {
+    alert("กรุณาเข้าสู่ระบบก่อน");
+    window.location.href = "/login";
+    return;
+  }
+
+  if (!confirm(`ยืนยันการชำระเงิน ${formatMoney(course.price)} สำหรับวิชา ${course.subject}?`)) return;
+
+  try {
+    const response = await fetch("/student/api/pay", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ app_id: course.app_id })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || result.status !== "success") {
+      alert(result.message || "ชำระเงินไม่สำเร็จ");
+      return;
+    }
+
+    alert(`ชำระเงินสำเร็จ!\nยอดเงินคงเหลือ: ฿${Number(result.new_balance || 0).toLocaleString("th-TH")}`);
+    loadCoursesFromDB();
+
+  } catch (error) {
+    console.error(error);
+    alert("เชื่อมต่อ backend ไม่สำเร็จ");
+  }
 }
