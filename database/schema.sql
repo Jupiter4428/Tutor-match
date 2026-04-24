@@ -83,6 +83,20 @@ CREATE TABLE tutor_subjects (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =========================================================
+-- 2) student_profiles
+-- =========================================================
+CREATE TABLE student_profiles (
+    student_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    grade_level VARCHAR(100) NULL,
+    school_name VARCHAR(255) NULL,
+    education_level VARCHAR(100) NULL,
+    CONSTRAINT fk_student_profiles_user
+        FOREIGN KEY (user_id) REFERENCES users(user_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =========================================================
 -- 6) student_posts
 -- Student job posts + moderation fields
 -- =========================================================
@@ -124,6 +138,38 @@ CREATE TABLE applications (
         ON DELETE CASCADE,
     CONSTRAINT fk_applications_tutor
         FOREIGN KEY (tutor_id) REFERENCES tutor_profiles(tutor_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =========================================================
+-- 8) tutor_schedules
+-- ตารางเวลาว่างของติวเตอร์
+-- =========================================================
+CREATE TABLE tutor_schedules (
+    schedule_id INT AUTO_INCREMENT PRIMARY KEY,
+    tutor_id INT NOT NULL,
+    day_of_week ENUM('Mon','Tue','Wed','Thu','Fri','Sat','Sun') NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    CONSTRAINT fk_tutor_schedules_tutor
+        FOREIGN KEY (tutor_id) REFERENCES tutor_profiles(tutor_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =========================================================
+-- 9) schedule_bookings
+-- เชื่อม application กับ schedule ที่นักเรียนจอง
+-- =========================================================
+CREATE TABLE schedule_bookings (
+    booking_id INT AUTO_INCREMENT PRIMARY KEY,
+    schedule_id INT NOT NULL,
+    app_id INT NOT NULL,
+    CONSTRAINT uq_schedule_bookings UNIQUE (schedule_id, app_id),
+    CONSTRAINT fk_schedule_bookings_schedule
+        FOREIGN KEY (schedule_id) REFERENCES tutor_schedules(schedule_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_schedule_bookings_app
+        FOREIGN KEY (app_id) REFERENCES applications(app_id)
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -253,7 +299,7 @@ CREATE TABLE transaction_logs (
 CREATE TABLE user_bank_accounts (
     bank_account_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    bank_name ENUM('Kasikorn', 'Krungthai', 'Siam Commercial', 'Bangkok', 'Krungsri') NOT NULL,
+    bank_name VARCHAR(100) NOT NULL,
     account_number VARCHAR(20) NOT NULL,
     account_name VARCHAR(100) NOT NULL,
     is_primary BOOLEAN DEFAULT FALSE, -- บัญชีหลักที่ใช้บ่อย

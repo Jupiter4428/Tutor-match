@@ -127,7 +127,7 @@ INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after
 (3,  'deposit',       1200.00, 1200.00, 'deposit_slip', NULL, 'เติมเงิน Wallet'),
 (4,  'deposit',        300.00,  300.00, 'deposit_slip', NULL, 'เติมเงิน Wallet'),
 (2,  'deposit',       2000.00, 2000.00, 'deposit_slip', NULL, 'เติมเงิน Wallet'),
-(2,  'payment',      -1500.00,  500.00, 'application',  1,    'ชำระค่าเรียนคณิตศาสตร์ (app #1)'),
+(2,  'payment',       1500.00,  500.00, 'application',  1,    'ชำระค่าเรียนคณิตศาสตร์ (app #1)'),
 (6,  'tutor_earnings', 1350.00, 1350.00, 'application',  1,    'รายรับค่าสอน หักค่าธรรมเนียม 10%'),
 (1,  'platform_fee',   150.00,  150.00, 'application',  1,    'ค่าธรรมเนียมแพลตฟอร์ม 10%');
 
@@ -135,10 +135,10 @@ INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after
 -- 13. user_bank_accounts
 -- ============================================================
 INSERT INTO user_bank_accounts (user_id, bank_name, account_number, account_name, is_primary) VALUES
-(6,  'Kasikorn',       '1234567890', 'มานี มีสุข',   TRUE),
-(7,  'Krungthai',      '0987654321', 'ชูใจ วิไล',    TRUE),
-(8,  'Siam Commercial','1122334455', 'อาร์ท ฟิสิกส์', TRUE),
-(2,  'Bangkok',        '5566778899', 'สมชาย ใจดี',   TRUE);
+(6,  'ธนาคารกสิกรไทย',    '1234567890', 'มานี มีสุข',    TRUE),
+(7,  'ธนาคารกรุงไทย',     '0987654321', 'ชูใจ วิไล',     TRUE),
+(8,  'ธนาคารไทยพาณิชย์',  '1122334455', 'อาร์ท ฟิสิกส์',  TRUE),
+(2,  'ธนาคารกรุงเทพ',     '5566778899', 'สมชาย ใจดี',    TRUE);
 
 -- ============================================================
 -- 14. reports
