@@ -414,26 +414,28 @@ def get_tutor_transactions(user_id):
     finally:
         connection.close()
 
-def request_withdrawal(user_id, amount, bank_name, account_number):
+def request_withdrawal(user_id, amount, bank_name, account_number, account_name=''):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
-            # 1. เช็คยอดเงินว่าพอไหม
             cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s FOR UPDATE", (user_id,))
             wallet = cursor.fetchone()
-            if not wallet or wallet['balance'] < amount:
+            if not wallet:
+                return {"status": "error", "message": "ไม่พบกระเป๋าเงิน"}
+            if float(wallet['balance']) < float(amount):
                 return {"status": "error", "message": "ยอดเงินไม่เพียงพอ"}
 
-            # 2. หักเงินใน wallet
             new_balance = float(wallet['balance']) - float(amount)
             cursor.execute("UPDATE wallets SET balance = %s WHERE wallet_id = %s", (new_balance, wallet['wallet_id']))
 
-            # 3. บันทึก log การถอน
+            name_part = f" ชื่อบัญชี {account_name}" if account_name else ""
             cursor.execute("""
-                INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, description)
-                VALUES (%s, 'withdrawal', %s, %s, %s)
-            """, (wallet['wallet_id'], amount, new_balance, f"ถอนเงินเข้าบัญชี {bank_name} ({account_number})"))
-            
+                INSERT INTO transaction_logs
+                    (wallet_id, transaction_type, amount, balance_after, reference_type, description)
+                VALUES (%s, 'withdrawal', %s, %s, 'withdrawal_request', %s)
+            """, (wallet['wallet_id'], amount, new_balance,
+                  f"ถอนเงินเข้าบัญชี {bank_name} ({account_number}){name_part}"))
+
             connection.commit()
             return {"status": "success", "message": "ส่งคำขอถอนเงินเรียบร้อยแล้ว"}
     except Exception as e:
