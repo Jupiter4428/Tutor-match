@@ -85,6 +85,7 @@ def request_withdraw():
     amount = data.get('amount')
     bank_name = data.get('bank_name')
     account_number = data.get('account_number')
+    account_name = data.get('account_name', '')
 
     if not all([amount, bank_name, account_number]):
         return jsonify({
@@ -92,7 +93,7 @@ def request_withdraw():
             "message": "ต้องส่ง amount, bank_name, account_number"
         }), 400
 
-    result = request_withdrawal(request.user_id, amount, bank_name, account_number)
+    result = request_withdrawal(request.user_id, amount, bank_name, account_number, account_name)
     status_code = 200 if result['status'] == 'success' else 400
     return jsonify(result), status_code
 
