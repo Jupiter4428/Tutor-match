@@ -89,10 +89,13 @@ def get_post_applications(post_id, user_id):
             cursor.execute("""
                 SELECT
                     a.app_id, a.status AS application_status, a.applied_at,
-                    u.name AS tutor_name, tp.bio, tp.hourly_rate, tp.tutor_id
+                    a.teaching_status,
+                    u.name AS tutor_name, tp.bio, tp.hourly_rate, tp.tutor_id,
+                    p.status AS payment_status, p.amount AS payment_amount
                 FROM applications a
                 JOIN tutor_profiles tp ON a.tutor_id = tp.tutor_id
-                JOIN users u ON tp.user_id = u.user_id
+                JOIN users u           ON tp.user_id  = u.user_id
+                LEFT JOIN payments p   ON a.app_id    = p.app_id
                 WHERE a.post_id = %s
                 ORDER BY a.applied_at ASC
             """, (post_id,))
@@ -240,12 +243,12 @@ def get_wallet_transactions(user_id):
             if not wallet:
                 return {"status": "success", "data": []}
                 
-            # ดึงประวัติธุรกรรม
             cursor.execute("""
-                SELECT transaction_id, transaction_type, amount, balance_after, description, 
-                       DATE_FORMAT(transaction_date, '%d %b %Y %H:%i') as formatted_date
-                FROM transaction_logs 
-                WHERE wallet_id = %s 
+                SELECT transaction_id, transaction_type, amount, balance_after,
+                       reference_type, reference_id, description,
+                       DATE_FORMAT(transaction_date, '%%d %%b %%Y %%H:%%i') AS formatted_date
+                FROM transaction_logs
+                WHERE wallet_id = %s
                 ORDER BY transaction_date DESC
             """, (wallet['wallet_id'],))
             
@@ -271,11 +274,11 @@ def process_deposit(user_id, amount, note):
             # อัปเดตยอดเงิน
             cursor.execute("UPDATE wallets SET balance = %s WHERE wallet_id = %s", (new_balance, wallet['wallet_id']))
             
-            # บันทึกประวัติ
             cursor.execute("""
-                INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, description)
-                VALUES (%s, 'deposit', %s, %s, %s)
-            """, (wallet['wallet_id'], amount, new_balance, note))
+                INSERT INTO transaction_logs
+                    (wallet_id, transaction_type, amount, balance_after, reference_type, description)
+                VALUES (%s, 'deposit', %s, %s, 'deposit_slip', %s)
+            """, (wallet['wallet_id'], amount, new_balance, note or 'ฝากเงินเข้า Wallet'))
             
             connection.commit()
             return {"status": "success", "message": "ฝากเงินสำเร็จ", "new_balance": new_balance}
@@ -301,15 +304,32 @@ def process_withdraw(user_id, amount, bank_name, account_number, note):
             # อัปเดตยอดเงิน
             cursor.execute("UPDATE wallets SET balance = %s WHERE wallet_id = %s", (new_balance, wallet['wallet_id']))
             
-            # บันทึกประวัติ
-            full_note = f"ถอนเข้า {bank_name} ({account_number}) | {note}"
+            full_note = f"ถอนเข้า {bank_name} ({account_number})" + (f" • {note}" if note else "")
             cursor.execute("""
-                INSERT INTO transaction_logs (wallet_id, transaction_type, amount, balance_after, description)
-                VALUES (%s, 'withdrawal', %s, %s, %s)
+                INSERT INTO transaction_logs
+                    (wallet_id, transaction_type, amount, balance_after, reference_type, description)
+                VALUES (%s, 'withdrawal', %s, %s, 'withdrawal_request', %s)
             """, (wallet['wallet_id'], amount, new_balance, full_note))
             
             connection.commit()
             return {"status": "success", "message": "แจ้งถอนเงินสำเร็จ", "new_balance": new_balance}
+    except Exception as e:
+        connection.rollback()
+        return {"status": "error", "message": str(e)}
+    finally:
+        connection.close()
+
+
+def submit_report(user_id, target_type, target_id, title, description):
+    connection = db.get_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO reports (reporter_id, target_type, target_id, title, description, status)
+                VALUES (%s, %s, %s, %s, %s, 'pending')
+            """, (user_id, target_type, target_id, title, description))
+            connection.commit()
+            return {"status": "success", "message": "ส่งรายงานเรียบร้อยแล้ว"}
     except Exception as e:
         connection.rollback()
         return {"status": "error", "message": str(e)}

@@ -44,15 +44,15 @@
 
         <div class="hero-stats">
           <div class="stat-box">
-            <h3>฿ 2,450</h3>
+            <h3 id="heroBalance">฿0.00</h3>
             <p>ยอดเงินคงเหลือปัจจุบัน</p>
           </div>
           <div class="stat-box">
-            <h3>12 รายการ</h3>
-            <p>จำนวนธุรกรรมเดือนนี้</p>
+            <h3 id="heroTxCount">0 รายการ</h3>
+            <p>จำนวนธุรกรรมทั้งหมด</p>
           </div>
           <div class="stat-box">
-            <h3>Active</h3>
+            <h3 id="heroWalletStatus">Active</h3>
             <p>สถานะกระเป๋าเงินพร้อมใช้งาน</p>
           </div>
         </div>
@@ -68,23 +68,22 @@
             <div class="pill">Updated: 23 Apr 2026</div>
           </div>
         </div>
-        <!-- Toydata -->
         <div class="mini-summary">
           <div class="mini-card">
             <span class="label">เงินฝากล่าสุด</span>
-            <div class="value">+ ฿500</div>
+            <div class="value" id="miniLastDeposit">—</div>
           </div>
           <div class="mini-card">
             <span class="label">ยอดชำระล่าสุด</span>
-            <div class="value">- ฿900</div>
+            <div class="value" id="miniLastPayment">—</div>
           </div>
           <div class="mini-card">
             <span class="label">ยอดคืนล่าสุด</span>
-            <div class="value">+ ฿600</div>
+            <div class="value" id="miniLastRefund">—</div>
           </div>
           <div class="mini-card">
-            <span class="label">สถานะล่าสุด</span>
-            <div class="value">Pending</div>
+            <span class="label">รายการล่าสุด</span>
+            <div class="value" id="miniLastType">—</div>
           </div>
         </div>
       </div>
