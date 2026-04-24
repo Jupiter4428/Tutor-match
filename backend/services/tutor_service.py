@@ -42,10 +42,15 @@ def apply_to_post(user_id, post_id):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT tutor_id FROM tutor_profiles WHERE user_id = %s", (user_id,))
+            cursor.execute(
+                "SELECT tutor_id, verification_status FROM tutor_profiles WHERE user_id = %s",
+                (user_id,)
+            )
             profile = cursor.fetchone()
             if not profile:
                 return {"status": "error", "message": "ไม่พบโปรไฟล์ติวเตอร์ของคุณในระบบ"}
+            if profile['verification_status'] != 'verified':
+                return {"status": "error", "message": "บัญชีของคุณยังไม่ได้รับการยืนยันจาก Admin"}
 
             tutor_id = profile['tutor_id']
 
