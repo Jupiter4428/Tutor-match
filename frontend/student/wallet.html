@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
 
-  <link rel="stylesheet" href="./wallet.css">
+  <link rel="stylesheet" href="/assets/student/wallet.css">
 </head>
 
 <body>
@@ -206,7 +206,17 @@
 
         <div class="input-group">
           <label for="accountNumber">เลขบัญชีปลายทาง</label>
-          <input id="accountNumber" type="text" placeholder="เช่น 123-4-56789-0">
+          <input 
+                id="accountNumber" 
+                type="" 
+                inputmode="numeric" 
+                minlength="10" 
+                maxlength="12" 
+                pattern="\d{10,12}" 
+                placeholder="เช่น 012-3-45678-9"
+                oninput="this.value = this.value.replace(/\D/g, '')"
+                required
+              >
         </div>
 
         <div class="input-group">
@@ -341,7 +351,7 @@
     </div>
   </div>
 
-  <script src="./wallet.js"></script>
+  <script src="/assets/student/wallet.js"></script>
 </body>
 
 </html>
