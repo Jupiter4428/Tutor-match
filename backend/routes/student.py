@@ -5,6 +5,7 @@ from backend.services.student_service import (
     respond_to_application,
     get_post_applications,
     get_student_post_history,
+    get_my_courses,
     update_student_profile,
     delete_student_post,
     get_student_wallet,
@@ -63,7 +64,14 @@ def add_post():
 def get_posts():
     result = get_student_post_history(user_id=request.user_id)
     return jsonify(result), 200
-
+#GET /student/my-courses — ดึงคอร์สของนักเรียนจาก database
+@student_bp.route('/my-courses', methods=['GET'])
+@token_required
+@role_required('student')
+def my_courses():
+    result = get_my_courses(user_id=request.user_id)
+    status_code = 200 if result["status"] == "success" else 400
+    return jsonify(result), status_code
 # POST /student/respond — นักเรียนยอมรับหรือปฏิเสธใบสมัครของติวเตอร์
 @student_bp.route('/respond', methods=['POST'])
 @token_required
