@@ -42,16 +42,16 @@
 
         <div class="hero-stats">
           <div class="mini-stat">
-            <h3>2.4K+</h3>
+            <h3 id="heroTotal">-</h3>
             <p>รีวิวทั้งหมด</p>
           </div>
           <div class="mini-stat">
-            <h3>4.9</h3>
+            <h3 id="heroAvg">-</h3>
             <p>คะแนนเฉลี่ย</p>
           </div>
           <div class="mini-stat">
-            <h3>320+</h3>
-            <p>ติวเตอร์ที่ถูกรีวิว</p>
+            <h3 id="heroFiveStar">-%</h3>
+            <p>รีวิว 5 ดาว</p>
           </div>
         </div>
       </div>
@@ -60,75 +60,41 @@
         <div class="rating-summary-card">
           <div class="rating-summary-title">
             <h3>สถิติรีวิว</h3>
-            <p>จากผู้เรียนทั้งหมด 2,432 รีวิว</p>
+            <p id="summarySubtitle">กำลังโหลด...</p>
           </div>
 
           <div class="rating-summary-grid">
             <div class="rating-score-box">
-              <div class="big-score">4.9</div>
-              <div class="big-stars">★★★★★</div>
+              <div class="big-score" id="summaryAvg">-</div>
+              <div class="big-stars" id="summaryStars">☆☆☆☆☆</div>
               <div class="score-caption">คะแนนเฉลี่ย</div>
             </div>
 
-            <div class="rating-breakdown">
+            <div class="rating-breakdown" id="ratingBreakdown">
               <div class="rating-row">
                 <div class="rating-label">5 ดาว</div>
-                <div class="rating-stars">
-                  <span class="on">★</span>
-                  <span class="on">★</span>
-                  <span class="on">★</span>
-                  <span class="on">★</span>
-                  <span class="on">★</span>
-                </div>
-                <div class="rating-count">2,144 รีวิว (88%)</div>
+                <div class="rating-stars" id="stars5"></div>
+                <div class="rating-count" id="count5">-</div>
               </div>
-
               <div class="rating-row">
                 <div class="rating-label">4 ดาว</div>
-                <div class="rating-stars">
-                  <span class="on">★</span>
-                  <span class="on">★</span>
-                  <span class="on">★</span>
-                  <span class="on">★</span>
-                  <span class="off">★</span>
-                </div>
-                <div class="rating-count">195 รีวิว (8%)</div>
+                <div class="rating-stars" id="stars4"></div>
+                <div class="rating-count" id="count4">-</div>
               </div>
-
               <div class="rating-row">
                 <div class="rating-label">3 ดาว</div>
-                <div class="rating-stars">
-                  <span class="on">★</span>
-                  <span class="on">★</span>
-                  <span class="on">★</span>
-                  <span class="off">★</span>
-                  <span class="off">★</span>
-                </div>
-                <div class="rating-count">49 รีวิว (2%)</div>
+                <div class="rating-stars" id="stars3"></div>
+                <div class="rating-count" id="count3">-</div>
               </div>
-
               <div class="rating-row">
                 <div class="rating-label">2 ดาว</div>
-                <div class="rating-stars">
-                  <span class="on">★</span>
-                  <span class="on">★</span>
-                  <span class="off">★</span>
-                  <span class="off">★</span>
-                  <span class="off">★</span>
-                </div>
-                <div class="rating-count">24 รีวิว (1%)</div>
+                <div class="rating-stars" id="stars2"></div>
+                <div class="rating-count" id="count2">-</div>
               </div>
-
               <div class="rating-row">
                 <div class="rating-label">1 ดาว</div>
-                <div class="rating-stars">
-                  <span class="on">★</span>
-                  <span class="off">★</span>
-                  <span class="off">★</span>
-                  <span class="off">★</span>
-                  <span class="off">★</span>
-                </div>
-                <div class="rating-count">20 รีวิว (1%)</div>
+                <div class="rating-stars" id="stars1"></div>
+                <div class="rating-count" id="count1">-</div>
               </div>
             </div>
           </div>
@@ -142,47 +108,35 @@
 
         <div class="filter-group">
           <label>ค้นหาคำในรีวิว</label>
-          <input type="text" placeholder="เช่น สอนดีมาก เข้าใจง่าย..." />
+          <input type="text" id="searchInput" placeholder="เช่น สอนดีมาก เข้าใจง่าย..." />
         </div>
 
         <div class="filter-group">
           <label>เลือกวิชา</label>
-          <select>
-            <option>ทั้งหมด</option>
-            <option>คณิตศาสตร์</option>
-            <option>ภาษาอังกฤษ</option>
-            <option>ฟิสิกส์</option>
-            <option>เคมี</option>
-            <option>ชีววิทยา</option>
-            <option>เขียนโปรแกรม</option>
+          <select id="subjectFilter">
+            <option value="">ทั้งหมด</option>
+            <option value="คณิตศาสตร์">คณิตศาสตร์</option>
+            <option value="ภาษาอังกฤษ">ภาษาอังกฤษ</option>
+            <option value="ฟิสิกส์">ฟิสิกส์</option>
+            <option value="เคมี">เคมี</option>
+            <option value="ชีววิทยา">ชีววิทยา</option>
+            <option value="Programming">Programming</option>
           </select>
         </div>
 
         <div class="filter-group">
           <label>คะแนนรีวิว</label>
-          <select>
-            <option>ทั้งหมด</option>
-            <option>5 ดาว</option>
-            <option>4 ดาวขึ้นไป</option>
-            <option>3 ดาวขึ้นไป</option>
+          <select id="ratingFilter">
+            <option value="">ทั้งหมด</option>
+            <option value="5">5 ดาว</option>
+            <option value="4">4 ดาว</option>
+            <option value="3">3 ดาว</option>
+            <option value="2">2 ดาว</option>
+            <option value="1">1 ดาว</option>
           </select>
         </div>
 
-        <div class="filter-group">
-          <label>แท็กยอดนิยม</label>
-          <div class="tag-list">
-            <div class="tag active">สอนเข้าใจง่าย</div>
-            <div class="tag">ตรงเวลา</div>
-            <div class="tag">ใจเย็น</div>
-            <div class="tag">มีเทคนิคดี</div>
-            <div class="tag">เอกสารครบ</div>
-            <div class="tag">เป็นกันเอง</div>
-            <div class="tag">เก็งข้อสอบแม่น</div>
-            <div class="tag">คุ้มราคา</div>
-          </div>
-        </div>
-
-        <button class="btn btn-primary">🔍 ใช้ตัวกรอง</button>
+        <button class="btn btn-primary" id="applyFilterBtn">🔍 ใช้ตัวกรอง</button>
       </aside>
 
       <main class="review-panel">
@@ -196,125 +150,14 @@
         <div class="review-header">
           <h3>💬 รีวิวล่าสุดจากนักเรียน</h3>
           <div class="header-actions">
-            <button class="btn btn-outline">📅 ล่าสุด</button>
-            <button class="btn btn-outline">🔥 ยอดนิยม</button>
-            <button class="btn btn-outline">⭐ คะแนนสูงสุด</button>
+            <button class="btn btn-outline sort-btn active" data-sort="latest">📅 ล่าสุด</button>
+            <button class="btn btn-outline sort-btn" data-sort="highest">⭐ คะแนนสูงสุด</button>
+            <button class="btn btn-outline sort-btn" data-sort="name">🔤 ชื่อนักเรียน</button>
           </div>
         </div>
 
-        <div class="review-list">
-          <div class="review-card">
-            <div class="review-top">
-              <div class="user-box">
-                <div class="avatar">AP</div>
-                <div class="user-meta">
-                  <h4>Apinya S.</h4>
-                  <p>นักเรียน ม.6 • วิชาคณิตศาสตร์</p>
-                </div>
-              </div>
-              <div class="review-rating">
-                <div class="score-number">5.0</div>
-                <div class="score-stars">★★★★★</div>
-              </div>
-            </div>
-
-            <div class="review-body">
-              ติวเตอร์สอนดีมากกกก อธิบายเรื่องยากให้เข้าใจง่ายแบบไม่น่าเชื่อ
-              มีเทคนิคจำสูตรและวิธีทำโจทย์ที่ใช้สอบจริงได้เลย จากเดิมหนูกลัวคณิตมาก
-              แต่พอได้เรียนแล้วรู้สึกมั่นใจขึ้นเยอะ คะแนนสอบดีขึ้นแบบเห็นชัดมาก
-            </div>
-
-            <div class="review-tags">
-              <span class="review-badge">สอนเข้าใจง่าย</span>
-              <span class="review-badge">ใจเย็น</span>
-              <span class="review-badge">เก็งข้อสอบแม่น</span>
-              <span class="review-badge">คุ้มราคา</span>
-            </div>
-
-            <div class="review-footer">
-              <div class="review-date">รีวิวเมื่อ 20 เมษายน 2026</div>
-              <div class="reaction-group">
-                <button class="react-btn">👍 มีประโยชน์ 124</button>
-                <button class="react-btn">💖 ชอบมาก</button>
-                <button class="react-btn">↗ แชร์</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="review-card">
-            <div class="review-top">
-              <div class="user-box">
-                <div class="avatar">NT</div>
-                <div class="user-meta">
-                  <h4>Nattawat T.</h4>
-                  <p>นักศึกษาปี 1 • วิชาภาษาอังกฤษ</p>
-                </div>
-              </div>
-              <div class="review-rating">
-                <div class="score-number">4.9</div>
-                <div class="score-stars">★★★★★</div>
-              </div>
-            </div>
-
-            <div class="review-body">
-              ชอบบรรยากาศการสอนมากครับ ไม่กดดันเลย ติวเตอร์พูดเพราะ เป็นกันเอง
-              แล้วก็ช่วยแก้จุดอ่อนแต่ละเรื่องให้ตรงจุด โดยเฉพาะ grammar กับ speaking
-              ดีขึ้นแบบชัดเจนมาก แถมมีเอกสารสรุปให้ครบ ดูตั้งใจสอนจริง
-            </div>
-
-            <div class="review-tags">
-              <span class="review-badge">เป็นกันเอง</span>
-              <span class="review-badge">เอกสารครบ</span>
-              <span class="review-badge">ตรงเวลา</span>
-            </div>
-
-            <div class="review-footer">
-              <div class="review-date">รีวิวเมื่อ 18 เมษายน 2026</div>
-              <div class="reaction-group">
-                <button class="react-btn">👍 มีประโยชน์ 98</button>
-                <button class="react-btn">💖 ชอบมาก</button>
-                <button class="react-btn">↗ แชร์</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="review-card">
-            <div class="review-top">
-              <div class="user-box">
-                <div class="avatar">PK</div>
-                <div class="user-meta">
-                  <h4>Pimchanok K.</h4>
-                  <p>นักเรียนเตรียมสอบ • วิชาฟิสิกส์</p>
-                </div>
-              </div>
-              <div class="review-rating">
-                <div class="score-number">5.0</div>
-                <div class="score-stars">★★★★★</div>
-              </div>
-            </div>
-
-            <div class="review-body">
-              ส่วนตัวประทับใจมากค่ะ ติวเตอร์สอนได้ละเอียดและมีการไล่พื้นฐานก่อน
-              ทำให้คนที่ไม่แน่นก็เรียนได้ แล้วพอเริ่มเข้าใจ ก็พาไปโจทย์ยากต่อแบบไม่งง
-              ที่ชอบมากคือมีการวิเคราะห์ข้อผิดพลาดให้ทีละจุด รู้เลยว่าควรกลับไปแก้ตรงไหน
-            </div>
-
-            <div class="review-tags">
-              <span class="review-badge">ละเอียดมาก</span>
-              <span class="review-badge">วิเคราะห์เก่ง</span>
-              <span class="review-badge">มีเทคนิคดี</span>
-              <span class="review-badge">สอนเป็นขั้นตอน</span>
-            </div>
-
-            <div class="review-footer">
-              <div class="review-date">รีวิวเมื่อ 15 เมษายน 2026</div>
-              <div class="reaction-group">
-                <button class="react-btn">👍 มีประโยชน์ 142</button>
-                <button class="react-btn">💖 ชอบมาก</button>
-                <button class="react-btn">↗ แชร์</button>
-              </div>
-            </div>
-          </div>
+        <div class="review-list" id="reviewList">
+          <div style="padding: 40px; text-align: center; color: #888;">กำลังโหลดรีวิว...</div>
         </div>
       </main>
     </div>
@@ -329,45 +172,50 @@
         <button class="close-btn" onclick="closeModal()">✕</button>
       </div>
 
-      <form>
+      <form id="modalReviewForm">
         <div class="form-grid">
-          <div class="filter-group">
-            <label>ชื่อผู้รีวิว</label>
-            <input type="text" placeholder="กรอกชื่อของคุณ">
-          </div>
-
-          <div class="filter-group">
-            <label>วิชาที่เรียน</label>
-            <select>
-              <option>คณิตศาสตร์</option>
-              <option>ภาษาอังกฤษ</option>
-              <option>ฟิสิกส์</option>
-              <option>เคมี</option>
-              <option>ชีววิทยา</option>
-              <option>เขียนโปรแกรม</option>
+          <div class="filter-group full">
+            <label>เลือกงานที่รีวิว</label>
+            <select id="modalAppSelect" required>
+              <option value="">-- เลือกงานที่รีวิวได้ --</option>
             </select>
           </div>
 
+          <div class="filter-group">
+            <label>ติวเตอร์</label>
+            <input type="text" id="modalTutorName" placeholder="เลือกงานก่อน" readonly>
+          </div>
+
+          <div class="filter-group">
+            <label>วิชา</label>
+            <input type="text" id="modalSubjectName" placeholder="เลือกงานก่อน" readonly>
+          </div>
+
           <div class="filter-group full">
-            <label>เลือกระดับคะแนน</label>
-            <div class="star-picker">
-              <div class="star-option">⭐ 1 ดาว</div>
-              <div class="star-option">⭐⭐ 2 ดาว</div>
-              <div class="star-option">⭐⭐⭐ 3 ดาว</div>
-              <div class="star-option">⭐⭐⭐⭐ 4 ดาว</div>
-              <div class="star-option active">⭐⭐⭐⭐⭐ 5 ดาว</div>
+            <label>คะแนนรีวิว</label>
+            <div class="star-picker" id="modalStarPicker">
+              <div class="star-option" data-value="1">⭐ 1 ดาว</div>
+              <div class="star-option" data-value="2">⭐⭐ 2 ดาว</div>
+              <div class="star-option" data-value="3">⭐⭐⭐ 3 ดาว</div>
+              <div class="star-option" data-value="4">⭐⭐⭐⭐ 4 ดาว</div>
+              <div class="star-option" data-value="5">⭐⭐⭐⭐⭐ 5 ดาว</div>
             </div>
+            <input type="hidden" id="modalRatingValue" value="">
           </div>
 
           <div class="filter-group full">
             <label>รายละเอียดรีวิว</label>
-            <textarea rows="6" placeholder="เล่าประสบการณ์การเรียน ความประทับใจ หรือข้อเสนอแนะ..."></textarea>
+            <textarea id="modalComment" rows="6" placeholder="เล่าประสบการณ์การเรียน ความประทับใจ หรือข้อเสนอแนะ..."></textarea>
+          </div>
+
+          <div class="filter-group full">
+            <div id="modalMessage" style="display:none; padding: 10px; border-radius: 8px; font-size: 14px;"></div>
           </div>
         </div>
 
         <div class="form-actions">
           <button type="button" class="btn btn-outline" onclick="closeModal()">ยกเลิก</button>
-          <button type="submit" class="btn btn-primary">🚀 ส่งรีวิว</button>
+          <button type="submit" class="btn btn-primary" id="modalSubmitBtn">🚀 ส่งรีวิว</button>
         </div>
       </form>
     </div>
