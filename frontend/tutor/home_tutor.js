@@ -116,7 +116,28 @@ function renderSchedules() {
     both: 'ออนไลน์ / ออนไซต์'
   }[v] || v);
 
-  list.innerHTML = schedules.map(item => `
+  list.innerHTML = schedules.map(item => {
+    const ts = item.teaching_status || 'not_started';
+    const ps = item.payment_status  || null;
+
+    let statusBadge = '<span class="badge badge-open">Confirmed</span>';
+    if (ts === 'ongoing')   statusBadge = '<span class="badge badge-warning">กำลังสอน</span>';
+    if (ts === 'completed') statusBadge = '<span class="badge badge-done">สอนเสร็จแล้ว</span>';
+
+    let actions = '';
+    if (ts === 'not_started' && !ps) {
+      actions = `<div style="color:#ffd75c;font-size:0.88rem;margin-top:8px">⏳ รอนักเรียนชำระเงิน</div>`;
+    } else if (ts === 'not_started' && ps === 'pending') {
+      actions = `<button class="small-btn accept-btn" onclick="startClass(${item.app_id})">▶ Start Class</button>`;
+    } else if (ts === 'ongoing') {
+      actions = `<button class="small-btn delete-btn" onclick="endClass(${item.app_id})">⏹ End Class</button>`;
+    } else if (ts === 'completed' && ps !== 'completed') {
+      actions = `<div style="color:#42d8ff;font-size:0.88rem;margin-top:8px">✅ รอนักเรียน Confirm</div>`;
+    } else if (ts === 'completed' && ps === 'completed') {
+      actions = `<div style="color:#35e0a1;font-size:0.88rem;margin-top:8px">🎉 เสร็จสมบูรณ์ รับเงินแล้ว</div>`;
+    }
+
+    return `
     <div class="schedule-card">
       <div class="item-top">
         <div>
@@ -127,11 +148,12 @@ function renderSchedules() {
             👤 นักเรียน: ${item.student_name}
           </div>
         </div>
-        <span class="badge badge-open">Confirmed</span>
+        ${statusBadge}
       </div>
       <div class="item-desc">💰 ${item.budget} บาท/ชม.</div>
-    </div>
-  `).join('');
+      <div class="item-actions">${actions}</div>
+    </div>`;
+  }).join('');
 }
 
 function renderReviews() {
@@ -251,6 +273,30 @@ function loadSchedule() {
       document.getElementById('scheduleList').innerHTML =
         '<div class="empty-state">โหลดตารางสอนไม่สำเร็จ</div>';
     });
+}
+
+async function startClass(app_id) {
+  if (!confirm('เริ่มคลาสเรียนนี้เลยใช่หรือไม่?')) return;
+  const res = await fetch('/tutor/api/class/start', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeader() },
+    body: JSON.stringify({ app_id })
+  }).then(r => r.json()).catch(() => ({ status: 'error', message: 'เชื่อมต่อไม่สำเร็จ' }));
+
+  alert(res.message || 'เกิดข้อผิดพลาด');
+  if (res.status === 'success') loadSchedule();
+}
+
+async function endClass(app_id) {
+  if (!confirm('จบคลาสนี้แล้วใช่หรือไม่? ระบบจะแจ้งให้นักเรียน Confirm')) return;
+  const res = await fetch('/tutor/api/class/end', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeader() },
+    body: JSON.stringify({ app_id })
+  }).then(r => r.json()).catch(() => ({ status: 'error', message: 'เชื่อมต่อไม่สำเร็จ' }));
+
+  alert(res.message || 'เกิดข้อผิดพลาด');
+  if (res.status === 'success') loadSchedule();
 }
 
 function acceptJob(post_id) {
