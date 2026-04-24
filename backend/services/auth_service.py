@@ -4,7 +4,6 @@ import jwt
 import datetime
 from datetime import timezone
 
-from backend.utils.db import get_connection
 from backend.config import SECRET_KEY
 from backend.extensions import db
 
@@ -33,8 +32,8 @@ def register_user(name, email, password, role):
             elif role == 'tutor':
                 # หน้า Tutor ต้องมีค่าเริ่มต้นสำหรับ hourly_rate และ profile_picture_url ตาม Schema
                 cursor.execute("""
-                    INSERT INTO tutor_profiles (user_id, hourly_rate, profile_picture_url) 
-                    VALUES (%s, 0.00, 'default_tutor.png')
+                    INSERT INTO tutor_profiles (user_id, hourly_rate, profile_picture_url)
+                    VALUES (%s, 0.00, 'static/uploads/default_profile.jpg')
                 """, (user_id,))
             
             # สร้าง Wallet ให้ user ใหม่ด้วย
@@ -52,7 +51,7 @@ def register_user(name, email, password, role):
 
 def login_user(email, password):
     """เข้าสู่ระบบและสร้าง JWT token"""
-    conn = get_connection()
+    conn = db.get_connection()
     try:
         with conn.cursor() as cursor:
             # หา user จาก email
