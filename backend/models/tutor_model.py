@@ -1,22 +1,26 @@
-# ตารางโปรไฟล์ติวเตอร์ [cite: 432]
 TUTOR_PROFILE_TABLE = {
     "tutor_id": "INT PRIMARY KEY AUTO_INCREMENT",
-    "user_id": "INT UNIQUE (FK -> User)",
-    "bio": "TEXT",
-    "verification_status": "ENUM('pending', 'verified', 'rejected') DEFAULT 'pending'",
-    "hourly_rate": "DECIMAL(10,2) (CHECK > 0)" # จุดที่เคยติด Error [cite: 433]
+    "user_id": "INT UNIQUE NOT NULL (FK -> users)",
+    "bio": "TEXT NULL",
+    "hourly_rate": "DECIMAL(10,2) NOT NULL (CHECK >= 0)",
+    "verification_status": "ENUM('pending', 'verified', 'rejected') NOT NULL DEFAULT 'pending'",
+    "profile_picture_url": "VARCHAR(512) NOT NULL",
+    "verification_submitted_at": "DATETIME NULL",
+    "verified_by": "INT NULL (FK -> users)",
+    "verified_at": "DATETIME NULL",
+    "reject_reason": "TEXT NULL"
 }
 
-# ตารางประสบการณ์สอน (4NF) [cite: 422, 435]
+# 4NF: separated from tutor_profiles
 TUTOR_EXPERIENCE_TABLE = {
     "experience_id": "INT PRIMARY KEY AUTO_INCREMENT",
-    "tutor_id": "INT (FK -> Tutor_Profile)",
+    "tutor_id": "INT NOT NULL (FK -> tutor_profiles)",
     "experience_detail": "TEXT NOT NULL"
 }
 
-# ตารางวิชาที่สอน (BCNF) [cite: 402, 437]
+# BCNF: composite PK prevents duplicate subjects per tutor
 TUTOR_SUBJECT_TABLE = {
-    "tutor_id": "INT (FK -> Tutor_Profile)",
-    "subject": "VARCHAR(100)",
-    "composite_pk": "(tutor_id, subject)"
+    "composite_pk": "(tutor_id, subject)",
+    "tutor_id": "INT NOT NULL (FK -> tutor_profiles)",
+    "subject": "VARCHAR(100) NOT NULL"
 }
