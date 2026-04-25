@@ -1,10 +1,12 @@
 from backend.extensions import db
 
 
+# ดึงรีวิวทั้งหมด (รองรับ filter ตาม tutor, rating, subject, คำค้นหา)
 def get_all_reviews(tutor_id=None, rating=None, subject=None, search=None):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # ดึงรีวิวพร้อมชื่อนักเรียน, ติวเตอร์ และวิชา
             sql = """
                 SELECT
                     r.review_id,
@@ -27,6 +29,7 @@ def get_all_reviews(tutor_id=None, rating=None, subject=None, search=None):
             """
             params = []
 
+            # เพิ่มเงื่อนไข filter ตามที่ส่งมา
             if tutor_id:
                 sql += " AND tp.tutor_id = %s"
                 params.append(tutor_id)
@@ -65,6 +68,7 @@ def get_all_reviews(tutor_id=None, rating=None, subject=None, search=None):
         connection.close()
 
 
+# ดึงรีวิวของติวเตอร์รายบุคคล (ใช้ฟังก์ชั่นหลักพร้อม filter tutor_id)
 def get_reviews_by_tutor(tutor_id, rating=None, subject=None, search=None):
     return get_all_reviews(
         tutor_id=tutor_id,
@@ -74,10 +78,12 @@ def get_reviews_by_tutor(tutor_id, rating=None, subject=None, search=None):
     )
 
 
+# ดึง applications ที่นักเรียนยังไม่ได้รีวิว (teaching_status=completed)
 def get_reviewable_applications(user_id):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # หา student_id ของผู้ใช้
             cursor.execute(
                 "SELECT student_id FROM student_profiles WHERE user_id = %s",
                 (user_id,)
@@ -92,6 +98,7 @@ def get_reviewable_applications(user_id):
 
             student_id = student_profile["student_id"]
 
+            # ดึง applications ที่สอนจบแล้ว พร้อมเช็คว่ามีรีวิวแล้วหรือยัง
             cursor.execute("""
                 SELECT
                     a.app_id,
@@ -119,6 +126,7 @@ def get_reviewable_applications(user_id):
 
             rows = cursor.fetchall()
 
+            # กรองเฉพาะที่ยังไม่มีรีวิว (review_id = NULL)
             available = []
             for row in rows:
                 if row["review_id"] is None:
@@ -147,10 +155,12 @@ def get_reviewable_applications(user_id):
         connection.close()
 
 
+# บันทึกรีวิวใหม่ (1 ครั้งต่อ 1 application)
 def create_review(user_id, app_id, rating, comment):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # หา student_id ของผู้ใช้
             cursor.execute("SELECT student_id FROM student_profiles WHERE user_id = %s", (user_id,))
             student_profile = cursor.fetchone()
             if not student_profile:
@@ -158,6 +168,7 @@ def create_review(user_id, app_id, rating, comment):
 
             student_id = student_profile["student_id"]
 
+            # ตรวจสอบว่า application นี้มีอยู่จริง
             cursor.execute("""
                 SELECT
                     a.app_id,
@@ -174,19 +185,23 @@ def create_review(user_id, app_id, rating, comment):
             if not app:
                 return {"status": "error", "message": "ไม่พบงานที่ต้องการรีวิว"}
 
+            # ตรวจสอบสิทธิ์: เฉพาะนักเรียนที่จ้างจริง
             if app["student_id"] != student_id:
                 return {"status": "error", "message": "คุณไม่มีสิทธิ์รีวิวงานนี้"}
 
             if app["status"] != "accepted":
                 return {"status": "error", "message": "รีวิวได้เฉพาะงานที่ถูกยืนยันแล้ว"}
 
+            # รีวิวได้เฉพาะเมื่อสอนจบแล้ว
             if app["teaching_status"] != "completed":
                 return {"status": "error", "message": "รีวิวได้หลังสอนเสร็จเท่านั้น"}
 
+            # ป้องกันรีวิวซ้ำ (1 application = 1 รีวิว)
             cursor.execute("SELECT review_id FROM reviews WHERE app_id = %s", (app_id,))
             if cursor.fetchone():
                 return {"status": "error", "message": "งานนี้ถูกรีวิวไปแล้ว"}
 
+            # บันทึกรีวิว
             cursor.execute("""
                 INSERT INTO reviews (app_id, rating, comment)
                 VALUES (%s, %s, %s)
@@ -210,10 +225,12 @@ def create_review(user_id, app_id, rating, comment):
         connection.close()
 
 
+# ลบรีวิวของตัวเอง
 def delete_review(user_id, review_id):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # หา student_id ของผู้ใช้
             cursor.execute("SELECT student_id FROM student_profiles WHERE user_id = %s", (user_id,))
             student_profile = cursor.fetchone()
             if not student_profile:
@@ -221,6 +238,7 @@ def delete_review(user_id, review_id):
 
             student_id = student_profile["student_id"]
 
+            # ดึงรีวิวพร้อมเช็คว่าเป็นของนักเรียนคนนี้จริง
             cursor.execute("""
                 SELECT
                     r.review_id,
@@ -239,6 +257,7 @@ def delete_review(user_id, review_id):
             if review["student_id"] != student_id:
                 return {"status": "error", "message": "คุณไม่มีสิทธิ์ลบรีวิวนี้"}
 
+            # ลบรีวิว
             cursor.execute("DELETE FROM reviews WHERE review_id = %s", (review_id,))
             connection.commit()
 
@@ -251,10 +270,12 @@ def delete_review(user_id, review_id):
         connection.close()
 
 
+# ดึงสรุปคะแนน rating (ภาพรวมหรือรายติวเตอร์)
 def get_rating_summary(tutor_id=None):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # นับจำนวนและเฉลี่ย rating แยกตามดาว 1-5
             sql = """
                 SELECT
                     COUNT(*) AS total_reviews,
@@ -271,6 +292,7 @@ def get_rating_summary(tutor_id=None):
             """
             params = []
 
+            # กรองเฉพาะติวเตอร์รายบุคคลถ้าระบุ
             if tutor_id:
                 sql += " AND tp.tutor_id = %s"
                 params.append(tutor_id)

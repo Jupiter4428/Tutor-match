@@ -4,16 +4,18 @@ PLATFORM_FEE_RATE = 0.10
 GATEWAY_FEE_RATE  = 0.03  # หักเมื่อยกเลิกก่อนเรียน
 
 
+# Phase 1: นักเรียนชำระเงิน Full Escrow
 def pay_for_application(user_id, app_id):
-    """Phase 1: นักเรียนชำระเงิน Full Escrow"""
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # หา student_id ของผู้ใช้
             cursor.execute("SELECT student_id FROM student_profiles WHERE user_id = %s", (user_id,))
             student = cursor.fetchone()
             if not student:
                 return {"status": "error", "message": "ไม่พบโปรไฟล์นักเรียน"}
 
+            # ดึงข้อมูลใบสมัครและตรวจสอบว่าเป็นของนักเรียนคนนี้จริง
             cursor.execute("""
                 SELECT a.app_id, a.status, a.teaching_status,
                        sp.budget, sp.subject, sp.student_id
@@ -30,6 +32,7 @@ def pay_for_application(user_id, app_id):
             if app['teaching_status'] != 'not_started':
                 return {"status": "error", "message": "ไม่สามารถชำระเงินได้ในสถานะนี้"}
 
+            # ตรวจสอบว่ายังไม่มีการชำระเงินซ้ำ
             cursor.execute("SELECT payment_id FROM payments WHERE app_id = %s", (app_id,))
             if cursor.fetchone():
                 return {"status": "error", "message": "ชำระเงินสำหรับการจองนี้แล้ว"}
@@ -37,6 +40,7 @@ def pay_for_application(user_id, app_id):
             amount       = float(app['budget'])
             platform_fee = round(amount * PLATFORM_FEE_RATE, 2)
 
+            # ล็อคกระเป๋าและตรวจสอบยอดเงิน
             cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s FOR UPDATE", (user_id,))
             wallet = cursor.fetchone()
             if not wallet:
@@ -46,12 +50,15 @@ def pay_for_application(user_id, app_id):
 
             new_balance = float(wallet['balance']) - amount
 
+            # หักเงินจากกระเป๋านักเรียน
             cursor.execute("UPDATE wallets SET balance = %s WHERE wallet_id = %s",
                            (new_balance, wallet['wallet_id']))
+            # สร้าง payment record สถานะ pending (เงิน Escrow)
             cursor.execute("""
                 INSERT INTO payments (app_id, amount, platform_fee, status)
                 VALUES (%s, %s, %s, 'pending')
             """, (app_id, amount, platform_fee))
+            # บันทึก transaction log
             cursor.execute("""
                 INSERT INTO transaction_logs
                     (wallet_id, transaction_type, amount, balance_after,
@@ -71,16 +78,18 @@ def pay_for_application(user_id, app_id):
         connection.close()
 
 
+# Phase 2a: ติวเตอร์กด Start Class
 def start_class(user_id, app_id):
-    """Phase 2a: ติวเตอร์กด Start Class"""
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # หา tutor_id ของผู้ใช้
             cursor.execute("SELECT tutor_id FROM tutor_profiles WHERE user_id = %s", (user_id,))
             tutor = cursor.fetchone()
             if not tutor:
                 return {"status": "error", "message": "ไม่พบโปรไฟล์ติวเตอร์"}
 
+            # ตรวจสอบว่าใบสมัครนี้เป็นของติวเตอร์และมีการชำระเงินแล้ว
             cursor.execute("""
                 SELECT a.app_id, a.teaching_status, p.payment_id
                 FROM applications a
@@ -96,6 +105,7 @@ def start_class(user_id, app_id):
             if not app['payment_id']:
                 return {"status": "error", "message": "นักเรียนยังไม่ได้ชำระเงิน กรุณารอก่อน"}
 
+            # เปลี่ยนสถานะเป็น ongoing
             cursor.execute(
                 "UPDATE applications SET teaching_status = 'ongoing' WHERE app_id = %s", (app_id,)
             )
@@ -109,16 +119,18 @@ def start_class(user_id, app_id):
         connection.close()
 
 
+# Phase 2b: ติวเตอร์กด End Class
 def end_class(user_id, app_id):
-    """Phase 2b: ติวเตอร์กด End Class"""
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # หา tutor_id ของผู้ใช้
             cursor.execute("SELECT tutor_id FROM tutor_profiles WHERE user_id = %s", (user_id,))
             tutor = cursor.fetchone()
             if not tutor:
                 return {"status": "error", "message": "ไม่พบโปรไฟล์ติวเตอร์"}
 
+            # ตรวจสอบว่าคลาสกำลัง ongoing อยู่
             cursor.execute("""
                 SELECT app_id, teaching_status
                 FROM applications
@@ -131,6 +143,7 @@ def end_class(user_id, app_id):
             if app['teaching_status'] != 'ongoing':
                 return {"status": "error", "message": "คลาสยังไม่ได้เริ่ม หรือสิ้นสุดไปแล้ว"}
 
+            # เปลี่ยนสถานะเป็น completed รอนักเรียนยืนยัน
             cursor.execute(
                 "UPDATE applications SET teaching_status = 'completed' WHERE app_id = %s", (app_id,)
             )
@@ -144,16 +157,18 @@ def end_class(user_id, app_id):
         connection.close()
 
 
+# Phase 3: นักเรียน Confirm → Payout ติวเตอร์ 90% + platform 10%
 def confirm_class(user_id, app_id):
-    """Phase 3: นักเรียน Confirm → Payout ติวเตอร์ 90% + platform 10%"""
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # หา student_id ของผู้ใช้
             cursor.execute("SELECT student_id FROM student_profiles WHERE user_id = %s", (user_id,))
             student = cursor.fetchone()
             if not student:
                 return {"status": "error", "message": "ไม่พบโปรไฟล์นักเรียน"}
 
+            # ดึงข้อมูลใบสมัคร, การชำระเงิน และ tutor_user_id สำหรับโอนเงิน
             cursor.execute("""
                 SELECT a.app_id, a.teaching_status, a.tutor_id,
                        p.payment_id, p.amount, p.platform_fee,
@@ -180,11 +195,12 @@ def confirm_class(user_id, app_id):
             tutor_gets   = round(amount - platform_fee, 2)
             subject      = app['subject']
 
-            # โอนเงินให้ติวเตอร์
+            # ล็อคกระเป๋าติวเตอร์และโอนเงิน 90%
             cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s FOR UPDATE",
                            (app['tutor_user_id'],))
             tutor_wallet = cursor.fetchone()
             if not tutor_wallet:
+                # สร้างกระเป๋าให้ติวเตอร์ถ้ายังไม่มี
                 cursor.execute("INSERT INTO wallets (user_id, balance) VALUES (%s, 0.00)",
                                (app['tutor_user_id'],))
                 cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s FOR UPDATE",
@@ -194,6 +210,7 @@ def confirm_class(user_id, app_id):
             new_tutor_balance = float(tutor_wallet['balance']) + tutor_gets
             cursor.execute("UPDATE wallets SET balance = %s WHERE wallet_id = %s",
                            (new_tutor_balance, tutor_wallet['wallet_id']))
+            # บันทึก transaction log ฝั่งติวเตอร์
             cursor.execute("""
                 INSERT INTO transaction_logs
                     (wallet_id, transaction_type, amount, balance_after,
@@ -202,13 +219,14 @@ def confirm_class(user_id, app_id):
             """, (tutor_wallet['wallet_id'], tutor_gets, new_tutor_balance, app_id,
                   f"รายได้จากการสอน{subject} (หัก GP {int(PLATFORM_FEE_RATE*100)}%)"))
 
-            # Platform fee → admin wallet (user_id = 1)
+            # โอน platform fee 10% เข้ากระเป๋า admin (user_id = 1)
             cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = 1 FOR UPDATE")
             admin_wallet = cursor.fetchone()
             if admin_wallet:
                 new_admin_balance = float(admin_wallet['balance']) + platform_fee
                 cursor.execute("UPDATE wallets SET balance = %s WHERE wallet_id = %s",
                                (new_admin_balance, admin_wallet['wallet_id']))
+                # บันทึก transaction log ฝั่ง admin
                 cursor.execute("""
                     INSERT INTO transaction_logs
                         (wallet_id, transaction_type, amount, balance_after,
@@ -217,6 +235,7 @@ def confirm_class(user_id, app_id):
                 """, (admin_wallet['wallet_id'], platform_fee, new_admin_balance, app_id,
                       f"ค่าธรรมเนียม GP {int(PLATFORM_FEE_RATE*100)}% จาก{subject}"))
 
+            # อัปเดตสถานะ payment เป็น completed
             cursor.execute("UPDATE payments SET status = 'completed' WHERE app_id = %s", (app_id,))
             connection.commit()
 
@@ -234,16 +253,18 @@ def confirm_class(user_id, app_id):
         connection.close()
 
 
+# ยกเลิกก่อนเรียน → คืนเงิน 97% (หัก Gateway Fee 3%)
 def cancel_booking(user_id, app_id):
-    """ยกเลิกก่อนเรียน → คืนเงิน 97% (หัก Gateway Fee 3%)"""
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # หา student_id ของผู้ใช้
             cursor.execute("SELECT student_id FROM student_profiles WHERE user_id = %s", (user_id,))
             student = cursor.fetchone()
             if not student:
                 return {"status": "error", "message": "ไม่พบโปรไฟล์นักเรียน"}
 
+            # ดึงข้อมูลใบสมัครและการชำระเงิน
             cursor.execute("""
                 SELECT a.app_id, a.teaching_status,
                        p.payment_id, p.amount, p.status AS payment_status,
@@ -260,6 +281,7 @@ def cancel_booking(user_id, app_id):
             if app['teaching_status'] != 'not_started':
                 return {"status": "error", "message": "ไม่สามารถยกเลิกได้หลังจากเริ่มเรียนแล้ว"}
 
+            # ยกเลิกโดยไม่คืนเงิน (ยังไม่มีการชำระ)
             if not app['payment_id']:
                 cursor.execute(
                     "UPDATE applications SET status = 'rejected' WHERE app_id = %s", (app_id,)
@@ -274,6 +296,7 @@ def cancel_booking(user_id, app_id):
             gateway_fee   = round(amount * GATEWAY_FEE_RATE, 2)
             refund_amount = round(amount - gateway_fee, 2)
 
+            # ล็อคกระเป๋าและคืนเงิน 97%
             cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s FOR UPDATE", (user_id,))
             wallet = cursor.fetchone()
             if not wallet:
@@ -282,6 +305,7 @@ def cancel_booking(user_id, app_id):
             new_balance = float(wallet['balance']) + refund_amount
             cursor.execute("UPDATE wallets SET balance = %s WHERE wallet_id = %s",
                            (new_balance, wallet['wallet_id']))
+            # บันทึก transaction log การคืนเงิน
             cursor.execute("""
                 INSERT INTO transaction_logs
                     (wallet_id, transaction_type, amount, balance_after,
@@ -290,10 +314,10 @@ def cancel_booking(user_id, app_id):
             """, (wallet['wallet_id'], refund_amount, new_balance, app_id,
                   f"คืนเงินยกเลิกคอร์ส{app['subject']} (หัก Gateway Fee 3%)"))
 
+            # ปฏิเสธใบสมัครและคืนโพสต์เป็น open ให้หาติวเตอร์คนใหม่ได้
             cursor.execute(
                 "UPDATE applications SET status = 'rejected' WHERE app_id = %s", (app_id,)
             )
-            # คืน post กลับเป็น open เพื่อให้นักเรียนหาติวเตอร์คนใหม่ได้
             cursor.execute("""
                 UPDATE student_posts SET status = 'open'
                 WHERE post_id = (
