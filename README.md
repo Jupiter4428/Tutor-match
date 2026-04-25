@@ -45,8 +45,8 @@
 > สามารถใช้ **MySQL Workbench** แทนการพิมพ์คำสั่งผ่าน PowerShell ก็ได้ ผลลัพธ์เหมือนกัน
 
 ```bash
-# clone เฉพาะ branch demo ลงมาในโฟลเดอร์ชื่อ project
-git clone -b demo https://github.com/Jupiter4428/Tutor-match.git project
+# clone เฉพาะ branch Final ลงมาในโฟลเดอร์ชื่อ project
+git clone -b Final https://github.com/Jupiter4428/Tutor-match.git project
 
 # เข้าโฟลเดอร์โปรเจกต์
 cd project
@@ -191,11 +191,11 @@ python run.py
 # เช็คก่อนว่าตอนนี้อยู่ branch อะไร
 git branch
 # ต้องเห็น * demo — ถ้าไม่ใช่ให้สลับก่อน
-git checkout demo
+git checkout Final
 
 # pull ก่อนทุกครั้งเพื่อ sync code ล่าสุดจาก remote
 # ป้องกัน conflict ที่ไม่จำเป็นตอน push
-git pull origin demo
+git pull origin Final
 
 # ถ้าเจอ Merge Conflict หลัง pull ให้แก้ไฟล์นั้นก่อน
 # หลังแก้เสร็จให้ mark ว่า resolved ด้วย git add
@@ -216,7 +216,7 @@ git add <ไฟล์1> <ไฟล์2>
 git commit -m "อธิบายการเปลี่ยนแปลงที่เกี่ยวข้องกัน"
 
 # push ขึ้น remote
-git push origin demo
+git push origin Final
 ```
 <table align="center" style="width: 100%; border-collapse: collapse;">
 <tr style="background-color: #f8fafc;">
