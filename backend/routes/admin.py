@@ -36,10 +36,11 @@ def get_admin_stats():
             """)
             posts = cursor.fetchone()["total"]
 
+            # นับ tutor ที่ยังรอ verify (pending อยู่ใน tutor_profiles ไม่ใช่ users)
             cursor.execute("""
                 SELECT COUNT(*) as total
-                FROM users
-                WHERE account_status = 'pending'
+                FROM tutor_profiles
+                WHERE verification_status = 'pending'
             """)
             pending = cursor.fetchone()["total"]
 
