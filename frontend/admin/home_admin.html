@@ -342,6 +342,20 @@
     </section>
   </div>
 
+  <!-- Modal แสดงข้อมูลผู้ใช้ -->
+  <div id="userModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#1e2a4a; border:1px solid #2e3f6f; border-radius:16px; padding:28px; min-width:340px; max-width:460px; width:90%; color:#e2e8f0;">
+      <h3 style="margin:0 0 16px; color:#fff; font-size:1.1rem;">👤 ข้อมูลผู้ใช้</h3>
+      <div id="userModalBody" style="display:flex; flex-direction:column; gap:10px; font-size:0.95rem;"></div>
+      <div style="margin-top:20px; text-align:right;">
+        <button onclick="document.getElementById('userModal').style.display='none'"
+          style="background:#3b4f82; color:#fff; border:none; border-radius:8px; padding:8px 20px; cursor:pointer; font-size:0.9rem;">
+          ปิด
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="/assets/admin/home_admin.js"></script>
 </body>
 
