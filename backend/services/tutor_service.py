@@ -7,6 +7,7 @@ def get_open_posts(subject_filter=None):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # ดึงโพสต์ที่ status=open และไม่ถูกซ่อน พร้อมชื่อนักเรียน
             sql = """
                 SELECT
                     p.post_id, p.subject, p.grade_level, p.learning_format,
@@ -20,6 +21,7 @@ def get_open_posts(subject_filter=None):
             """
             params = []
 
+            # กรองตามวิชาถ้ามี filter
             if subject_filter and len(subject_filter) <= 100:
                 sql += " AND p.subject LIKE %s"
                 params.append(f"%{subject_filter}%")
@@ -42,6 +44,7 @@ def apply_to_post(user_id, post_id):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # หา tutor_id และเช็ค verification_status ในครั้งเดียว
             cursor.execute(
                 "SELECT tutor_id, verification_status FROM tutor_profiles WHERE user_id = %s",
                 (user_id,)
@@ -49,11 +52,13 @@ def apply_to_post(user_id, post_id):
             profile = cursor.fetchone()
             if not profile:
                 return {"status": "error", "message": "ไม่พบโปรไฟล์ติวเตอร์ของคุณในระบบ"}
+            # ป้องกันติวเตอร์ที่ยังไม่ผ่านการยืนยันสมัครงาน
             if profile['verification_status'] != 'verified':
                 return {"status": "error", "message": "บัญชีของคุณยังไม่ได้รับการยืนยันจาก Admin"}
 
             tutor_id = profile['tutor_id']
 
+            # ตรวจสอบว่าโพสต์ยังเปิดรับสมัครอยู่
             cursor.execute("SELECT status FROM student_posts WHERE post_id = %s AND is_hidden = FALSE", (post_id,))
             post = cursor.fetchone()
             if not post:
@@ -61,6 +66,7 @@ def apply_to_post(user_id, post_id):
             if post['status'] != 'open':
                 return {"status": "error", "message": "โพสต์นี้ปิดรับสมัครแล้ว"}
 
+            # ป้องกันสมัครซ้ำในโพสต์เดิม
             cursor.execute(
                 "SELECT app_id FROM applications WHERE post_id = %s AND tutor_id = %s",
                 (post_id, tutor_id)
@@ -68,6 +74,7 @@ def apply_to_post(user_id, post_id):
             if cursor.fetchone():
                 return {"status": "error", "message": "คุณได้สมัครโพสต์นี้ไปแล้ว"}
 
+            # บันทึกใบสมัครสถานะ pending รอนักเรียนเลือก
             cursor.execute(
                 "INSERT INTO applications (post_id, tutor_id, status) VALUES (%s, %s, 'pending')",
                 (post_id, tutor_id)
@@ -88,6 +95,7 @@ def get_tutor_applications(user_id):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # หา tutor_id ของผู้ใช้
             cursor.execute("SELECT tutor_id FROM tutor_profiles WHERE user_id = %s", (user_id,))
             profile = cursor.fetchone()
             if not profile:
@@ -95,6 +103,7 @@ def get_tutor_applications(user_id):
 
             tutor_id = profile['tutor_id']
 
+            # ดึงใบสมัครทั้งหมดพร้อมรายละเอียดโพสต์และชื่อนักเรียน
             sql = """
                 SELECT
                     a.app_id, a.status AS application_status, a.applied_at,
@@ -124,6 +133,7 @@ def get_tutor_dashboard_stats(user_id):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # หา tutor_id ของผู้ใช้
             cursor.execute("SELECT tutor_id FROM tutor_profiles WHERE user_id = %s", (user_id,))
             profile = cursor.fetchone()
             if not profile:
@@ -131,21 +141,21 @@ def get_tutor_dashboard_stats(user_id):
 
             tutor_id = profile['tutor_id']
 
+            # ดึงสถิติ 4 ตัวในครั้งเดียว: งานที่กำลังสอน, งานที่เปิดรับ, รายได้เดือนนี้, rating เฉลี่ย
             cursor.execute("""
                 SELECT
-                
                     (SELECT COUNT(*) FROM applications
                      WHERE tutor_id = %s AND status = 'accepted') AS teaching_now,
-                     
+
                     (SELECT COUNT(*) FROM student_posts
                      WHERE status = 'open' AND is_hidden = FALSE) AS available_jobs,
-                     
+
                     (SELECT COALESCE(SUM(p.budget), 0)
                      FROM applications a JOIN student_posts p ON a.post_id = p.post_id
                      WHERE a.tutor_id = %s AND a.status = 'accepted'
                        AND MONTH(a.applied_at) = MONTH(CURDATE())
                        AND YEAR(a.applied_at)  = YEAR(CURDATE())) AS monthly_income,
-                       
+
                     (SELECT ROUND(AVG(r.rating), 1)
                      FROM reviews r JOIN applications a ON r.app_id = a.app_id
                      WHERE a.tutor_id = %s) AS avg_rating
@@ -174,6 +184,7 @@ def get_tutor_schedule(user_id):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # หา tutor_id ของผู้ใช้
             cursor.execute("SELECT tutor_id FROM tutor_profiles WHERE user_id = %s", (user_id,))
             profile = cursor.fetchone()
             if not profile:
@@ -181,6 +192,7 @@ def get_tutor_schedule(user_id):
 
             tutor_id = profile['tutor_id']
 
+            # ดึงตารางสอนทั้งหมดพร้อมข้อมูลโพสต์, นักเรียน และสถานะชำระเงิน
             sql = """
                 SELECT
                     a.app_id, a.applied_at, a.teaching_status,
@@ -205,14 +217,14 @@ def get_tutor_schedule(user_id):
         return {"status": "error", "message": str(e), "data": []}
     finally:
         connection.close()
-    
-# Tutor Profile
-# =========================
 
+
+# ดึงโปรไฟล์ติวเตอร์ของตัวเอง (สำหรับหน้า edit)
 def get_tutor_profile(user_id):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # ดึงข้อมูลโปรไฟล์พร้อม name และ email จากตาราง users
             sql = """
                 SELECT
                     tp.tutor_id, tp.bio, tp.hourly_rate,
@@ -236,16 +248,19 @@ def get_tutor_profile(user_id):
         connection.close()
 
 
+# อัปเดตโปรไฟล์ติวเตอร์ (bio, ราคา, รูปโปรไฟล์)
 def update_tutor_profile(user_id, bio, hourly_rate, filename=None):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
             if filename:
+                # อัปเดตพร้อมรูปโปรไฟล์ใหม่
                 cursor.execute(
                     "UPDATE tutor_profiles SET bio=%s, hourly_rate=%s, profile_picture_url=%s WHERE user_id=%s",
                     (bio, hourly_rate, f"static/uploads/{filename}", user_id)
                 )
             else:
+                # อัปเดตเฉพาะ bio และราคา
                 cursor.execute(
                     "UPDATE tutor_profiles SET bio=%s, hourly_rate=%s WHERE user_id=%s",
                     (bio, hourly_rate, user_id)
@@ -257,11 +272,15 @@ def update_tutor_profile(user_id, bio, hourly_rate, filename=None):
         return {"status": "error", "message": str(e)}
     finally:
         connection.close()
+
+
+# ดึงรายชื่อติวเตอร์ทั้งหมดที่ verified สำหรับหน้าค้นหา
 def get_available_tutors():
     from collections import defaultdict
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # ดึงติวเตอร์ที่ verified และ active พร้อม rating เฉลี่ย เรียงตาม rating
             cursor.execute("""
                 SELECT
                     tp.tutor_id, u.name, tp.bio, tp.hourly_rate,
@@ -285,6 +304,7 @@ def get_available_tutors():
             tutor_ids = [t['tutor_id'] for t in tutors]
             fmt = ",".join(["%s"] * len(tutor_ids))
 
+            # ดึง subjects ของทุก tutor ในครั้งเดียว
             cursor.execute(
                 f"SELECT tutor_id, subject FROM tutor_subjects WHERE tutor_id IN ({fmt})",
                 tutor_ids
@@ -293,6 +313,7 @@ def get_available_tutors():
             for row in cursor.fetchall():
                 subjects_map[row['tutor_id']].append(row['subject'])
 
+            # ดึง experiences ของทุก tutor ในครั้งเดียว
             cursor.execute(
                 f"SELECT tutor_id, experience_detail FROM tutor_experiences WHERE tutor_id IN ({fmt})",
                 tutor_ids
@@ -322,12 +343,14 @@ def get_available_tutors():
         return {"status": "error", "message": str(e), "data": []}
     finally:
         connection.close()
- 
- 
+
+
+# ดึงโปรไฟล์สาธารณะของติวเตอร์รายบุคคล
 def get_tutor_profile_public(tutor_id):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # ดึงข้อมูลหลักพร้อม rating เฉลี่ย (เฉพาะ verified เท่านั้น)
             cursor.execute("""
                 SELECT tp.tutor_id, u.name, tp.bio, tp.hourly_rate,
                        tp.profile_picture_url,
@@ -344,9 +367,11 @@ def get_tutor_profile_public(tutor_id):
             if not t:
                 return {"status": "error", "message": "ไม่พบติวเตอร์"}
 
+            # ดึงรายวิชาที่สอน
             cursor.execute("SELECT subject FROM tutor_subjects WHERE tutor_id = %s", (tutor_id,))
             subjects = [r['subject'] for r in cursor.fetchall()]
 
+            # ดึงประสบการณ์
             cursor.execute("SELECT experience_detail FROM tutor_experiences WHERE tutor_id = %s", (tutor_id,))
             experiences = [r['experience_detail'] for r in cursor.fetchall()]
 
@@ -367,16 +392,20 @@ def get_tutor_profile_public(tutor_id):
     finally:
         connection.close()
 
+
+# ดึงข้อมูลกระเป๋าเงินของติวเตอร์ (สร้างใหม่อัตโนมัติถ้ายังไม่มี)
 def get_tutor_wallet(user_id):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # ค้นหากระเป๋าเงิน
             cursor.execute(
                 "SELECT wallet_id, balance, status, updated_at FROM wallets WHERE user_id = %s",
                 (user_id,)
             )
             wallet = cursor.fetchone()
 
+            # สร้างกระเป๋าใหม่ถ้ายังไม่มี
             if not wallet:
                 cursor.execute(
                     "INSERT INTO wallets (user_id, balance, status) VALUES (%s, 0.00, 'active')",
@@ -396,15 +425,18 @@ def get_tutor_wallet(user_id):
         connection.close()
 
 
+# ดึงประวัติรายการทางการเงินของติวเตอร์
 def get_tutor_transactions(user_id):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # หา wallet_id ก่อน
             cursor.execute("SELECT wallet_id FROM wallets WHERE user_id = %s", (user_id,))
             wallet = cursor.fetchone()
             if not wallet:
                 return {"status": "success", "data": []}
 
+            # ดึงประวัติรายการเรียงตามวันล่าสุด
             cursor.execute("""
                 SELECT transaction_id, transaction_type, amount, balance_after, description,
                        DATE_FORMAT(transaction_date, '%%d %%b %%Y %%H:%%i') AS formatted_date
@@ -419,10 +451,13 @@ def get_tutor_transactions(user_id):
     finally:
         connection.close()
 
+
+# ขอถอนเงินออกจากกระเป๋าไปยังบัญชีธนาคาร
 def request_withdrawal(user_id, amount, bank_name, account_number, account_name=''):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # ล็อคกระเป๋าและตรวจสอบยอดเงิน
             cursor.execute("SELECT wallet_id, balance FROM wallets WHERE user_id = %s FOR UPDATE", (user_id,))
             wallet = cursor.fetchone()
             if not wallet:
@@ -431,8 +466,10 @@ def request_withdrawal(user_id, amount, bank_name, account_number, account_name=
                 return {"status": "error", "message": "ยอดเงินไม่เพียงพอ"}
 
             new_balance = float(wallet['balance']) - float(amount)
+            # หักเงินจากกระเป๋า
             cursor.execute("UPDATE wallets SET balance = %s WHERE wallet_id = %s", (new_balance, wallet['wallet_id']))
 
+            # บันทึก transaction log พร้อมระบุธนาคารและชื่อบัญชีปลายทาง
             name_part = f" ชื่อบัญชี {account_name}" if account_name else ""
             cursor.execute("""
                 INSERT INTO transaction_logs
@@ -446,3 +483,5 @@ def request_withdrawal(user_id, amount, bank_name, account_number, account_name=
     except Exception as e:
         connection.rollback()
         return {"status": "error", "message": str(e)}
+    finally:
+        connection.close()
