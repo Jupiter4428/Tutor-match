@@ -157,13 +157,17 @@ function getRoleText(role) {
 }
 
 function getStatusBadge(status) {
-  if (status === "active") {
-    return `<span class="badge badge-approved">ใช้งานปกติ</span>`;
-  }
-  if (status === "suspended") {
-    return `<span class="badge badge-pending">พักบัญชี</span>`;
-  }
+  if (status === "active") return `<span class="badge badge-approved">ใช้งานปกติ</span>`;
+  if (status === "suspended") return `<span class="badge badge-pending">พักบัญชี</span>`;
   return `<span class="badge badge-banned">ถูกระงับ</span>`;
+}
+
+function getTutorVerifyBadge(verifyStatus, accountStatus) {
+  if (accountStatus === "suspended") return `<span class="badge badge-pending">พักบัญชี</span>`;
+  if (accountStatus === "ban") return `<span class="badge badge-banned">ถูกระงับ</span>`;
+  if (verifyStatus === "verified") return `<span class="badge badge-approved">ยืนยันแล้ว</span>`;
+  if (verifyStatus === "rejected") return `<span class="badge badge-banned">ปฏิเสธ</span>`;
+  return `<span class="badge badge-pending">รอยืนยัน</span>`;
 }
 
 function filterUsers() {
@@ -206,7 +210,7 @@ function renderUsers() {
       <td>${user.name || "-"}</td>
       <td>${user.email || "-"}</td>
       <td>${getRoleText(user.role)}</td>
-      <td>${getStatusBadge(user.status)}</td>
+      <td>${user.role === "tutor" ? getTutorVerifyBadge(user.verification_status, user.status) : getStatusBadge(user.status)}</td>
       <td>${user.createdAt || user.created_at || "-"}</td>
       <td>
         <div class="action-buttons">
@@ -264,13 +268,47 @@ function viewUser(id) {
   const user = users.find((u) => u.id === id);
   if (!user) return;
 
-  alert(
-    `[ข้อมูลผู้ใช้]\n` +
-    `ชื่อ: ${user.name}\n` +
-    `อีเมล: ${user.email}\n` +
-    `บทบาท: ${getRoleText(user.role)}\n` +
-    `สถานะ: ${user.status}`
-  );
+  const verifyStatusText = {
+    pending:  "รอยืนยัน",
+    verified: "ยืนยันแล้ว",
+    rejected: "ปฏิเสธ"
+  };
+
+  const accountStatusText = {
+    active:    "ใช้งานปกติ",
+    suspended: "พักบัญชี",
+    ban:       "ระงับแล้ว"
+  };
+
+  const picUrl = user.profile_picture_url || null;
+
+  let rows = `
+    <div><span style="color:#8899cc;">ชื่อ:</span> <strong>${user.name || "-"}</strong></div>
+    <div><span style="color:#8899cc;">อีเมล:</span> ${user.email || "-"}</div>
+    <div><span style="color:#8899cc;">บทบาท:</span> ${getRoleText(user.role)}</div>
+    <div><span style="color:#8899cc;">สถานะบัญชี:</span> ${accountStatusText[user.status] || user.status || "-"}</div>
+  `;
+
+  if (user.role === "tutor") {
+    rows += `<div><span style="color:#8899cc;">สถานะ Verify:</span> ${verifyStatusText[user.verification_status] || user.verification_status || "-"}</div>`;
+
+    if (picUrl) {
+      rows += `
+        <div>
+          <span style="color:#8899cc;">รูปโปรไฟล์:</span><br>
+          <a href="/${picUrl}" target="_blank"
+             style="color:#60a5fa; word-break:break-all; font-size:0.85rem;">
+            /${picUrl}
+          </a>
+        </div>
+      `;
+    } else {
+      rows += `<div><span style="color:#8899cc;">รูปโปรไฟล์:</span> <span style="color:#f87171;">ยังไม่ได้อัปโหลด</span></div>`;
+    }
+  }
+
+  document.getElementById("userModalBody").innerHTML = rows;
+  document.getElementById("userModal").style.display = "flex";
 }
 
 function scrollToSection(id) {

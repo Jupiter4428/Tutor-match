@@ -88,6 +88,7 @@ def get_all_users():
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
+            # LEFT JOIN tutor_profiles เพื่อดึง profile_picture_url และ verification_status สำหรับ tutor
             cursor.execute("""
                 SELECT
                     u.user_id as id,
@@ -95,8 +96,11 @@ def get_all_users():
                     u.email,
                     u.role,
                     u.account_status as status,
-                    u.created_at as createdAt
+                    u.created_at as createdAt,
+                    tp.profile_picture_url,
+                    tp.verification_status
                 FROM users u
+                LEFT JOIN tutor_profiles tp ON tp.user_id = u.user_id
                 ORDER BY u.created_at DESC
             """)
             users = cursor.fetchall()
