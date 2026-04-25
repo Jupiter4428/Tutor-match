@@ -2,10 +2,6 @@
 from flask import Flask, send_from_directory
 from flask_cors import CORS
 from backend.config import SECRET_KEY, ALLOWED_ORIGINS
-from backend.routes.admin import admin_bp
-from backend.routes.auth import auth_bp
-from backend.routes.student import student_bp
-from backend.routes.tutor import tutor_bp
 
 
 def create_app():
@@ -46,11 +42,10 @@ def create_app():
     @app.route("/student/wallet")
     def student_wallet_page():
         return send_from_directory("../frontend/student", "wallet.html")
-    @app.route("/student/reviews")
     
     @app.route("/home/student/reviews")
     def student_review_page():
-        return send_from_directory("../frontend/student", "Review.html")
+        return send_from_directory("../frontend/tutorprofile", "review.html")
     
     @app.route("/home/tutor")
     def tutor_home():
@@ -82,6 +77,7 @@ def create_app():
         return send_from_directory("../frontend", filepath)
     
     # register blueprint
+    from backend.routes.admin import admin_bp
     from backend.routes.auth import auth_bp
     from backend.routes.student import student_bp
     from backend.routes.tutor import tutor_bp

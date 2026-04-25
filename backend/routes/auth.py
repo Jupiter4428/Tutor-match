@@ -7,17 +7,32 @@ auth_bp = Blueprint("auth", __name__)
 @auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
-    name = data.get("name")
+
+    # รับค่าจาก frontend
+    first_name = data.get("first_name")
+    last_name = data.get("last_name")
     email = data.get("email")
     password = data.get("password")
     role = data.get("role")
 
-    if not all([name, email, password, role]):
-        return jsonify({"status": "error", "message": "กรอกข้อมูลไม่ครบ"}), 400
+    # รวมชื่อ
+    name = f"{first_name} {last_name}".strip()
 
+    # เช็คข้อมูลครบไหม
+    if not all([first_name, last_name, email, password, role]):
+        return jsonify({
+            "status": "error",
+            "message": "กรอกข้อมูลไม่ครบ"
+        }), 400
+
+    # เช็ค role ถูกต้องไหม
     if role not in ("student", "tutor"):
-        return jsonify({"status": "error", "message": "role ไม่ถูกต้อง"}), 400
+        return jsonify({
+            "status": "error",
+            "message": "role ไม่ถูกต้อง"
+        }), 400
 
+    # เรียก service
     result = register_user(name, email, password, role)
 
     if result["status"] == "success":
