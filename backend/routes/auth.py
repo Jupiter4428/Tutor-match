@@ -15,6 +15,9 @@ def register():
     if not all([name, email, password, role]):
         return jsonify({"status": "error", "message": "กรอกข้อมูลไม่ครบ"}), 400
 
+    if role not in ("student", "tutor"):
+        return jsonify({"status": "error", "message": "role ไม่ถูกต้อง"}), 400
+
     result = register_user(name, email, password, role)
 
     if result["status"] == "success":
