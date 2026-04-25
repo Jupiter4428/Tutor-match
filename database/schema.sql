@@ -206,7 +206,7 @@ CREATE TABLE payments (
     verified_by INT NULL,
     verified_at DATETIME NULL,
     remarks TEXT NULL,
-    CONSTRAINT chk_payments_amount CHECK (amount > 0),
+    CONSTRAINT chk_payments_amount CHECK (amount >= 0),
     CONSTRAINT chk_payments_platform_fee_nonnegative CHECK (platform_fee >= 0),
     CONSTRAINT chk_payments_platform_fee_rule CHECK (platform_fee = ROUND(amount * 0.10, 2)),
     CONSTRAINT fk_payments_application
