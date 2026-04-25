@@ -8,6 +8,7 @@ const apiHeaders = {
   Authorization: `Bearer ${token}`,
 };
 
+// logout listener (ตัวเดียว)
 document.getElementById("logout").addEventListener("click", function () {
   if (!confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) return;
   localStorage.removeItem("token");
@@ -70,6 +71,7 @@ async function fetchReports() {
   }
 }
 
+// อนุมัติผู้ใช้ → ส่ง "active" ตาม ENUM ใน users table
 async function approveUser(id) {
   const user = users.find((u) => u.id === id);
   if (!user) return;
@@ -78,7 +80,7 @@ async function approveUser(id) {
     const response = await fetch("/admin/users/status", {
       method: "POST",
       headers: apiHeaders,
-      body: JSON.stringify({ user_id: id, status: "approved" }),
+      body: JSON.stringify({ user_id: id, status: "active" }),
     });
 
     const result = await response.json();
@@ -94,6 +96,7 @@ async function approveUser(id) {
   }
 }
 
+// ระงับผู้ใช้ → ส่ง "ban" ตาม ENUM ใน users table
 async function banUser(id) {
   const user = users.find((u) => u.id === id);
   if (!user) return;
@@ -104,11 +107,7 @@ async function banUser(id) {
     const response = await fetch("/admin/users/status", {
       method: "POST",
       headers: apiHeaders,
-      body: JSON.stringify({
-        user_id: id,
-        status: "banned",
-        reason: "ถูกระงับโดยผู้ดูแลระบบ",
-      }),
+      body: JSON.stringify({ user_id: id, status: "ban" }),
     });
 
     const result = await response.json();
@@ -124,6 +123,33 @@ async function banUser(id) {
   }
 }
 
+// พักบัญชี → ส่ง "suspended" ตาม ENUM ใน users table
+async function rejectUser(id) {
+  const user = users.find((u) => u.id === id);
+  if (!user) return;
+
+  if (!confirm(`ต้องการพักบัญชี ${user.name} ใช่หรือไม่?`)) return;
+
+  try {
+    const response = await fetch("/admin/users/status", {
+      method: "POST",
+      headers: apiHeaders,
+      body: JSON.stringify({ user_id: id, status: "suspended" }),
+    });
+
+    const result = await response.json();
+
+    if (result.status === "success") {
+      alert(`พักบัญชี ${user.name} เรียบร้อย`);
+      refreshData();
+    } else {
+      alert(result.message || "ไม่สำเร็จ");
+    }
+  } catch (error) {
+    alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+  }
+}
+
 function getRoleText(role) {
   if (role === "student") return "นักเรียน";
   if (role === "tutor") return "ติวเตอร์";
@@ -131,14 +157,12 @@ function getRoleText(role) {
 }
 
 function getStatusBadge(status) {
-  if (status === "active" || status === "approved") {
+  if (status === "active") {
     return `<span class="badge badge-approved">ใช้งานปกติ</span>`;
   }
-
-  if (status === "pending") {
-    return `<span class="badge badge-pending">รออนุมัติ</span>`;
+  if (status === "suspended") {
+    return `<span class="badge badge-pending">พักบัญชี</span>`;
   }
-
   return `<span class="badge badge-banned">ถูกระงับ</span>`;
 }
 
@@ -155,11 +179,10 @@ function filterUsers() {
     const matchRole = role === "all" || user.role === role;
 
     let matchStatus = true;
-
     if (status === "approved") {
-      matchStatus = user.status === "active" || user.status === "approved";
+      matchStatus = user.status === "active";
     } else if (status === "banned") {
-      matchStatus = user.status === "ban" || user.status === "suspended" || user.status === "banned";
+      matchStatus = user.status === "ban" || user.status === "suspended";
     } else if (status === "pending") {
       matchStatus = user.status === "pending";
     }
@@ -188,9 +211,9 @@ function renderUsers() {
       <td>
         <div class="action-buttons">
           <button class="small-btn view-btn" onclick="viewUser(${user.id})">ดู</button>
-<button class="small-btn approve-btn" onclick="approveUser(${user.id})">อนุมัติ</button>
-<button class="small-btn reject-btn" onclick="rejectUser(${user.id})">ไม่อนุมัติ</button>
-<button class="small-btn ban-btn" onclick="banUser(${user.id})">ระงับ</button>
+          <button class="small-btn approve-btn" onclick="approveUser(${user.id})">อนุมัติ</button>
+          <button class="small-btn reject-btn" onclick="rejectUser(${user.id})">พักบัญชี</button>
+          <button class="small-btn ban-btn" onclick="banUser(${user.id})">ระงับ</button>
         </div>
       </td>
     </tr>
@@ -297,68 +320,7 @@ function renderActivities() {
   `).join("");
 }
 
-let adminReviews = [
-  {
-    review_id: 1,
-    student_name: "พิมพ์ชนก ส.",
-    tutor_name: "อาจารย์เมย์",
-    subject: "คณิตศาสตร์",
-    rating: 5,
-    comment: "สอนดีมากค่ะ อธิบายละเอียดและค่อย ๆ พาเข้าใจทีละจุด ติวเตอร์ใจเย็นมากและมีเทคนิคการจำที่ช่วยได้จริงก่อนสอบ",
-    created_at: "2026-04-15",
-    status: "visible"
-  },
-  {
-    review_id: 2,
-    student_name: "ณัฐวุฒิ ท.",
-    tutor_name: "ครูพลอย",
-    subject: "ภาษาอังกฤษ",
-    rating: 5,
-    comment: "ประทับใจมากครับ สอน speaking กับ grammar แบบไม่กดดันเลย ทำให้กล้าพูดมากขึ้นจริง ๆ",
-    created_at: "2026-04-18",
-    status: "visible"
-  },
-  {
-    review_id: 3,
-    student_name: "กวางพร ด.",
-    tutor_name: "พี่ต้น",
-    subject: "ฟิสิกส์",
-    rating: 4,
-    comment: "ติวเตอร์อธิบายเรื่องแรงและการเคลื่อนที่ได้เข้าใจง่ายมากค่ะ มีสรุปสูตรและตัวอย่างโจทย์ให้ครบ",
-    created_at: "2026-04-10",
-    status: "visible"
-  },
-  {
-    review_id: 4,
-    student_name: "เบญญาภา ค.",
-    tutor_name: "พี่ฟ้า",
-    subject: "เคมี",
-    rating: 5,
-    comment: "ก่อนเรียนงงเคมีมาก แต่หลังจากเรียนกับพี่ฟ้ารู้สึกเข้าใจเนื้อหาเป็นระบบขึ้นมาก",
-    created_at: "2026-04-08",
-    status: "visible"
-  },
-  {
-    review_id: 5,
-    student_name: "ศุภชัย ว.",
-    tutor_name: "ครูมิน",
-    subject: "ชีววิทยา",
-    rating: 5,
-    comment: "สอนสนุกและมีเทคนิคจำเยอะมากครับ เนื้อหาชีวะที่เยอะ ๆ ดูง่ายขึ้นอย่างไม่น่าเชื่อ",
-    created_at: "2026-04-04",
-    status: "visible"
-  },
-  {
-    review_id: 6,
-    student_name: "ธนภัทร ย.",
-    tutor_name: "พี่เกม",
-    subject: "Programming",
-    rating: 4,
-    comment: "ชอบมากครับ เพราะติวเตอร์สอนโค้ดแบบมีตัวอย่างจริง ทำให้คนพื้นฐานน้อยตามทันได้",
-    created_at: "2026-04-01",
-    status: "visible"
-  }
-];
+let adminReviews = [];
 
 function renderStars(rating) {
   const value = Math.max(0, Math.min(5, Number(rating || 0)));
@@ -401,7 +363,7 @@ function getFilteredAdminReviews() {
   const rating = document.getElementById("adminReviewRating").value;
   const sort = document.getElementById("adminReviewSort").value;
 
-  let list = adminReviews.filter(review => review.status !== "deleted");
+  let list = adminReviews.filter(review => review.status !== "deleted" && review.status !== "hidden");
 
   list = list.filter(review => {
     const text = `
@@ -503,16 +465,18 @@ function deleteReviewAdmin(id) {
   renderAdminReviews();
 }
 
+// ดึงรีวิวจริงจาก API
 async function refreshAdminReviews() {
+  try {
+    const res = await fetch("/reviews", { headers: apiHeaders });
+    const result = await res.json();
+    if (result.status === "success") {
+      adminReviews = result.data || [];
+    }
+  } catch (e) {
+    console.error("Error fetching reviews:", e);
+  }
   renderAdminReviews();
-
-  // ถ้า backend พร้อม ค่อยเปลี่ยนเป็น:
-  // const res = await fetch("/admin/reviews", { headers: apiHeaders });
-  // const result = await res.json();
-  // if (result.status === "success") {
-  //   adminReviews = result.data;
-  //   renderAdminReviews();
-  // }
 }
 
 document.getElementById("adminReviewSearch").addEventListener("input", renderAdminReviews);
@@ -520,45 +484,6 @@ document.getElementById("adminReviewSubject").addEventListener("change", renderA
 document.getElementById("adminReviewRating").addEventListener("change", renderAdminReviews);
 document.getElementById("adminReviewSort").addEventListener("change", renderAdminReviews);
 
-document.getElementById("logout").addEventListener("click", function () {
-  if (!confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) return;
-  localStorage.clear();
-
-  // Live Server
-  window.location.href = "../auth/login.html";
-
-  // Flask จริง ใช้อันนี้แทน
-  // window.location.href = "/login";
-});
-
 renderActivities();
 refreshData();
-renderAdminReviews();
-async function rejectUser(id) {
-  const user = users.find((u) => u.id === id);
-  if (!user) return;
-
-  if (!confirm(`ต้องการไม่อนุมัติ ${user.name} ใช่หรือไม่?`)) return;
-
-  try {
-    const response = await fetch("/admin/users/status", {
-      method: "POST",
-      headers: apiHeaders,
-      body: JSON.stringify({
-        user_id: id,
-        status: "rejected"
-      }),
-    });
-
-    const result = await response.json();
-
-    if (result.status === "success") {
-      alert(`ไม่อนุมัติ ${user.name} เรียบร้อย`);
-      refreshData();
-    } else {
-      alert(result.message || "ไม่สำเร็จ");
-    }
-  } catch (error) {
-    alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
-  }
-}
+refreshAdminReviews();
