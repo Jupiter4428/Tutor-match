@@ -28,8 +28,6 @@ tutor_bp = Blueprint('tutor', __name__)
 # Wallet API
 # =========================
 
-@tutor_bp.route('/wallet', methods=['GET'])
-# เพิ่ม Route สำหรับ Wallet
 @tutor_bp.route('/api/wallet', methods=['GET'])
 @token_required
 @role_required('tutor')
@@ -75,7 +73,6 @@ def get_transactions():
     return jsonify(result), 200
 
 
-@tutor_bp.route('/wallet/withdraw', methods=['POST'])
 @tutor_bp.route('/api/wallet/withdraw', methods=['POST'])
 @token_required
 @role_required('tutor')

@@ -33,7 +33,8 @@ form.addEventListener('submit', async (e) => {
     registerBtn.textContent = 'Creating account...';
 
     const data = {
-        name: firstName + " " + lastName,   // รวมชื่อ
+        first_name: firstName,
+        last_name: lastName,
         email: email,
         password: password,
         role: role

@@ -28,13 +28,24 @@ def register_user(name, email, password, role):
             
             # สร้าง Profile ตาม Role (เพื่อป้องกัน Error เวลาเข้าหน้า Profile)
             if role == 'student':
-                cursor.execute("INSERT INTO student_profiles (user_id) VALUES (%s)", (user_id,))
-            elif role == 'tutor':
-                # หน้า Tutor ต้องมีค่าเริ่มต้นสำหรับ hourly_rate และ profile_picture_url ตาม Schema
                 cursor.execute("""
-                    INSERT INTO tutor_profiles (user_id, hourly_rate, profile_picture_url)
-                    VALUES (%s, 0.00, 'static/uploads/default_profile.jpg')
-                """, (user_id,))
+                    INSERT INTO student_profiles 
+                    (user_id, profile_picture_url)
+                    VALUES (%s, %s)
+                """, (
+                    user_id,
+                    'static/uploads/default_profile.jpg'
+                ))
+            elif role == 'tutor':
+                cursor.execute("""
+                    INSERT INTO tutor_profiles 
+                    (user_id, hourly_rate, profile_picture_url)
+                    VALUES (%s, %s, %s)
+                """, (
+                    user_id,
+                    0.00,
+                    'static/uploads/default_profile.jpg'
+                ))
             
             # สร้าง Wallet ให้ user ใหม่ด้วย
             cursor.execute("INSERT INTO wallets (user_id, balance) VALUES (%s, 0.00)", (user_id,))
@@ -43,6 +54,7 @@ def register_user(name, email, password, role):
             return {"status": "success", "message": "สมัครสมาชิกสำเร็จ"}
             
     except Exception as e:
+        print("REGISTER ERROR:", str(e))
         connection.rollback()
         return {"status": "error", "message": str(e)}
     finally:
