@@ -28,14 +28,11 @@ def register_user(name, email, password, role):
             
             # สร้าง Profile ตาม Role (เพื่อป้องกัน Error เวลาเข้าหน้า Profile)
             if role == 'student':
-                cursor.execute("""
-                    INSERT INTO student_profiles 
-                    (user_id, profile_picture_url)
-                    VALUES (%s, %s)
-                """, (
-                    user_id,
-                    'static/uploads/default_profile.jpg'
-                ))
+                # student_profiles ไม่มี profile_picture_url — ใส่แค่ user_id
+                cursor.execute(
+                    "INSERT INTO student_profiles (user_id) VALUES (%s)",
+                    (user_id,)
+                )
             elif role == 'tutor':
                 cursor.execute("""
                     INSERT INTO tutor_profiles 
