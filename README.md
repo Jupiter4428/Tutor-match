@@ -405,7 +405,7 @@ git push origin Final
 <td align="center">6710535011</td>
 </tr>
 <tr>
-<td align="center"><b>Database & Backend Developer & Backend Architect</b></td>
+<td align="center"><b>Technical Lead & Backend Architect</b></td>
 <td align="center">นายวุฒิศักดิ์ บุญกัน</td>
 <td align="center">6710535029</td>
 </tr>
@@ -421,4 +421,4 @@ git push origin Final
 </tr>
 </table>
 
-<p align="right"><i>Project Version 2.0 | Updated: April 2026</i></p>
+<p align="right"><i>Project Version 2.0
