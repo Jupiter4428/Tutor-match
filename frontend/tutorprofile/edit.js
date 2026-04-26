@@ -98,6 +98,31 @@ async function loadCurrentProfile() {
   previewImage.src = p.profile_picture_url
     ? `/${p.profile_picture_url}?t=${new Date().getTime()}`
     : '/static/uploads/default_profile.jpg';
+
+  // แสดง Verification Status จาก database
+  const statusMap = {
+    pending:  '<div class="status-badge pending">⏳ Pending</div>',
+    verified: '<div class="status-badge verified">✅ Verified</div>',
+    rejected: '<div class="status-badge rejected">❌ Rejected</div>',
+  };
+  document.getElementById('editVerifyStatus').innerHTML =
+    statusMap[p.verification_status] || p.verification_status || '';
+
+  const verifiedBox = document.getElementById('editVerifiedReason');
+  const rejectBox   = document.getElementById('editRejectReason');
+
+  if (p.verification_status === 'verified') {
+    verifiedBox.style.display = '';
+    rejectBox.style.display   = 'none';
+  } else if (p.verification_status === 'rejected') {
+    verifiedBox.style.display = 'none';
+    rejectBox.style.display   = '';
+    document.getElementById('editRejectReasonText').textContent =
+      p.reject_reason || 'ไม่มีเหตุผลเพิ่มเติม';
+  } else {
+    verifiedBox.style.display = 'none';
+    rejectBox.style.display   = 'none';
+  }
 }
 
 loadCurrentProfile();

@@ -325,6 +325,35 @@ body {
   line-height: 1.7;
 }
 
+.verified-box {
+  margin-top: 18px;
+  padding: 20px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(0, 214, 143, 0.15), rgba(67, 255, 180, 0.06));
+  border: 1px solid rgba(0, 214, 143, 0.28);
+}
+
+.verified-box h4 {
+  margin-bottom: 10px;
+  color: #7fffd1;
+  font-size: 1rem;
+}
+
+.verified-box p {
+  color: #d0fff2;
+  line-height: 1.7;
+}
+
+.pending-box {
+  margin-top: 18px;
+  padding: 20px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255, 184, 77, 0.14), rgba(255, 200, 100, 0.06));
+  border: 1px solid rgba(255, 184, 77, 0.28);
+  color: #ffd38a;
+  line-height: 1.7;
+}
+
 .bio-box {
   padding: 24px;
   line-height: 1.9;

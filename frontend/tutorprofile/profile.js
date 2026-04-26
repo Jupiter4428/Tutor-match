@@ -52,6 +52,26 @@ async function loadProfile() {
     };
     statusEl.innerHTML = statusMap[p.verification_status] || p.verification_status;
 
+    // Admin Review card: แสดงเฉพาะ pending หรือ rejected เท่านั้น
+    const adminCard  = document.getElementById('adminReviewCard');
+    const rejBox     = document.getElementById('rejectedBox');
+    const pendBox    = document.getElementById('pendingBox');
+    const reasonText = document.getElementById('rejectReasonText');
+
+    const verBox = document.getElementById('verifiedBox');
+
+    if (p.verification_status === 'verified') {
+      adminCard.style.display = '';
+      verBox.style.display    = '';
+    } else if (p.verification_status === 'rejected') {
+      adminCard.style.display = '';
+      rejBox.style.display    = '';
+      reasonText.textContent  = p.reject_reason || 'ไม่มีเหตุผลเพิ่มเติม';
+    } else if (p.verification_status === 'pending') {
+      adminCard.style.display = '';
+      pendBox.style.display   = '';
+    }
+
     const img = document.querySelector('.profile-image');
     img.src = p.profile_picture_url
       ? `/${p.profile_picture_url}`

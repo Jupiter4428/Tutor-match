@@ -125,22 +125,18 @@
             <div class="status-top">
               <div>
                 <strong style="font-size: 1.05rem;">Verification Status</strong>
-                <div class="hint" style="margin-top: 6px;">สถานะนี้ปกติดึงมาจาก backend / database</div>
               </div>
-
-              <div class="status-badge pending">⏳ Pending</div>
-              <!-- ตัวอย่าง:
-              <div class="status-badge verified">✅ Verified</div>
-              <div class="status-badge rejected">❌ Rejected</div>
-              -->
+              <div id="editVerifyStatus"></div>
             </div>
 
-            <div class="reject-reason">
+            <div class="verified-reason" id="editVerifiedReason" style="display:none">
+              <h4>เหตุผลในการยอมรับจากแอดมิน</h4>
+              <p>โปรไฟล์ของคุณผ่านการตรวจสอบแล้ว ข้อมูลครบถ้วนและเหมาะสมสำหรับการใช้งานในระบบ คุณสามารถรับงานสอนได้ทันที</p>
+            </div>
+
+            <div class="reject-reason" id="editRejectReason" style="display:none">
               <h4>เหตุผลในการปฏิเสธจากแอดมิน</h4>
-              <p>
-                รูปโปรไฟล์ยังไม่เหมาะสมสำหรับการใช้งานในระบบ และข้อมูลในส่วนประสบการณ์การสอนยังไม่ละเอียดพอ
-                กรุณาอัปโหลดรูปโปรไฟล์ใหม่ที่ชัดเจน และเพิ่มรายละเอียดการสอนให้ครบถ้วนมากขึ้น
-              </p>
+              <p id="editRejectReasonText"></p>
             </div>
           </div>
 

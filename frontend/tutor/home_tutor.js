@@ -67,6 +67,7 @@ let reviews = [];        // รีวิวที่ tutor ได้รับ
 let tutorId = null;      // ดึงจาก /tutor/profile ครั้งแรก
 
 // ---- Navigation ------------------------------------------
+function goToProfile()     { window.location.href = '/profile/tutor'; }
 function goToEditProfile() { window.location.href = '/profile/tutor/edit'; }
 function goToWallet()      { window.location.href = '/tutor/wallet'; }
 

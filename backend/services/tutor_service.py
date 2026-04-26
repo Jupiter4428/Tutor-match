@@ -230,6 +230,7 @@ def get_tutor_profile(user_id):
                 SELECT
                     tp.tutor_id, tp.bio, tp.hourly_rate,
                     tp.verification_status, tp.profile_picture_url,
+                    tp.reject_reason,
                     u.name, u.email
                 FROM tutor_profiles tp
                 JOIN users u ON tp.user_id = u.user_id

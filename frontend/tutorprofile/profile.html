@@ -98,17 +98,18 @@
                     </div>
                 </div>
 
-                <div class="card info-card">
+                <div class="card info-card" id="adminReviewCard" style="display:none">
                     <h3>Admin Review</h3>
-
-                    <!-- แสดงกล่องนี้เฉพาะตอน status = rejected -->
-                    <div class="rejected-box">
+                    <div class="verified-box" id="verifiedBox" style="display:none">
+                        <h4>เหตุผลในการยอมรับจากแอดมิน</h4>
+                        <p>โปรไฟล์ของคุณผ่านการตรวจสอบแล้ว ข้อมูลครบถ้วนและเหมาะสมสำหรับการใช้งานในระบบ คุณสามารถรับงานสอนได้ทันที</p>
+                    </div>
+                    <div class="rejected-box" id="rejectedBox" style="display:none">
                         <h4>เหตุผลในการปฏิเสธจากแอดมิน</h4>
-                        <p>
-                            ข้อมูลโปรไฟล์ยังไม่ครบถ้วน กรุณาอัปโหลดรูปโปรไฟล์ที่เหมาะสม
-                            และเพิ่มรายละเอียดประสบการณ์การสอนให้ชัดเจนมากขึ้น
-                            เพื่อให้ทีมงานสามารถตรวจสอบและอนุมัติได้เร็วขึ้น
-                        </p>
+                        <p id="rejectReasonText"></p>
+                    </div>
+                    <div class="pending-box" id="pendingBox" style="display:none">
+                        <p>⏳ โปรไฟล์ของคุณอยู่ระหว่างการตรวจสอบจากแอดมิน กรุณารอการยืนยัน</p>
                     </div>
                 </div>
 
