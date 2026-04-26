@@ -8,7 +8,9 @@ from backend.services.admin_service import (
     get_reports,
     update_report_status,
     verify_tutor,
-    get_pending_tutors
+    get_pending_tutors,
+    hide_review,
+    admin_delete_review
 )
 
 admin_bp = Blueprint('admin', __name__, url_prefix="/admin")
@@ -106,6 +108,32 @@ def tutor_verify():
     if result.get("not_found"):
         return jsonify(result), 404
     return jsonify(result), 200 if result["status"] == "success" else 500
+
+
+# ==========================================
+# จัดการรีวิว (Admin)
+# ==========================================
+
+# POST /admin/reviews/hide — ซ่อนรีวิว
+@admin_bp.route("/reviews/hide", methods=["POST"])
+@token_required
+@role_required("admin")
+def hide_review_route():
+    data = request.get_json()
+    review_id = data.get("review_id")
+    if not review_id:
+        return jsonify({"status": "error", "message": "ต้องส่ง review_id"}), 400
+    result = hide_review(review_id)
+    return jsonify(result), 200 if result["status"] == "success" else 404
+
+
+# DELETE /admin/reviews/<review_id> — ลบรีวิวถาวร
+@admin_bp.route("/reviews/<int:review_id>", methods=["DELETE"])
+@token_required
+@role_required("admin")
+def delete_review_route(review_id):
+    result = admin_delete_review(review_id)
+    return jsonify(result), 200 if result["status"] == "success" else 404
 
 
 # GET /admin/tutors/pending — ดึงรายชื่อ tutor ที่รอการอนุมัติ

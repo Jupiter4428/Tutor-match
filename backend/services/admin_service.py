@@ -180,6 +180,42 @@ def verify_tutor(tutor_id, action, reject_reason, admin_user_id):
         connection.close()
 
 
+# ซ่อนรีวิว (ไม่ลบถาวร)
+def hide_review(review_id):
+    connection = db.get_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT review_id FROM reviews WHERE review_id = %s", (review_id,))
+            if not cursor.fetchone():
+                return {"status": "error", "message": "ไม่พบรีวิวนี้"}
+            cursor.execute("UPDATE reviews SET is_hidden = TRUE WHERE review_id = %s", (review_id,))
+        connection.commit()
+        return {"status": "success", "message": "ซ่อนรีวิวเรียบร้อยแล้ว"}
+    except Exception as e:
+        connection.rollback()
+        return {"status": "error", "message": str(e)}
+    finally:
+        connection.close()
+
+
+# ลบรีวิวถาวร (Admin เท่านั้น)
+def admin_delete_review(review_id):
+    connection = db.get_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT review_id FROM reviews WHERE review_id = %s", (review_id,))
+            if not cursor.fetchone():
+                return {"status": "error", "message": "ไม่พบรีวิวนี้"}
+            cursor.execute("DELETE FROM reviews WHERE review_id = %s", (review_id,))
+        connection.commit()
+        return {"status": "success", "message": "ลบรีวิวเรียบร้อยแล้ว"}
+    except Exception as e:
+        connection.rollback()
+        return {"status": "error", "message": str(e)}
+    finally:
+        connection.close()
+
+
 # ดึงรายชื่อ tutor ที่รอการอนุมัติ เรียงตามวันที่ยื่นก่อน
 def get_pending_tutors():
     connection = db.get_connection()
