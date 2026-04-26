@@ -77,7 +77,7 @@ DB_PORT     = 3306
 DB_USER     = root
 DB_PASSWORD = <รหัสผ่าน MySQL>
 DB_NAME     = tutor_match
-SECRET_KEY  = <สตริงสุ่มยาวๆ>
+SECRET_KEY  = <anything kub>
 ```
 
 #### 2. Setup Database
