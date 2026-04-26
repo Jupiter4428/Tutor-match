@@ -13,211 +13,241 @@
 ---
 
 ### 📖 ภาพรวมของระบบ (System Overview)
-แพลตฟอร์มที่เชื่อมต่อระหว่าง **นักเรียน** และ **ติวเตอร์** โดยเน้นความน่าเชื่อถือผ่านระบบยืนยันตัวตนและรีวิวที่ออกแบบตามหลักฐานข้อมูลที่ถูกต้อง
+แพลตฟอร์มกลางเชื่อมต่อ **นักเรียน** และ **ติวเตอร์** โดยตรง ลดการพึ่งพานายหน้า รองรับระบบ Escrow, รีวิว และการยืนยันตัวตนติวเตอร์โดย Admin
+
+**ผู้ใช้งาน 3 บทบาท:**
+- 👨‍🎓 **นักเรียน** — โพสต์หาติวเตอร์, จ่ายเงิน Escrow, เขียนรีวิว
+- 👨‍🏫 **ติวเตอร์** — สมัครงานสอน, ตั้งตารางเวลา, รับเงิน
+- 🛡️ **Admin** — ยืนยันตัวตนติวเตอร์, จัดการผู้ใช้, ดูสถิติ
 
 ---
 
 ### 🗄️ โครงสร้างฐานข้อมูล (Database Schema)
-ระบบผ่านการทำ **Normalization (3NF, BCNF, 4NF)** เพื่อลดความซ้ำซ้อนและรองรับความปลอดภัย
+ระบบผ่านการทำ **Normalization (3NF, BCNF, 4NF)** และ **Database Optimization** เพื่อลดความซ้ำซ้อนและรองรับ performance
 
 <details>
-<summary><b>🔎 คลิกเพื่อดูรายละเอียด 12 ตาราง</b></summary>
+<summary><b>🔎 คลิกเพื่อดูรายละเอียด 16 ตาราง</b></summary>
 
-| หมวดหมู่ | รายชื่อตาราง (Tables) | รายละเอียด |
+| หมวดหมู่ | ตาราง | รายละเอียด |
 | :--- | :--- | :--- |
-| **Identity** | `users` | Single-role design — เก็บชื่อ, อีเมล, bcrypt password hash และ role (`admin` / `student` / `tutor`) พร้อม account lifecycle (`active` / `suspended` / `deleted`) |
-| **Profile** | `student_profiles`, `tutor_profiles` | ข้อมูลเฉพาะทางแยกตาม role — นักเรียน: โรงเรียน, ระดับการศึกษา / ติวเตอร์: bio, ราคาค่าสอน, สถานะ verify (`pending` / `verified` / `rejected`) |
-| **Tutor Details** | `tutor_experiences`, `tutor_subjects` | 4NF: แยก multi-value attribute ออกจาก tutor_profiles — `tutor_subjects` ใช้ Composite PK `(tutor_id, subject)` ป้องกันวิชาซ้ำ (BCNF) |
-| **Post** | `student_posts` | กระดานประกาศหาติวเตอร์ — ระบุวิชา, ระดับ, รูปแบบการเรียน (`online` / `onsite` / `both`), สถานที่, เวลา, งบประมาณ และ moderation fields |
-| **Job** | `applications` | ติวเตอร์สมัครงาน — Unique constraint `(post_id, tutor_id)` ป้องกัน apply ซ้ำ มี `teaching_status` (`not_started` / `ongoing` / `completed`) เพื่อ gate การเขียนรีวิว |
-| **Schedule** | `tutor_schedules`, `schedule_bookings` | ตารางเวลาว่างของติวเตอร์ — `schedule_bookings` มี Unique constraint บน `schedule_id` ป้องกันการจองซ้ำ |
-| **Review** | `reviews` | 3NF: อ้างอิงผ่าน `app_id` เท่านั้น — rating 1–5 พร้อม moderation fields (`is_hidden`, `moderation_reason`) |
-| **Finance** | `payments` | 3NF: อ้างอิงผ่าน `app_id` — คำนวณ `platform_fee = amount × 10%` บังคับด้วย CHECK constraint, รองรับ slip verification |
-| **Audit** | `user_action_logs` | Flexible audit trail สำหรับ admin — บันทึกทุก action บน user, post, review, payment พร้อม `performed_by` |
+| **User & Profile** | `users`, `student_profiles`, `tutor_profiles` | Single-role design, account lifecycle, verification workflow |
+| **Tutor Details** | `tutor_experiences`, `tutor_subjects` | 4NF multi-value, BCNF Composite PK |
+| **Posts & Jobs** | `student_posts`, `applications` | moderation fields, teaching_status gate, UNIQUE constraint |
+| **Schedule** | `tutor_schedules`, `schedule_bookings` | conflict prevention, Composite UNIQUE |
+| **Review** | `reviews` | 3NF อ้างอิงผ่าน app_id, rating 1-5, is_hidden |
+| **Finance** | `payments`, `wallets`, `transaction_logs` | Escrow model, platform_fee CHECK, balance snapshot |
+| **Audit** | `user_action_logs`, `reports`, `user_bank_accounts` | Enterprise auditability, community moderation |
 
+ดูรายละเอียดเพิ่มเติมได้ที่ [`database/DESIGN.md`](database/DESIGN.md)
 </details>
 
 ---
 
-### วิธีการ Clone Project Using PowerShell
+### 🚀 วิธีติดตั้งและรัน
 
 > ⚠️ ต้องติดตั้ง **Python 3.10+** และ **MySQL 9.6** ก่อนเริ่มต้น
-> สามารถใช้ **MySQL Workbench** แทนการพิมพ์คำสั่งผ่าน PowerShell ก็ได้ ผลลัพธ์เหมือนกัน
+
+#### 1. Clone & ติดตั้ง
 
 ```bash
-# clone เฉพาะ branch Final ลงมาในโฟลเดอร์ชื่อ project
+# Clone branch Final
 git clone -b Final https://github.com/Jupiter4428/Tutor-match.git project
-
-# เข้าโฟลเดอร์โปรเจกต์
 cd project
 
-# สร้าง virtual environment ใหม่ (แนะนำให้ทำทุกครั้งที่ clone ใหม่)
+# สร้าง virtual environment
 python -m venv venv
 
-# อนุญาตให้รัน script ใน PowerShell (ทำครั้งเดียวต่อเครื่อง)
+# อนุญาตรัน script (ทำครั้งเดียวต่อเครื่อง)
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-# เปิดใช้งาน venv — prompt จะเปลี่ยนเป็น (venv) ด้านหน้า
+# เปิด venv
 .\venv\Scripts\activate
 
-# ติดตั้ง library ทั้งหมดจาก requirements.txt
-# ถ้าเพิ่ม library ใหม่ทีหลัง ให้รัน pip freeze > requirements.txt แล้ว commit ด้วย
+# ติดตั้ง dependencies
 pip install -r requirements.txt
 
-# สร้างไฟล์ .env จาก template
+# สร้างไฟล์ .env
 copy .env.example .env
-# ⚠️ เปิดไฟล์ .env แล้วแก้ค่าต่อไปนี้ให้ตรงกับเครื่องของตัวเอง:
-#   DB_HOST     = localhost
-#   DB_PORT     = 3306
-#   DB_USER     = root
-#   DB_PASSWORD = <รหัสผ่าน MySQL ของคุณ>
-#   DB_NAME     = tutor_match
-#   SECRET_KEY  = <สตริงยาวๆ สุ่มขึ้นมาเอง เช่น openssl rand -hex 32>
 ```
 
----
+แก้ไฟล์ `.env` ให้ตรงกับเครื่องของตัวเอง:
+```env
+DB_HOST     = localhost
+DB_PORT     = 3306
+DB_USER     = root
+DB_PASSWORD = <รหัสผ่าน MySQL>
+DB_NAME     = tutor_match
+SECRET_KEY  = <สตริงสุ่มยาวๆ>
+```
 
-### Setup Database Using PowerShell
+#### 2. Setup Database
 
-> ⚠️ ต้องทำขั้นตอนนี้ **ก่อนรัน server** และทำแค่ **ครั้งเดียว** (ถ้า drop database แล้วสร้างใหม่ค่อยทำซ้ำ)
+**วิธีที่ 1 — ดับเบิลคลิก (แนะนำ)**
+
+| ไฟล์ | ใช้เมื่อ |
+|---|---|
+| `ayo/setup_db.bat` | ครั้งแรก — สร้าง schema (16 ตาราง) |
+| `ayo/seed_db.bat` | ใส่ข้อมูลตัวอย่าง (9 scenarios + 12 reviews) |
+| `ayo/reset_db.bat` | Reset ทั้งหมด = setup + seed ใหม่ |
+| `ayo/clear_db.bat` | ล้างข้อมูล (โครงสร้างตารางคงอยู่) |
+
+**วิธีที่ 2 — PowerShell**
 
 ```bash
-# ทดสอบก่อนว่า MySQL อยู่ใน PATH หรือยัง
-mysql --version
-# ถ้าขึ้น "mysql  Ver 9.6.x ..." แสดงว่าพร้อมแล้ว ข้ามไปขั้นถัดไปได้เลย
-
-# ถ้าไม่ขึ้น version ให้เพิ่ม PATH ชั่วคราวสำหรับ session นี้ก่อน
-# (เปลี่ยน 9.6 เป็น version ที่ติดตั้งจริงในเครื่องถ้าต่างกัน)
+# เพิ่ม MySQL ใน PATH (ถ้ายังไม่มี)
 $env:PATH += ";C:\Program Files\MySQL\MySQL Server 9.6\bin"
 
-# ลองใหม่อีกครั้ง
-mysql --version
-
-# cd เข้าโปรเจค
-cd project
-
-# สร้าง Database (ถ้ามีอยู่แล้วจะข้ามไป ไม่มี error)
+# สร้าง database
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS tutor_match CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-# Enter password: <รหัสผ่าน MySQL ของคุณ>
 
-# รัน schema.sql เพื่อสร้าง table ทั้งหมด (12 ตาราง)
-# --default-character-set=utf8mb4 จำเป็นมากเพราะไฟล์มีภาษาไทย
+# รัน schema
 cmd /c "mysql --default-character-set=utf8mb4 -u root -p tutor_match < database/schema.sql"
-# Enter password: <รหัสผ่าน MySQL ของคุณ>
 
-# (ไม่บังคับ) เพิ่มข้อมูลตัวอย่างสำหรับ dev/testing
+# รัน seed (ข้อมูลตัวอย่าง)
 cmd /c "mysql --default-character-set=utf8mb4 -u root -p tutor_match < database/seed.sql"
-# Enter password: <รหัสผ่าน MySQL ของคุณ>
+
+# รัน indexes สำหรับ performance (ทำครั้งเดียว)
+cmd /c "mysql --default-character-set=utf8mb4 -u root -p tutor_match < database/add_indexes.sql"
 ```
 
----
-
-### Using Database in PowerShell
+#### 3. รัน Server
 
 ```bash
-# เข้า MySQL shell
-mysql -u root -p
-# Enter password: <รหัสผ่าน MySQL ของคุณ>
-
-# เลือก database ที่จะใช้งาน (ต้องทำทุกครั้งที่เข้า shell ใหม่)
-USE tutor_match;
-
-# ตัวอย่าง query ที่ใช้บ่อย
-SELECT * FROM users;
-SELECT * FROM tutor_profiles;
-SELECT * FROM student_posts WHERE status = 'open';
-
-# รัน .sql file จากภายนอก (PowerShell) โดยไม่ต้องเข้า shell
-Get-Content database/seed.sql | mysql -u root -p tutor_match
-# Enter password: <รหัสผ่าน MySQL ของคุณ>
-
-# ออกจาก MySQL shell
-EXIT;
-```
-
----
-
-### Some Script sql for testing in MySQL
-
-```sql
--- ล้างข้อมูลทั้งหมดแต่คง table structure ไว้ (ใช้ตอน reset ข้อมูล dev)
--- ต้องปิด foreign key check ก่อนเพราะ table มี constraint ซึ่งกันและกัน
-SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE user_action_logs;
-TRUNCATE TABLE payments;
-TRUNCATE TABLE reviews;
-TRUNCATE TABLE schedule_bookings;
-TRUNCATE TABLE tutor_schedules;
-TRUNCATE TABLE applications;
-TRUNCATE TABLE student_posts;
-TRUNCATE TABLE tutor_subjects;
-TRUNCATE TABLE tutor_experiences;
-TRUNCATE TABLE tutor_profiles;
-TRUNCATE TABLE student_profiles;
-TRUNCATE TABLE users;
-SET FOREIGN_KEY_CHECKS = 1;
-
--- เพิ่ม admin user สำหรับ dev (รหัสผ่าน: 1234)
--- hash นี้เป็น bcrypt $2y$ format จาก PHP ซึ่ง backend รองรับแล้ว
-USE tutor_match;
-INSERT INTO users (name, email, password_hash, role, account_status)
-VALUES (
-    'superuser',
-    'admin@tutormatch.com',
-    '$2y$10$Wz/1MRBMFauEtGdJNeaKq.5INBmig0Nip2urekRON8ekLkYesdj6i',
-    'admin',
-    'active'
-);
-```
-
----
-
-### Runserver
-
-```bash
-# ตรวจสอบก่อนว่า venv เปิดอยู่ (ต้องเห็น (venv) นำหน้า prompt)
-# ถ้ายังไม่เปิดให้รัน: .\venv\Scripts\activate
-
-# รัน Flask development server — เปิดที่ http://127.0.0.1:5000
+# ตรวจสอบว่า venv เปิดอยู่ (เห็น (venv) นำหน้า prompt)
 python run.py
-
+# เปิดที่ http://127.0.0.1:5000
 ```
 
 ---
 
-### ขั้นตอนการ push
+### 🧪 ข้อมูลตัวอย่าง (Test Accounts)
+
+> รหัสผ่านทุก account คือ **`1234`**
+
+| Role | Email | หมายเหตุ |
+|---|---|---|
+| Admin | `admin@tutormatch.com` | ดู dashboard, จัดการผู้ใช้ |
+| Student | `somchai@test.com` | มีโพสต์ที่จบแล้ว + รีวิว |
+| Student | `somying@test.com` | มีโพสต์ open หลายรายการ |
+| Tutor | `manee@test.com` | verified, มีรีวิว 5 ดาว |
+| Tutor | `art_tutor@test.com` | verified, กำลังสอนอยู่ |
+| Tutor | `nid_tutor@test.com` | pending (รอ Admin verify) |
+
+---
+
+### 🗂️ โครงสร้างโปรเจกต์
+
+```
+project/
+├── ayo/                    ← bat files (setup/seed/reset/clear)
+├── backend/
+│   ├── app.py              ← Flask app + blueprints + DB teardown
+│   ├── extensions.py       ← DB connection pooling
+│   ├── models/             ← Table schema definitions (11 files)
+│   ├── routes/             ← API endpoints (5 blueprints)
+│   ├── services/           ← Business logic (5 services)
+│   └── utils/              ← JWT auth helpers
+├── frontend/
+│   ├── auth/               ← login, register
+│   ├── student/            ← home, my_courses, wallet
+│   ├── tutor/              ← home, tutor_wallet
+│   ├── tutorprofile/       ← profile, edit
+│   └── admin/              ← home_admin
+├── database/
+│   ├── schema.sql          ← 16 tables
+│   ├── seed.sql            ← test data (12 reviews, 9 scenarios)
+│   ├── add_indexes.sql     ← 8 performance indexes
+│   └── DESIGN.md           ← database design documentation
+├── static/uploads/         ← profile pictures
+├── run.py                  ← Flask entry point (threaded=True)
+└── โครงสร้างไฟล์.txt       ← รายละเอียดทุกไฟล์
+```
+
+---
+
+### 🔌 API Endpoints
+
+<details>
+<summary><b>คลิกดู endpoints ทั้งหมด</b></summary>
+
+**Auth** `/auth`
+```
+POST /auth/register    สมัครสมาชิก (student/tutor)
+POST /auth/login       เข้าสู่ระบบ → JWT token
+```
+
+**Student** `/student`
+```
+GET  /student/posts                  ดูโพสต์ของตัวเอง
+POST /student/post                   สร้างโพสต์ใหม่
+DELETE /student/post/<id>            ลบโพสต์
+GET  /student/applications/<post_id> ดูผู้สมัคร
+POST /student/respond                ยอมรับ/ปฏิเสธ tutor
+GET  /student/my-courses             คอร์สที่เรียนทั้งหมด
+POST /student/api/pay                จ่าย Escrow
+POST /student/api/confirm-class      ยืนยันการเรียน (payout 90/10)
+POST /student/api/cancel-booking     ยกเลิก (refund 97%)
+GET  /student/api/wallet             ยอดเงิน wallet
+GET  /student/api/wallet/transactions ประวัติธุรกรรม
+POST /student/api/wallet/deposit     ฝากเงิน
+POST /student/api/wallet/withdraw    ถอนเงิน
+```
+
+**Tutor** `/tutor`
+```
+GET  /tutor/profile           ดูโปรไฟล์ตัวเอง
+PUT  /tutor/profile           แก้ไขโปรไฟล์
+GET  /tutor/list              รายชื่อ tutor ทั้งหมด (verified)
+GET  /tutor/profile/<id>      ดูโปรไฟล์ tutor รายบุคคล
+POST /tutor/apply             สมัครงานจากโพสต์
+GET  /tutor/my-applications   งานที่สมัครไป
+GET  /tutor/posts             งานที่เปิดรับสมัคร
+GET  /tutor/dashboard         stats สำหรับ dashboard
+GET  /tutor/schedule          ตารางสอน
+POST /tutor/api/class/start   เริ่มสอน
+POST /tutor/api/class/end     จบสอน
+GET  /tutor/api/wallet        ยอดเงิน wallet
+GET  /tutor/api/wallet/transactions ประวัติธุรกรรม
+POST /tutor/api/wallet/withdraw    ถอนเงิน
+```
+
+**Reviews** `/reviews`
+```
+GET    /reviews               ดูรีวิวทั้งหมด (filter ได้)
+GET    /reviews/tutor/<id>/summary สรุป rating ของ tutor
+POST   /reviews               เขียนรีวิว (ต้อง teaching_status=completed)
+POST   /reviews/my-options    งานที่เขียนรีวิวได้
+DELETE /reviews/<id>          ลบรีวิวของตัวเอง
+```
+
+**Admin** `/admin`
+```
+GET  /admin/stats             สถิติระบบทั้งหมด
+GET  /admin/users             รายชื่อ users
+POST /admin/users/status      เปลี่ยนสถานะ (active/suspended/ban)
+GET  /admin/reports           รายงานปัญหา
+POST /admin/reviews/hide      ซ่อนรีวิว
+DELETE /admin/reviews/<id>    ลบรีวิว
+```
+</details>
+
+---
+
+### 🛠️ Development
 
 ```bash
-# เช็คก่อนว่าตอนนี้อยู่ branch อะไร
-git branch
-# ต้องเห็น * demo — ถ้าไม่ใช่ให้สลับก่อน
+# ขั้นตอนการ push
 git checkout Final
-
-# pull ก่อนทุกครั้งเพื่อ sync code ล่าสุดจาก remote
-# ป้องกัน conflict ที่ไม่จำเป็นตอน push
 git pull origin Final
 
-# ถ้าเจอ Merge Conflict หลัง pull ให้แก้ไฟล์นั้นก่อน
-# หลังแก้เสร็จให้ mark ว่า resolved ด้วย git add
-git add <ชื่อไฟล์ที่แก้ conflict>
-git commit -m "resolve merge conflict in <ชื่อไฟล์>"
-
-# ถ้าติดตั้ง library เพิ่มเติมในระหว่าง dev อย่าลืม update requirements.txt
-pip freeze > requirements.txt
-git add requirements.txt
-git commit -m "update requirements.txt"
-
-# add และ commit ทีละไฟล์ (แนะนำ) เพื่อให้ history อ่านง่าย
-git add <ชื่อไฟล์>
+# add และ commit
+git add <ไฟล์>
 git commit -m "อธิบายสั้นๆ ว่าแก้อะไร"
-
-# ถ้ามีหลายไฟล์ที่เกี่ยวกันก็ add พร้อมกันแล้ว commit ครั้งเดียวได้
-git add <ไฟล์1> <ไฟล์2>
-git commit -m "อธิบายการเปลี่ยนแปลงที่เกี่ยวข้องกัน"
-
-# push ขึ้น remote
 git push origin Final
 ```
+
+---
+
 <table align="center" style="width: 100%; border-collapse: collapse;">
 <tr style="background-color: #f8fafc;">
 <th align="center" style="padding: 10px;">บทบาท (Role)</th>
@@ -230,7 +260,7 @@ git push origin Final
 <td align="center">6710535011</td>
 </tr>
 <tr>
-<td align="center"><b>Database & Backend developer & Backend Architect</b></td>
+<td align="center"><b>Database & Backend Developer & Backend Architect</b></td>
 <td align="center">นายวุฒิศักดิ์ บุญกัน</td>
 <td align="center">6710535029</td>
 </tr>
@@ -245,3 +275,5 @@ git push origin Final
 <td align="center">6710625010</td>
 </tr>
 </table>
+
+<p align="right"><i>Project Version 2.0 | Updated: April 2026</i></p>
