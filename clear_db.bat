@@ -1,0 +1,3 @@
+@echo off
+"C:\Program Files\MySQL\MySQL Server 9.6\bin\mysql.exe" -u root -p0000 -e "USE tutor_match; SET FOREIGN_KEY_CHECKS=0; TRUNCATE TABLE user_action_logs; TRUNCATE TABLE reports; TRUNCATE TABLE transaction_logs; TRUNCATE TABLE wallets; TRUNCATE TABLE payments; TRUNCATE TABLE reviews; TRUNCATE TABLE schedule_bookings; TRUNCATE TABLE tutor_schedules; TRUNCATE TABLE applications; TRUNCATE TABLE student_posts; TRUNCATE TABLE tutor_subjects; TRUNCATE TABLE tutor_experiences; TRUNCATE TABLE tutor_profiles; TRUNCATE TABLE student_profiles; TRUNCATE TABLE user_bank_accounts; TRUNCATE TABLE users; SET FOREIGN_KEY_CHECKS=1;"
+pause
