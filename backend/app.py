@@ -51,10 +51,6 @@ def create_app():
     def student_wallet_page():
         return send_from_directory("../frontend/student", "wallet.html")
     
-    @app.route("/home/student/reviews")
-    def student_review_page():
-        return send_from_directory("../frontend/tutorprofile", "review.html")
-    
     @app.route("/home/tutor")
     def tutor_home():
         return send_from_directory("../frontend/tutor", "home_tutor.html")
@@ -62,10 +58,6 @@ def create_app():
     @app.route('/profile/tutor')
     def tutor_profile():
         return send_from_directory("../frontend/tutorprofile", "profile.html")
-
-    @app.route('/profile/tutor/reviews')
-    def tutor_profile_reviews():
-        return send_from_directory("../frontend/tutorprofile", "review.html")
 
     @app.route('/frontend/tutorprofile/<path:filename>')
     def tutorprofile_assets(filename):
