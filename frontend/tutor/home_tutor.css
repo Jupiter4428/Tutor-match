@@ -649,4 +649,33 @@ body::after {
   .item-top {
     flex-direction: column;
   }
+  
+}
+
+/* ทำให้งานสอนที่แนะนำเต็มพื้นที่ ไม่ต้องเลื่อนในกล่องเยอะ */
+.main-grid {
+  grid-template-columns: 1.35fr 0.65fr;
+  align-items: start;
+}
+
+#job-section {
+  min-height: 760px;
+}
+
+#job-section .list-box {
+  max-height: none;
+  overflow-y: visible;
+  padding-right: 0;
+}
+
+#job-section .job-card {
+  padding: 22px;
+  min-height: 155px;
+}
+
+/* ฝั่งตารางสอน/รีวิวให้ยังเลื่อนได้ถ้าข้อมูลเยอะ */
+⁠scheduleList,
+#reviewList {
+  max-height: 360px;
+  overflow-y: auto;
 }
