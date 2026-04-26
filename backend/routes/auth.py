@@ -1,9 +1,11 @@
-# routes.auth.py
+# auth_routes.py
 from flask import Blueprint, request, jsonify
 from backend.services.auth_service import register_user, login_user
 
 auth_bp = Blueprint("auth", __name__)
 
+
+# POST /register — สมัครสมาชิกใหม่ (student หรือ tutor)
 @auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
@@ -41,6 +43,7 @@ def register():
         return jsonify(result), 400
 
 
+# POST /login — เข้าสู่ระบบและรับ JWT token
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()

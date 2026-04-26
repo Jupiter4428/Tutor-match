@@ -1,3 +1,4 @@
+# review_routes.py
 from flask import Blueprint, request, jsonify
 from backend.utils.auth_helper import token_required, role_required
 from backend.services.review_service import (
@@ -12,6 +13,11 @@ from backend.services.review_service import (
 review_bp = Blueprint("review", __name__)
 
 
+# ==========================================
+# ดูรีวิวและสรุป Rating
+# ==========================================
+
+# GET /review — ดึงรีวิวทั้งหมด รองรับ filter ตาม tutor_id, rating, subject, คำค้น
 @review_bp.route("", methods=["GET"])
 def list_reviews():
     tutor_id = request.args.get("tutor_id", type=int)
@@ -28,6 +34,7 @@ def list_reviews():
     return jsonify(result), 200
 
 
+# GET /review/summary — ดึงสรุป rating เฉลี่ยของ tutor (ระบุ tutor_id ใน query)
 @review_bp.route("/summary", methods=["GET"])
 def summary():
     tutor_id = request.args.get("tutor_id", type=int)
@@ -35,6 +42,7 @@ def summary():
     return jsonify(result), 200
 
 
+# GET /review/tutor/<tutor_id> — ดึงรีวิวของ tutor รายบุคคล
 @review_bp.route("/tutor/<int:tutor_id>", methods=["GET"])
 def tutor_reviews(tutor_id):
     rating = request.args.get("rating", type=int)
@@ -50,12 +58,18 @@ def tutor_reviews(tutor_id):
     return jsonify(result), 200
 
 
+# GET /review/tutor/<tutor_id>/summary — ดึงสรุป rating ของ tutor รายบุคคล
 @review_bp.route("/tutor/<int:tutor_id>/summary", methods=["GET"])
 def tutor_summary(tutor_id):
     result = get_rating_summary(tutor_id=tutor_id)
     return jsonify(result), 200
 
 
+# ==========================================
+# เขียนและลบรีวิว (เฉพาะ student)
+# ==========================================
+
+# GET /review/my-options — ดึงรายการ application ที่นักเรียนสามารถเขียนรีวิวได้
 @review_bp.route("/my-options", methods=["GET"])
 @token_required
 @role_required("student")
@@ -65,6 +79,7 @@ def my_reviewable_options():
     return jsonify(result), status_code
 
 
+# POST /review — เขียนรีวิวและให้คะแนน tutor หลังเรียนจบ
 @review_bp.route("", methods=["POST"])
 @token_required
 @role_required("student")
@@ -96,6 +111,7 @@ def add_review():
     return jsonify(result), status_code
 
 
+# DELETE /review/<review_id> — ลบรีวิวของตัวเอง
 @review_bp.route("/<int:review_id>", methods=["DELETE"])
 @token_required
 @role_required("student")

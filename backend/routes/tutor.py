@@ -41,6 +41,7 @@ def get_wallet():
 # Payment Flow API
 # =========================
 
+# POST /tutor/api/class/start — ติวเตอร์เริ่มสอน เปลี่ยน teaching_status เป็น ongoing
 @tutor_bp.route('/api/class/start', methods=['POST'])
 @token_required
 @role_required('tutor')
@@ -53,6 +54,7 @@ def class_start():
     return jsonify(result), 200 if result['status'] == 'success' else 400
 
 
+# POST /tutor/api/class/end — ติวเตอร์จบสอน เปลี่ยน teaching_status เป็น completed
 @tutor_bp.route('/api/class/end', methods=['POST'])
 @token_required
 @role_required('tutor')
@@ -65,6 +67,7 @@ def class_end():
     return jsonify(result), 200 if result['status'] == 'success' else 400
 
 
+# GET /tutor/api/wallet/transactions — ดึงประวัติทำรายการของกระเป๋าเงิน
 @tutor_bp.route('/api/wallet/transactions', methods=['GET'])
 @token_required
 @role_required('tutor')
