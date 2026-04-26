@@ -150,16 +150,18 @@ def get_tutor_dashboard_stats(user_id):
                     (SELECT COUNT(*) FROM student_posts
                      WHERE status = 'open' AND is_hidden = FALSE) AS available_jobs,
 
-                    (SELECT COALESCE(SUM(p.budget), 0)
-                     FROM applications a JOIN student_posts p ON a.post_id = p.post_id
-                     WHERE a.tutor_id = %s AND a.status = 'accepted'
-                       AND MONTH(a.applied_at) = MONTH(CURDATE())
-                       AND YEAR(a.applied_at)  = YEAR(CURDATE())) AS monthly_income,
+                    (SELECT COALESCE(SUM(tl.amount), 0)
+                     FROM transaction_logs tl
+                     JOIN wallets w ON tl.wallet_id = w.wallet_id
+                     WHERE w.user_id = %s
+                       AND tl.transaction_type = 'tutor_earnings'
+                       AND MONTH(tl.transaction_date) = MONTH(CURDATE())
+                       AND YEAR(tl.transaction_date)  = YEAR(CURDATE())) AS monthly_income,
 
                     (SELECT ROUND(AVG(r.rating), 1)
                      FROM reviews r JOIN applications a ON r.app_id = a.app_id
                      WHERE a.tutor_id = %s) AS avg_rating
-            """, (tutor_id, tutor_id, tutor_id))
+            """, (tutor_id, user_id, tutor_id))
             row = cursor.fetchone()
 
             return {
