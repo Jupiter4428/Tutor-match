@@ -233,6 +233,151 @@ DELETE /admin/reviews/<id>    ลบรีวิว
 
 ---
 
+### 🗃️ คำสั่ง SQL ที่ใช้บ่อย
+
+#### เข้า MySQL Shell
+```bash
+mysql -u root -p
+# Enter password → พิมพ์รหัสผ่าน MySQL
+USE tutor_match;
+```
+
+#### ดูข้อมูลพื้นฐาน
+```sql
+-- ดู users ทั้งหมด
+SELECT user_id, name, email, role, account_status FROM users;
+
+-- ดู tutors พร้อมสถานะ verify
+SELECT tp.tutor_id, u.name, u.email, tp.verification_status, tp.hourly_rate
+FROM tutor_profiles tp JOIN users u ON tp.user_id = u.user_id;
+
+-- ดูโพสต์ที่ยังเปิดรับสมัคร
+SELECT p.post_id, p.subject, p.budget, p.learning_format, u.name AS student
+FROM student_posts p
+JOIN student_profiles sp ON p.student_id = sp.student_id
+JOIN users u ON sp.user_id = u.user_id
+WHERE p.status = 'open' AND p.is_hidden = FALSE;
+
+-- ดูรีวิวทั้งหมดพร้อมชื่อ
+SELECT r.review_id, r.rating, r.comment,
+       u_s.name AS student_name, u_t.name AS tutor_name
+FROM reviews r
+JOIN applications a ON r.app_id = a.app_id
+JOIN student_posts p ON a.post_id = p.post_id
+JOIN student_profiles sp ON p.student_id = sp.student_id
+JOIN users u_s ON sp.user_id = u_s.user_id
+JOIN tutor_profiles tp ON a.tutor_id = tp.tutor_id
+JOIN users u_t ON tp.user_id = u_t.user_id
+ORDER BY r.created_at DESC;
+
+-- ดู avg rating แต่ละ tutor
+SELECT u.name, ROUND(AVG(r.rating), 2) AS avg_rating, COUNT(r.review_id) AS reviews
+FROM tutor_profiles tp
+JOIN users u ON tp.user_id = u.user_id
+LEFT JOIN applications a ON a.tutor_id = tp.tutor_id
+LEFT JOIN reviews r ON r.app_id = a.app_id
+GROUP BY tp.tutor_id, u.name
+ORDER BY avg_rating DESC;
+
+-- ดูยอด wallet ทุก user
+SELECT u.name, u.role, w.balance, w.status
+FROM wallets w JOIN users u ON w.user_id = u.user_id
+ORDER BY w.balance DESC;
+
+-- ดูประวัติธุรกรรมทั้งหมด
+SELECT tl.transaction_id, u.name, tl.transaction_type,
+       tl.amount, tl.balance_after, tl.transaction_date
+FROM transaction_logs tl
+JOIN wallets w ON tl.wallet_id = w.wallet_id
+JOIN users u ON w.user_id = u.user_id
+ORDER BY tl.transaction_date DESC;
+```
+
+#### จัดการข้อมูล
+```sql
+-- เพิ่ม Admin user (รหัสผ่าน: 1234)
+INSERT INTO users (name, email, password_hash, role, account_status)
+VALUES (
+    'superuser',
+    'admin@tutormatch.com',
+    '$2b$12$m4ixkpFMtcS0aMutT/bPJerq11YqM/VmUeAY6LQf9wgsmAiKfyEO2',
+    'admin',
+    'active'
+);
+
+-- Ban ผู้ใช้
+UPDATE users SET account_status = 'ban' WHERE user_id = ?;
+
+-- ยืนยัน tutor
+UPDATE tutor_profiles
+SET verification_status = 'verified', verified_by = 1, verified_at = NOW()
+WHERE tutor_id = ?;
+
+-- ซ่อนโพสต์
+UPDATE student_posts
+SET is_hidden = TRUE, moderation_reason = 'ละเมิดกฎการใช้งาน'
+WHERE post_id = ?;
+```
+
+#### ล้างและ Reset ข้อมูล
+```sql
+-- ล้างข้อมูลทั้งหมด (โครงสร้างตารางคงอยู่)
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE user_action_logs;
+TRUNCATE TABLE reports;
+TRUNCATE TABLE transaction_logs;
+TRUNCATE TABLE wallets;
+TRUNCATE TABLE payments;
+TRUNCATE TABLE reviews;
+TRUNCATE TABLE schedule_bookings;
+TRUNCATE TABLE tutor_schedules;
+TRUNCATE TABLE applications;
+TRUNCATE TABLE student_posts;
+TRUNCATE TABLE tutor_subjects;
+TRUNCATE TABLE tutor_experiences;
+TRUNCATE TABLE tutor_profiles;
+TRUNCATE TABLE student_profiles;
+TRUNCATE TABLE user_bank_accounts;
+TRUNCATE TABLE users;
+SET FOREIGN_KEY_CHECKS = 1;
+```
+
+#### ตรวจสอบ Indexes
+```sql
+-- ดู indexes ทั้งหมดใน database
+SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME
+FROM information_schema.STATISTICS
+WHERE TABLE_SCHEMA = 'tutor_match'
+ORDER BY TABLE_NAME, INDEX_NAME;
+```
+
+#### Admin Dashboard Queries
+```sql
+-- สรุปสถิติระบบ
+SELECT
+    (SELECT COUNT(*) FROM users WHERE role = 'student') AS students,
+    (SELECT COUNT(*) FROM users WHERE role = 'tutor')   AS tutors,
+    (SELECT COUNT(*) FROM student_posts)                AS posts,
+    (SELECT COUNT(*) FROM applications WHERE status = 'accepted') AS matched,
+    (SELECT COALESCE(SUM(platform_fee), 0) FROM payments WHERE status = 'completed') AS total_revenue;
+
+-- Top 5 วิชาที่มีโพสต์มากสุด
+SELECT subject, COUNT(*) AS post_count
+FROM student_posts
+GROUP BY subject
+ORDER BY post_count DESC
+LIMIT 5;
+
+-- Tutor ที่รอ verify
+SELECT tp.tutor_id, u.name, u.email, tp.verification_submitted_at
+FROM tutor_profiles tp
+JOIN users u ON tp.user_id = u.user_id
+WHERE tp.verification_status = 'pending'
+ORDER BY tp.verification_submitted_at ASC;
+```
+
+---
+
 ### 🛠️ Development
 
 ```bash
