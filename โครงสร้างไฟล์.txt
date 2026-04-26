@@ -36,13 +36,14 @@ tutor-match/
 │   │   ├── student_service.py              # จัดการโพสต์, ดูผู้สมัคร, ตอบรับ/ปฏิเสธ, wallet, deposit/withdraw
 │   │   ├── tutor_service.py                # profile, subjects, experiences, dashboard stats, schedule, wallet
 │   │   ├── payment_service.py              # escrow pay, confirm class (payout 90/10), cancel booking (refund 97%)
-│   │   └── review_service.py               # สร้าง/ลบรีวิว, ดูรีวิวรายติวเตอร์, summary stats
+│   │   ├── review_service.py               # สร้าง/ลบรีวิว, ดูรีวิวรายติวเตอร์, summary stats
+│   │   └── admin_service.py                # stats, ดูผู้ใช้, เปลี่ยนสถานะบัญชี, รายงาน, verify tutor
 │   │
 │   ├── routes/                             # รับ Request → เรียก Service → ส่ง JSON
 │   │   ├── auth.py                         # POST /auth/register, POST /auth/login
 │   │   ├── student.py                      # CRUD posts, applications, wallet, pay/confirm/cancel
 │   │   ├── tutor.py                        # profile, subjects, dashboard, schedule, wallet, apply
-│   │   ├── admin.py                        # stats, users, user status, reports, review hide/delete
+│   │   ├── admin.py                        # stats, users, user status, reports, verify tutor
 │   │   └── review.py                       # GET /reviews, POST /reviews, DELETE /reviews/<id>
 │   │
 │   └── utils/
