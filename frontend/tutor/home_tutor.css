@@ -36,8 +36,6 @@ body::after {
   width: 400px;
   height: 400px;
   border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.36;
   z-index: 0;
   pointer-events: none;
 }
@@ -45,13 +43,13 @@ body::after {
 body::before {
   top: -120px;
   left: -100px;
-  background: #ff3fd2;
+  background: radial-gradient(circle, rgba(255,63,210,0.35) 0%, transparent 70%);
 }
 
 body::after {
   bottom: -120px;
   right: -100px;
-  background: #4d7dff;
+  background: radial-gradient(circle, rgba(77,125,255,0.35) 0%, transparent 70%);
 }
 
 .floating-glow {
@@ -61,9 +59,7 @@ body::after {
   width: 280px;
   height: 280px;
   border-radius: 50%;
-  background: #39e7ff;
-  filter: blur(140px);
-  opacity: 0.12;
+  background: radial-gradient(circle, rgba(57,231,255,0.18) 0%, transparent 70%);
   z-index: 0;
   pointer-events: none;
 }
@@ -85,7 +81,6 @@ body::after {
   padding: 18px 22px;
   margin-bottom: 28px;
   background: rgba(255, 255, 255, 0.07);
-  backdrop-filter: blur(18px);
   border: 1px solid var(--border);
   border-radius: 24px;
   box-shadow: var(--shadow);
@@ -202,7 +197,6 @@ body::after {
 .hero-right,
 .card {
   background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(18px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 28px;
   box-shadow: var(--shadow);
@@ -366,7 +360,6 @@ body::after {
   padding: 24px;
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(18px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: var(--shadow);
   transition: 0.25s ease;
@@ -476,6 +469,8 @@ body::after {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: 0.25s ease;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 120px;
 }
 
 .job-card:hover,

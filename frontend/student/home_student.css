@@ -41,22 +41,20 @@ body::after {
   width: 420px;
   height: 420px;
   border-radius: 50%;
-  filter: blur(120px);
   z-index: 0;
-  opacity: 0.45;
   pointer-events: none;
 }
 
 body::before {
   top: -120px;
   left: -100px;
-  background: #ff3fd2;
+  background: radial-gradient(circle, rgba(255,63,210,0.35) 0%, transparent 70%);
 }
 
 body::after {
   bottom: -140px;
   right: -100px;
-  background: #4d7dff;
+  background: radial-gradient(circle, rgba(77,125,255,0.35) 0%, transparent 70%);
 }
 
 .floating-glow {
@@ -66,9 +64,7 @@ body::after {
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  background: #37e7ff;
-  filter: blur(140px);
-  opacity: 0.12;
+  background: radial-gradient(circle, rgba(55,231,255,0.18) 0%, transparent 70%);
   z-index: 0;
   pointer-events: none;
 }
@@ -89,7 +85,6 @@ body::after {
   margin-bottom: 28px;
   padding: 18px 22px;
   background: rgba(255, 255, 255, 0.07);
-  backdrop-filter: blur(18px);
   border: 1px solid var(--border);
   border-radius: 24px;
   box-shadow: var(--shadow);
@@ -175,7 +170,6 @@ body::after {
 .hero-right,
 .card {
   background: var(--glass);
-  backdrop-filter: blur(18px);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow);
@@ -556,6 +550,8 @@ select option {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: 0.25s ease;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 120px;
 }
 
 .request-card:hover,

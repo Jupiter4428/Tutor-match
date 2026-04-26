@@ -356,6 +356,24 @@
     </div>
   </div>
 
+  <!-- Modal แสดงรายละเอียดรีวิว -->
+  <div id="reviewDetailModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:linear-gradient(135deg,#181b3a,#221d4e); border:1px solid rgba(255,255,255,0.15); border-radius:20px; padding:28px; max-width:500px; width:100%; color:#e2e8f0;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h3 style="margin:0; font-size:1.15rem; font-weight:800;">⭐ รายละเอียดรีวิว</h3>
+        <button onclick="document.getElementById('reviewDetailModal').style.display='none'"
+          style="background:rgba(255,255,255,0.1); border:none; color:#fff; padding:7px 14px; border-radius:8px; cursor:pointer;">✕</button>
+      </div>
+      <div id="reviewDetailBody" style="display:flex; flex-direction:column; gap:12px; font-size:0.95rem; line-height:1.7;"></div>
+      <div style="margin-top:20px; text-align:right;">
+        <button onclick="document.getElementById('reviewDetailModal').style.display='none'"
+          style="background:#3b4f82; color:#fff; border:none; border-radius:8px; padding:8px 20px; cursor:pointer; font-size:0.9rem;">
+          ปิด
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="/assets/admin/home_admin.js"></script>
 </body>
 

@@ -74,9 +74,11 @@
               <div class="hint">ค่านี้ดึงมาจากฐานข้อมูล จึงไม่สามารถแก้ไขได้</div>
             </div>
             <div class="field">
-  <label for="hourly_rate">Hourly Rate (บาท/ชั่วโมง)</label>
-  <input class="input" type="number" id="hourly_rate" name="hourly_rate">
-</div>
+              <label for="hourly_rate">Hourly Rate (บาท/ชั่วโมง)</label>
+              <input class="input" type="number" id="hourly_rate" name="hourly_rate" min="0"
+                placeholder="กรอกราคาต่อชั่วโมง">
+              <div class="hint">กรอกราคาเป็นตัวเลข เช่น 350, 500, 800</div>
+            </div>
 
 <!-- 🔥 วางตรงนี้ -->
 <div class="field full">
@@ -106,22 +108,11 @@
 </div>
 <!-- 🔥 จบตรงนี้ -->
 
-<div class="field full">
-  <label for="bio">Bio</label>
-  <textarea class="textarea" id="bio" name="bio"></textarea>
-</div>
-
-            <div class="field">
-              <label for="hourly_rate">Hourly Rate (บาท/ชั่วโมง)</label>
-              <input class="input" type="number" id="hourly_rate" name="hourly_rate" value="350" min="0"
-                placeholder="กรอกราคาต่อชั่วโมง">
-              <div class="hint">กรอกราคาเป็นตัวเลข เช่น 350, 500, 800</div>
-            </div>
 
             <div class="field full">
               <label for="bio">Bio</label>
               <textarea class="textarea" id="bio" name="bio"
-                placeholder="เขียนแนะนำตัว ประสบการณ์การสอน จุดเด่น หรือวิธีการสอนของคุณ">สวัสดีค่ะ ฉันเป็นติวเตอร์ที่มีความเชี่ยวชาญด้านคณิตศาสตร์ วิทยาศาสตร์ และภาษาอังกฤษ เน้นการสอนแบบเข้าใจง่าย เป็นกันเอง และช่วยให้นักเรียนพัฒนาคะแนนและความมั่นใจในการเรียนได้อย่างมีประสิทธิภาพ</textarea>
+                placeholder="เขียนแนะนำตัว ประสบการณ์การสอน จุดเด่น หรือวิธีการสอนของคุณ"></textarea>
               <div class="hint">แนะนำให้ใส่ข้อมูลให้น่าสนใจ ชัดเจน และดูเป็นมืออาชีพ</div>
             </div>
           </div>

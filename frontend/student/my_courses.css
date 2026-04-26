@@ -34,8 +34,6 @@ body{
 .glow{
   position:fixed;
   border-radius:50%;
-  filter:blur(110px);
-  opacity:.35;
   z-index:0;
   pointer-events:none;
 }
@@ -43,7 +41,7 @@ body{
 .glow-1{
   width:330px;
   height:330px;
-  background:var(--pink);
+  background:radial-gradient(circle, rgba(255,95,210,0.35) 0%, transparent 70%);
   top:-90px;
   left:-90px;
 }
@@ -51,7 +49,7 @@ body{
 .glow-2{
   width:340px;
   height:340px;
-  background:var(--blue);
+  background:radial-gradient(circle, rgba(66,216,255,0.35) 0%, transparent 70%);
   right:-100px;
   top:180px;
 }
@@ -59,7 +57,7 @@ body{
 .glow-3{
   width:320px;
   height:320px;
-  background:var(--purple);
+  background:radial-gradient(circle, rgba(139,107,255,0.35) 0%, transparent 70%);
   bottom:-100px;
   left:25%;
 }
@@ -81,7 +79,6 @@ body{
   border-radius:28px;
   background:var(--card);
   border:var(--border);
-  backdrop-filter:blur(18px);
   box-shadow:var(--shadow);
   margin-bottom:24px;
   flex-wrap:wrap;
@@ -163,7 +160,6 @@ body{
 .course-card{
   background:var(--card);
   border:var(--border);
-  backdrop-filter:blur(18px);
   box-shadow:var(--shadow);
 }
 
@@ -332,6 +328,8 @@ body{
   position:relative;
   overflow:hidden;
   transition:.28s ease;
+  content-visibility:auto;
+  contain-intrinsic-size:0 300px;
 }
 
 .course-card:hover{

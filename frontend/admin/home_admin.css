@@ -39,22 +39,20 @@ body::after {
   width: 420px;
   height: 420px;
   border-radius: 50%;
-  filter: blur(120px);
   z-index: 0;
-  opacity: 0.4;
   pointer-events: none;
 }
 
 body::before {
   top: -120px;
   left: -100px;
-  background: #ff3fd2;
+  background: radial-gradient(circle, rgba(255,63,210,0.32) 0%, transparent 70%);
 }
 
 body::after {
   bottom: -140px;
   right: -100px;
-  background: #4d7dff;
+  background: radial-gradient(circle, rgba(77,125,255,0.32) 0%, transparent 70%);
 }
 
 .floating-glow {
@@ -64,9 +62,7 @@ body::after {
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  background: #37e7ff;
-  filter: blur(140px);
-  opacity: 0.12;
+  background: radial-gradient(circle, rgba(55,231,255,0.16) 0%, transparent 70%);
   z-index: 0;
   pointer-events: none;
 }
@@ -85,7 +81,6 @@ body::after {
 .card,
 .overview-card {
   background: var(--glass);
-  backdrop-filter: blur(18px);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
 }
@@ -509,6 +504,8 @@ td {
   border-radius: 20px;
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.1);
+  content-visibility: auto;
+  contain-intrinsic-size: 0 100px;
 }
 
 .activity-top,
@@ -639,6 +636,8 @@ td {
   border: 1px solid rgba(255,255,255,0.1);
   position: relative;
   overflow: hidden;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 200px;
 }
 
 .admin-review-card.featured {

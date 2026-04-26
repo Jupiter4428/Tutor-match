@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, g
 from flask_cors import CORS
 from backend.config import SECRET_KEY, ALLOWED_ORIGINS
 
@@ -13,6 +13,14 @@ def create_app():
     app.config["SECRET_KEY"] = SECRET_KEY
 
     CORS(app, origins=ALLOWED_ORIGINS, supports_credentials=True)
+
+    # ปิด DB connection จริงเมื่อจบทุก request
+    # (service files เรียก connection.close() แต่เป็น no-op — ปิดที่นี่แทน)
+    @app.teardown_appcontext
+    def close_db_connection(_exception=None):
+        wrapped = g.pop('_db_wrapped', None)
+        if wrapped is not None:
+            wrapped.force_close()
 
     # register html routes
     @app.route("/")

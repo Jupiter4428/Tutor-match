@@ -1,25 +1,21 @@
+// ============================================================
+//  wallet.js — Student Wallet
+//  นักเรียนเติมเงิน (deposit) เพื่อชำระค่าเรียน
+//  และถอนเงินคงเหลือกลับบัญชีธนาคารได้
+// ============================================================
+
 const TOKEN = localStorage.getItem('token');
 
 if (!TOKEN) {
-  alert("กรุณาเข้าสู่ระบบก่อนใช้งาน Wallet");
   window.location.href = '/login';
 }
 
-function goToStuHome() {
-  window.location.href = "/home/student";
-}
-
-function goToMyCourses() {
-  window.location.href = "/student/courses";
-}
+function goToStuHome()   { window.location.href = '/home/student'; }
+function goToMyCourses() { window.location.href = '/student/courses'; }
 
 function scrollToSection(id) {
   const el = document.getElementById(id);
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } else {
-    console.error("หา Element ที่มี ID: " + id + " ไม่เจอครับ!");
-  }
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 const apiHeaders = {
@@ -27,26 +23,29 @@ const apiHeaders = {
   'Authorization': `Bearer ${TOKEN}`
 };
 
-let baseBalance = 0;
-let walletId = "";
+// ---- State -----------------------------------------------
+let baseBalance       = 0;     // ยอดเงินปัจจุบัน
+let walletId          = "";
+let isSubmittingDeposit  = false; // ป้องกัน double-submit deposit
+let isSubmittingWithdraw = false; // ป้องกัน double-submit withdraw
 
+// ---- DOM refs --------------------------------------------
 const currentWalletBalance = document.getElementById('currentWalletBalance');
-const depositAmountInput = document.getElementById('depositAmount');
-const withdrawAmountInput = document.getElementById('withdrawAmount');
-const summaryDeposit = document.getElementById('summaryDeposit');
-const summaryBalance = document.getElementById('summaryBalance');
-const summaryWithdraw = document.getElementById('summaryWithdraw');
+const depositAmountInput   = document.getElementById('depositAmount');
+const withdrawAmountInput  = document.getElementById('withdrawAmount');
+const summaryDeposit       = document.getElementById('summaryDeposit');
+const summaryBalance       = document.getElementById('summaryBalance');
+const summaryWithdraw      = document.getElementById('summaryWithdraw');
 const summaryWithdrawBalance = document.getElementById('summaryWithdrawBalance');
-const confirmDepositBtn = document.getElementById('confirmDepositBtn');
-const confirmWithdrawBtn = document.getElementById('confirmWithdrawBtn');
-const bankName = document.getElementById('bankName');
-const accountNumber = document.getElementById('accountNumber');
+const confirmDepositBtn    = document.getElementById('confirmDepositBtn');
+const confirmWithdrawBtn   = document.getElementById('confirmWithdrawBtn');
+const bankName             = document.getElementById('bankName');
+const accountNumber        = document.getElementById('accountNumber');
 
-
+// ---- Utility ---------------------------------------------
 function formatCurrency(amount) {
   return `฿${Number(amount).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    minimumFractionDigits: 2, maximumFractionDigits: 2
   })}`;
 }
 
@@ -55,297 +54,315 @@ function setText(id, value) {
   if (el) el.textContent = value;
 }
 
+// escape HTML ป้องกัน XSS ก่อนแทรก innerHTML
+function escapeHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// แสดง toast แทน alert() เพื่อไม่ block UI
+function showToast(msg, type = 'success') {
+  const bg = type === 'success'
+    ? 'rgba(46,230,166,0.95)'
+    : 'rgba(255,123,146,0.95)';
+  const toast = document.createElement('div');
+  toast.textContent = msg;
+  toast.style.cssText = `
+    position:fixed;bottom:24px;right:24px;z-index:9999;
+    padding:14px 20px;border-radius:12px;
+    font-size:0.95rem;font-weight:600;color:#fff;
+    background:${bg};backdrop-filter:blur(8px);
+    box-shadow:0 4px 20px rgba(0,0,0,0.3);transition:opacity 0.4s;
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 400);
+  }, 2800);
+}
+
+// ============================================================
+//  LOAD DATA
+// ============================================================
+
+// ดึงยอดเงิน wallet และอัปเดต summary โดยไม่ใส่ default amount
 async function fetchWalletData() {
   try {
-    const res = await fetch('/student/api/wallet', { headers: apiHeaders });
+    const res  = await fetch('/student/api/wallet', { headers: apiHeaders });
     const data = await res.json();
 
     if (data.status === 'success') {
       baseBalance = parseFloat(data.data.balance || 0);
-      walletId = data.data.wallet_id || "";
+      walletId    = data.data.wallet_id || "";
 
       currentWalletBalance.textContent = formatCurrency(baseBalance);
-      setText('heroBalance', formatCurrency(baseBalance));
+      setText('heroBalance',      formatCurrency(baseBalance));
       setText('heroWalletStatus', data.data.status || 'active');
 
       const pillElements = document.querySelectorAll('.wallet-meta .pill');
-      if (pillElements.length > 1) {
-        pillElements[1].textContent = `Wallet ID: #WLT-${walletId}`;
-      }
-      if (pillElements.length > 2) {
-        pillElements[2].textContent = `Updated: ${data.data.updated_at || '-'}`;
-      }
+      if (pillElements.length > 1) pillElements[1].textContent = `Wallet ID: #WLT-${walletId}`;
+      if (pillElements.length > 2) pillElements[2].textContent = `Updated: ${data.data.updated_at || '-'}`;
 
-      updateDepositSummary(depositAmountInput.value || 500);
-      updateWithdrawSummary(withdrawAmountInput.value || 100);
+      // อัปเดต summary ด้วยค่าที่ user อาจพิมพ์ไว้แล้ว (ไม่ใส่ default)
+      updateDepositSummary(depositAmountInput.value  || 0);
+      updateWithdrawSummary(withdrawAmountInput.value || 0);
     } else {
-      console.warn(data.message || "โหลด wallet ไม่สำเร็จ");
+      console.warn(data.message || 'โหลด wallet ไม่สำเร็จ');
     }
   } catch (error) {
-    console.error("Error fetching wallet:", error);
+    console.error('Error fetching wallet:', error);
   }
 }
 
+// ดึงประวัติ transaction — escapeHtml ทุก field ที่มาจาก API
 async function fetchTransactions() {
   const listContainer = document.querySelector('.transaction-list');
 
   try {
-    const res = await fetch('/student/api/wallet/transactions', { headers: apiHeaders });
+    const res  = await fetch('/student/api/wallet/transactions', { headers: apiHeaders });
     const data = await res.json();
 
     if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
       setText('heroTxCount', `${data.data.length} รายการ`);
 
+      // mini cards — หา transaction ล่าสุดแต่ละประเภท
       const lastDeposit = data.data.find(t => t.transaction_type === 'deposit');
       const lastPayment = data.data.find(t => t.transaction_type === 'payment');
-      const lastRefund = data.data.find(t => t.transaction_type === 'refund');
-      const lastTx = data.data[0];
+      const lastRefund  = data.data.find(t => t.transaction_type === 'refund');
+      const lastTx      = data.data[0];
 
       if (lastDeposit) setText('miniLastDeposit', `+ ${formatCurrency(lastDeposit.amount)}`);
       if (lastPayment) setText('miniLastPayment', `- ${formatCurrency(lastPayment.amount)}`);
-      if (lastRefund) setText('miniLastRefund', `+ ${formatCurrency(lastRefund.amount)}`);
-      if (lastTx) setText('miniLastType', lastTx.transaction_type);
+      if (lastRefund)  setText('miniLastRefund',  `+ ${formatCurrency(lastRefund.amount)}`);
+      if (lastTx)      setText('miniLastType', lastTx.transaction_type);
 
+      // mapping แสดงผล
       const titleMap = {
-        deposit: 'ฝากเงินเข้า Wallet',
-        withdrawal: 'ถอนเงินคงเหลือกลับบัญชี',
-        payment: 'ชำระค่าเรียน',
-        refund: 'รับเงินคืน',
+        deposit:        'ฝากเงินเข้า Wallet',
+        withdrawal:     'ถอนเงินคงเหลือกลับบัญชี',
+        payment:        'ชำระค่าเรียน',
+        refund:         'รับเงินคืน',
         tutor_earnings: 'รายได้จากการสอน',
-        platform_fee: 'ค่าธรรมเนียมแพลตฟอร์ม',
+        platform_fee:   'ค่าธรรมเนียมแพลตฟอร์ม',
       };
-
       const iconMap = {
-        deposit: '💸',
-        withdrawal: '🏦',
-        payment: '📚',
-        refund: '↩️',
-        tutor_earnings: '💼',
-        platform_fee: '💠',
+        deposit: '💸', withdrawal: '🏦', payment: '📚',
+        refund:  '↩️', tutor_earnings: '💼', platform_fee: '💠',
       };
-
       const iconBgMap = {
-        deposit: 'linear-gradient(135deg,rgba(255,95,210,.35),rgba(139,107,255,.25))',
-        withdrawal: 'linear-gradient(135deg,rgba(255,123,146,.3),rgba(255,215,92,.2))',
-        payment: 'linear-gradient(135deg,rgba(66,216,255,.3),rgba(139,107,255,.25))',
-        refund: 'linear-gradient(135deg,rgba(46,230,166,.3),rgba(66,216,255,.25))',
+        deposit:     'linear-gradient(135deg,rgba(255,95,210,.35),rgba(139,107,255,.25))',
+        withdrawal:  'linear-gradient(135deg,rgba(255,123,146,.3),rgba(255,215,92,.2))',
+        payment:     'linear-gradient(135deg,rgba(66,216,255,.3),rgba(139,107,255,.25))',
+        refund:      'linear-gradient(135deg,rgba(46,230,166,.3),rgba(66,216,255,.25))',
         tutor_earnings: 'linear-gradient(135deg,rgba(46,230,166,.3),rgba(139,107,255,.2))',
-        platform_fee: 'linear-gradient(135deg,rgba(255,215,92,.3),rgba(255,95,210,.2))',
+        platform_fee:   'linear-gradient(135deg,rgba(255,215,92,.3),rgba(255,95,210,.2))',
       };
-
       const chipMap = {
-        deposit: 'completed',
-        withdrawal: 'completed',
-        refund: 'completed',
-        payment: 'pending',
-        platform_fee: 'pending',
-        tutor_earnings: 'completed',
+        deposit: 'completed', withdrawal: 'completed', refund: 'completed',
+        payment: 'pending',   platform_fee: 'pending', tutor_earnings: 'completed',
       };
-
-      const isInMap = {
-        deposit: true,
-        refund: true,
-        tutor_earnings: true
-      };
-
-      const refPrefixMap = {
-        deposit_slip: 'DPS',
-        withdrawal_request: 'WDR',
-        application: 'APP',
-        deposit_slip_manual: 'DPS',
+      // เงินเข้า wallet ของนักเรียน = deposit, refund
+      const isInMap       = { deposit: true, refund: true, tutor_earnings: true };
+      const refPrefixMap  = {
+        deposit_slip: 'DPS', withdrawal_request: 'WDR',
+        application: 'APP', deposit_slip_manual: 'DPS',
       };
 
       listContainer.innerHTML = data.data.map(t => {
-        const type = t.transaction_type;
-        const isIn = !!isInMap[type];
-        const sign = isIn ? '+' : '-';
+        const type       = t.transaction_type;
+        const isIn       = !!isInMap[type];
+        const sign       = isIn ? '+' : '-';
         const moneyClass = isIn ? 'in' : 'out';
-
-        const dateText = t.formatted_date || t.transaction_date || '-';
+        const dateText   = escapeHtml(t.formatted_date || t.transaction_date || '-');
 
         let refText = '';
         if (t.reference_type) {
           const prefix = refPrefixMap[t.reference_type] || t.reference_type.toUpperCase().slice(0, 3);
-          const refId = t.reference_id ? t.reference_id : t.transaction_id;
-          refText = `${t.reference_type} #${prefix}-${refId}`;
+          refText = `${escapeHtml(t.reference_type)} #${prefix}-${t.reference_id ?? t.transaction_id}`;
         } else {
           refText = `TXN-${t.transaction_id}`;
         }
-
-        const noteText = t.description || '';
-        const refLine = noteText ? `${refText} • ${noteText}` : refText;
+        const noteText = escapeHtml(t.description || '');
+        const refLine  = noteText ? `${refText} • ${noteText}` : refText;
 
         return `
           <div class="transaction-item">
             <div class="transaction-icon" style="background:${iconBgMap[type] || iconBgMap.deposit}">
               ${iconMap[type] || '💳'}
             </div>
-
             <div class="transaction-main">
-              <h4>${titleMap[type] || type}</h4>
+              <h4>${escapeHtml(titleMap[type] || type)}</h4>
               <p>อ้างอิง: ${refLine}</p>
             </div>
-
             <div class="transaction-type">
-              <div class="status-chip ${chipMap[type] || 'completed'}">${type}</div>
+              <div class="status-chip ${chipMap[type] || 'completed'}">${escapeHtml(type)}</div>
             </div>
-
             <div class="transaction-balance">
               <div class="money ${moneyClass}">${sign} ${formatCurrency(t.amount)}</div>
-              <div style="color:var(--muted);font-size:.86rem;">
-                Balance After: ${formatCurrency(t.balance_after)}
-              </div>
+              <div style="color:var(--muted);font-size:.86rem;">Balance After: ${formatCurrency(t.balance_after)}</div>
             </div>
-
-            <div class="transaction-date">
-              ${dateText}
-            </div>
+            <div class="transaction-date">${dateText}</div>
           </div>`;
       }).join('');
     } else {
       setText('heroTxCount', '0 รายการ');
       listContainer.innerHTML = `
-        <div style="text-align:center;padding:20px;color:var(--muted);">
-          ไม่มีประวัติการทำรายการในระบบ
-        </div>
-      `;
+        <div style="text-align:center;padding:20px;color:var(--muted);">ไม่มีประวัติการทำรายการในระบบ</div>`;
     }
   } catch (error) {
-    console.error("Error fetching transactions:", error);
+    console.error('Error fetching transactions:', error);
     listContainer.innerHTML = `
-      <div style="text-align:center;padding:20px;color:var(--muted);">
-        โหลดประวัติธุรกรรมไม่สำเร็จ
-      </div>
-    `;
+      <div style="text-align:center;padding:20px;color:var(--muted);">โหลดประวัติธุรกรรมไม่สำเร็จ</div>`;
   }
 }
 
+// ============================================================
+//  DEPOSIT ACTION
+// ============================================================
+
 confirmDepositBtn.addEventListener('click', async () => {
+  if (isSubmittingDeposit) return; // ป้องกัน double-submit
+
   const amount = Number(depositAmountInput.value);
-  const note = document.getElementById('depositNote').value;
+  const note   = document.getElementById('depositNote').value;
 
   if (!amount || amount <= 0) {
-    alert('กรุณากรอกจำนวนเงินฝากให้ถูกต้อง');
+    showToast('กรุณากรอกจำนวนเงินฝากให้ถูกต้อง', 'error');
     return;
   }
 
-  confirmDepositBtn.disabled = true;
+  isSubmittingDeposit           = true;
+  confirmDepositBtn.disabled    = true;
   confirmDepositBtn.textContent = 'กำลังดำเนินการ...';
 
   try {
-    const res = await fetch('/student/api/wallet/deposit', {
-      method: 'POST',
-      headers: apiHeaders,
+    const res  = await fetch('/student/api/wallet/deposit', {
+      method: 'POST', headers: apiHeaders,
       body: JSON.stringify({ amount, note })
     });
-
     const data = await res.json();
 
     if (data.status === 'success') {
-      alert('ฝากเงินสำเร็จ! ยอดเงินอัปเดตเข้ากระเป๋าเรียบร้อย');
+      showToast('ฝากเงินสำเร็จ! ยอดเงินอัปเดตเข้ากระเป๋าเรียบร้อย', 'success');
       document.getElementById('depositNote').value = '';
+      depositAmountInput.value = '';
+      updateDepositSummary(0);
       await fetchWalletData();
       await fetchTransactions();
     } else {
-      alert(data.message || 'ฝากเงินไม่สำเร็จ');
+      showToast(data.message || 'ฝากเงินไม่สำเร็จ', 'error');
     }
   } catch (err) {
     console.error(err);
-    alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
+    showToast('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+  } finally {
+    // always re-enable ไม่ว่าจะ success หรือ error
+    isSubmittingDeposit           = false;
+    confirmDepositBtn.disabled    = false;
+    confirmDepositBtn.textContent = '💸 Confirm Deposit';
   }
-
-  confirmDepositBtn.disabled = false;
-  confirmDepositBtn.textContent = '💸 Confirm Deposit';
 });
 
+// ============================================================
+//  WITHDRAW ACTION
+// ============================================================
+
 confirmWithdrawBtn.addEventListener('click', async () => {
+  if (isSubmittingWithdraw) return;
+
   const amount = Number(withdrawAmountInput.value);
-  const note = document.getElementById('withdrawNote').value;
+  const note   = document.getElementById('withdrawNote').value;
 
   if (!amount || amount <= 0) {
-    alert('กรุณากรอกจำนวนเงินถอนให้ถูกต้อง');
+    showToast('กรุณากรอกจำนวนเงินถอนให้ถูกต้อง', 'error');
     return;
   }
-
   if (amount > baseBalance) {
-    alert('ยอดเงินใน Wallet ของคุณไม่เพียงพอสำหรับการถอน');
+    showToast('ยอดเงินใน Wallet ของคุณไม่เพียงพอสำหรับการถอน', 'error');
+    return;
+  }
+  if (!bankName.value || !accountNumber.value.trim()) {
+    showToast('กรุณากรอกข้อมูลธนาคารและเลขบัญชีให้ครบถ้วน', 'error');
     return;
   }
 
-  if (bankName.value === '' || accountNumber.value.trim() === '') {
-    alert('กรุณากรอกข้อมูลธนาคารและเลขบัญชีให้ครบถ้วน');
-    return;
-  }
-
-  confirmWithdrawBtn.disabled = true;
+  isSubmittingWithdraw           = true;
+  confirmWithdrawBtn.disabled    = true;
   confirmWithdrawBtn.textContent = 'กำลังดำเนินการ...';
 
   try {
-    const res = await fetch('/student/api/wallet/withdraw', {
-      method: 'POST',
-      headers: apiHeaders,
+    const res  = await fetch('/student/api/wallet/withdraw', {
+      method: 'POST', headers: apiHeaders,
       body: JSON.stringify({
-        amount,
-        bank_name: bankName.value,
-        account_number: accountNumber.value,
-        note
+        amount, bank_name: bankName.value,
+        account_number: accountNumber.value, note
       })
     });
-
     const data = await res.json();
 
     if (data.status === 'success') {
-      alert('แจ้งถอนเงินสำเร็จ! ระบบได้ตัดยอดเงินในกระเป๋าของคุณแล้ว');
-
+      showToast('แจ้งถอนเงินสำเร็จ! ระบบได้ตัดยอดเงินในกระเป๋าของคุณแล้ว', 'success');
       document.getElementById('withdrawNote').value = '';
-      accountNumber.value = '';
-      bankName.value = '';
-
+      accountNumber.value    = '';
+      bankName.value         = '';
+      withdrawAmountInput.value = '';
+      updateWithdrawSummary(0);
       await fetchWalletData();
       await fetchTransactions();
     } else {
-      alert(data.message || 'ถอนเงินไม่สำเร็จ');
+      showToast(data.message || 'ถอนเงินไม่สำเร็จ', 'error');
     }
   } catch (err) {
     console.error(err);
-    alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
+    showToast('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+  } finally {
+    isSubmittingWithdraw           = false;
+    confirmWithdrawBtn.disabled    = false;
+    confirmWithdrawBtn.textContent = '🏦 Confirm Withdraw';
   }
-
-  confirmWithdrawBtn.disabled = false;
-  confirmWithdrawBtn.textContent = '🏦 Confirm Withdraw';
 });
 
+// ============================================================
+//  SUMMARY CALCULATORS
+// ============================================================
+
+// คำนวณยอดหลังฝาก = baseBalance + deposit amount
 function updateDepositSummary(amount) {
   const deposit = Number(amount) || 0;
-  summaryDeposit.textContent = formatCurrency(deposit);
-  summaryBalance.textContent = formatCurrency(baseBalance + deposit);
+  summaryDeposit.textContent  = formatCurrency(deposit);
+  summaryBalance.textContent  = formatCurrency(baseBalance + deposit);
 }
 
+// คำนวณยอดหลังถอน — ไม่ให้ติดลบ (Math.max(0, ...))
 function updateWithdrawSummary(amount) {
   const withdraw = Number(amount) || 0;
-  let newBalance = baseBalance - withdraw;
-  if (newBalance < 0) newBalance = 0;
-
-  summaryWithdraw.textContent = formatCurrency(withdraw);
-  summaryWithdrawBalance.textContent = formatCurrency(newBalance);
+  summaryWithdraw.textContent        = formatCurrency(withdraw);
+  summaryWithdrawBalance.textContent = formatCurrency(Math.max(0, baseBalance - withdraw));
 }
 
+// ============================================================
+//  EVENT LISTENERS
+// ============================================================
+
+// Quick amount buttons (deposit)
 document.querySelectorAll('.amount-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
     const val = btn.textContent.replace('฿', '').replace(',', '').trim();
     depositAmountInput.value = val;
     updateDepositSummary(val);
   });
 });
 
+// Quick amount buttons (withdraw)
 document.querySelectorAll('.withdraw-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.withdraw-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
     const val = btn.textContent.replace('฿', '').replace(',', '').trim();
     withdrawAmountInput.value = val;
     updateWithdrawSummary(val);
@@ -366,11 +383,10 @@ document.querySelectorAll('.filter-pill').forEach(pill => {
   });
 });
 
-depositAmountInput.addEventListener('input', () => updateDepositSummary(depositAmountInput.value));
+// อัปเดต summary ทุกครั้งที่ user พิมพ์
+depositAmountInput.addEventListener('input',  () => updateDepositSummary(depositAmountInput.value));
 withdrawAmountInput.addEventListener('input', () => updateWithdrawSummary(withdrawAmountInput.value));
 
-depositAmountInput.value = 500;
-withdrawAmountInput.value = 100;
-
+// ---- INIT ------------------------------------------------
 fetchWalletData();
 fetchTransactions();

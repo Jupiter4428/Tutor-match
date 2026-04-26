@@ -42,8 +42,6 @@ body::after {
   content: "";
   position: fixed;
   border-radius: 50%;
-  filter: blur(100px);
-  opacity: .35;
   z-index: 0;
   pointer-events: none;
 }
@@ -51,7 +49,7 @@ body::after {
 body::before {
   width: 320px;
   height: 320px;
-  background: #ff5fd2;
+  background: radial-gradient(circle, rgba(255,95,210,0.35) 0%, transparent 70%);
   top: -80px;
   left: -80px;
 }
@@ -59,7 +57,7 @@ body::before {
 body::after {
   width: 320px;
   height: 320px;
-  background: #42d8ff;
+  background: radial-gradient(circle, rgba(66,216,255,0.35) 0%, transparent 70%);
   right: -100px;
   bottom: -100px;
 }
@@ -81,7 +79,6 @@ body::after {
   border-radius: 28px;
   background: var(--card);
   border: var(--border);
-  backdrop-filter: blur(18px);
   box-shadow: var(--shadow);
   margin-bottom: 24px;
   flex-wrap: wrap;
@@ -166,7 +163,6 @@ body::after {
 .card {
   background: var(--card);
   border: var(--border);
-  backdrop-filter: blur(18px);
   box-shadow: var(--shadow);
   border-radius: 30px;
 }
@@ -337,7 +333,6 @@ body::after {
   background: var(--card);
   border: var(--border);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(18px);
 }
 
 .section-head {
@@ -557,7 +552,6 @@ body::after {
   background: var(--card);
   border: var(--border);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(18px);
 }
 
 .transaction-toolbar {
@@ -609,6 +603,8 @@ body::after {
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.08);
+  content-visibility: auto;
+  contain-intrinsic-size: 0 80px;
 }
 
 .transaction-icon {
@@ -691,7 +687,6 @@ body::after {
   background: var(--card);
   border: var(--border);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(18px);
 }
 
 .policy-card h3 {
