@@ -411,7 +411,7 @@ git push origin Final
 </tr>
 <tr>
 <td align="center"><b>Database</b></td>
-<td align="center">[ชื่อของคุณ]</td>
+<td align="center">นายภูวรัตน์ นาคจันทึก</td>
 <td align="center">6710615201</td>
 </tr>
 <tr>
