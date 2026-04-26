@@ -72,8 +72,8 @@ document.getElementById('profileUpload').addEventListener('change', async functi
   }
 
   const formData = new FormData();
-  formData.append('bio',             profileData.data.bio);
-  formData.append('hourly_rate',     profileData.data.hourly_rate);
+  formData.append('bio',             profileData.data.bio ?? '');
+  formData.append('hourly_rate',     profileData.data.hourly_rate ?? 0);
   formData.append('profile_picture', file);
 
   const res  = await fetch('/tutor/profile', {

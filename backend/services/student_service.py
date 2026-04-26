@@ -278,10 +278,12 @@ def get_my_courses(user_id):
                     schedule_parts.append(str(row["location"]))
                 schedule = " / ".join(schedule_parts) if schedule_parts else "-"
 
-                # ใช้รูป default ถ้าไม่มีรูปโปรไฟล์
+                # ใช้รูป default ถ้าไม่มีรูปโปรไฟล์ และทำให้ path เป็น absolute เสมอ
                 tutor_pic = row.get("tutor_pic")
                 if not tutor_pic or str(tutor_pic).strip() == "":
                     tutor_pic = "/static/uploads/default_profile.jpg"
+                elif not str(tutor_pic).startswith("/"):
+                    tutor_pic = f"/{tutor_pic}"
 
                 # แยก subjects และ experiences จาก GROUP_CONCAT
                 tutor_subjects = []

@@ -191,9 +191,22 @@ def get_profile():
 @role_required('tutor')
 def update_profile():
     """อัปเดตข้อมูลโปรไฟล์ติวเตอร์ (รวมรูปโปรไฟล์)"""
-    bio = request.form.get("bio")
-    hourly_rate = request.form.get("hourly_rate")
+    import json as _json
+
+    bio = request.form.get("bio") or None
+    hourly_rate = request.form.get("hourly_rate") or None
     profile_file = request.files.get("profile_picture")
+
+    # แปลง subjects JSON string → list (ถ้าส่งมา)
+    subjects_raw = request.form.get("subjects")
+    subjects = None
+    if subjects_raw is not None:
+        try:
+            subjects = _json.loads(subjects_raw)
+            if not isinstance(subjects, list):
+                subjects = []
+        except (ValueError, TypeError):
+            subjects = []
 
     filename = None
 
@@ -222,7 +235,8 @@ def update_profile():
         request.user_id,
         bio,
         hourly_rate,
-        filename
+        filename,
+        subjects
     )
 
     return jsonify(result), 200

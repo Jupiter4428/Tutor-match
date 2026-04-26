@@ -226,8 +226,7 @@ def get_tutor_profile(user_id):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
-            # ดึงข้อมูลโปรไฟล์พร้อม name และ email จากตาราง users
-            sql = """
+            cursor.execute("""
                 SELECT
                     tp.tutor_id, tp.bio, tp.hourly_rate,
                     tp.verification_status, tp.profile_picture_url,
@@ -235,12 +234,18 @@ def get_tutor_profile(user_id):
                 FROM tutor_profiles tp
                 JOIN users u ON tp.user_id = u.user_id
                 WHERE tp.user_id = %s
-            """
-            cursor.execute(sql, (user_id,))
+            """, (user_id,))
             profile = cursor.fetchone()
 
             if not profile:
                 return {"status": "error", "message": "ไม่พบโปรไฟล์ติวเตอร์"}
+
+            # ดึงวิชาที่สอนเพื่อให้ edit form pre-populate checkboxes ได้ถูกต้อง
+            cursor.execute(
+                "SELECT subject FROM tutor_subjects WHERE tutor_id = %s",
+                (profile['tutor_id'],)
+            )
+            profile['subjects'] = [r['subject'] for r in cursor.fetchall()]
 
             return {"status": "success", "message": "ดึงข้อมูลสำเร็จ", "data": profile}
 
@@ -250,27 +255,42 @@ def get_tutor_profile(user_id):
         connection.close()
 
 
-# อัปเดตโปรไฟล์ติวเตอร์ (bio, ราคา, รูปโปรไฟล์)
-def update_tutor_profile(user_id, bio, hourly_rate, filename=None):
+# อัปเดตโปรไฟล์ติวเตอร์ (bio, ราคา, รูปโปรไฟล์, วิชาที่สอน)
+def update_tutor_profile(user_id, bio, hourly_rate, filename=None, subjects=None):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
             if filename:
-                # อัปเดตพร้อมรูปโปรไฟล์ใหม่
                 cursor.execute(
                     "UPDATE tutor_profiles SET bio=%s, hourly_rate=%s, profile_picture_url=%s WHERE user_id=%s",
                     (bio, hourly_rate, f"static/uploads/{filename}", user_id)
                 )
             else:
-                # อัปเดตเฉพาะ bio และราคา
                 cursor.execute(
                     "UPDATE tutor_profiles SET bio=%s, hourly_rate=%s WHERE user_id=%s",
                     (bio, hourly_rate, user_id)
                 )
+
+            # อัปเดตวิชาที่สอน (ถ้าส่งมา): ลบเก่าแล้ว insert ใหม่
+            if subjects is not None:
+                cursor.execute(
+                    "SELECT tutor_id FROM tutor_profiles WHERE user_id = %s", (user_id,)
+                )
+                row = cursor.fetchone()
+                if row:
+                    tutor_id = row['tutor_id']
+                    cursor.execute("DELETE FROM tutor_subjects WHERE tutor_id = %s", (tutor_id,))
+                    if subjects:
+                        cursor.executemany(
+                            "INSERT INTO tutor_subjects (tutor_id, subject) VALUES (%s, %s)",
+                            [(tutor_id, s) for s in subjects]
+                        )
+
             connection.commit()
             return {"status": "success", "message": "อัปเดตโปรไฟล์สำเร็จ", "data": None}
 
     except Exception as e:
+        connection.rollback()
         return {"status": "error", "message": str(e)}
     finally:
         connection.close()
