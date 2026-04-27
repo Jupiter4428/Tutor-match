@@ -93,27 +93,41 @@ async function approveUser(id) {
   if (!user) return;
 
   try {
-    let response;
-    if (user.role === "tutor") {
-      response = await fetch("/admin/tutors/verify", {
-        method: "POST",
-        headers: apiHeaders,
-        body: JSON.stringify({ tutor_id: id, action: "verified" }),
-      });
-    } else {
-      response = await fetch("/admin/users/status", {
+    const isBannedOrSuspended = user.status === "ban" || user.status === "suspended";
+    const isTutorPending = user.role === "tutor" && user.verification_status === "pending";
+
+    if (isBannedOrSuspended) {
+      // คืนสถานะบัญชีกลับเป็น active (ทั้ง tutor และ student)
+      const res = await fetch("/admin/users/status", {
         method: "POST",
         headers: apiHeaders,
         body: JSON.stringify({ user_id: id, status: "active" }),
       });
-    }
-    const result = await response.json();
-    if (result.status === "success") {
-      showToast(`อนุมัติผู้ใช้ ${user.name} เรียบร้อยแล้ว`, 'success');
-      refreshData();
+      const result = await res.json();
+      if (result.status !== "success") {
+        showToast(result.message || "อนุมัติไม่สำเร็จ", 'error');
+        return;
+      }
+    } else if (isTutorPending) {
+      // อนุมัติการยืนยันตัวตนของ tutor
+      const res = await fetch("/admin/tutors/verify", {
+        method: "POST",
+        headers: apiHeaders,
+        body: JSON.stringify({ tutor_id: id, action: "verified" }),
+      });
+      const result = await res.json();
+      if (result.status !== "success") {
+        showToast(result.message || "อนุมัติไม่สำเร็จ", 'error');
+        return;
+      }
     } else {
-      showToast(result.message || "อนุมัติไม่สำเร็จ", 'error');
+      // active + verified อยู่แล้ว ไม่ต้องทำอะไร
+      showToast(`${user.name} ใช้งานปกติอยู่แล้ว`, 'error');
+      return;
     }
+
+    showToast(`อนุมัติผู้ใช้ ${user.name} เรียบร้อยแล้ว`, 'success');
+    refreshData();
   } catch {
     showToast("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", 'error');
   }
