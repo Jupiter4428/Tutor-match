@@ -211,11 +211,26 @@ function filterUsers() {
     const matchRole   = role === "all" || user.role === role;
 
     let matchStatus = true;
-    if (status === "approved") matchStatus = user.status === "active";
-    else if (status === "banned") matchStatus = user.status === "ban" || user.status === "suspended";
-    else if (status === "pending") matchStatus = user.status === "pending";
+    if (status === "approved") {
+      if (user.role === "tutor") {
+        matchStatus = user.verification_status === "verified" && user.status === "active";
+      } else {
+        matchStatus = user.status === "active";
+      }
+    } else if (status === "pending") {
+      matchStatus = user.role === "tutor" && user.verification_status === "pending";
+    } else if (status === "banned") {
+      matchStatus = user.status === "ban" || user.status === "suspended";
+    }
 
     return matchSearch && matchRole && matchStatus;
+  });
+
+  // admin อยู่บนสุดเสมอ
+  filteredUsers.sort((a, b) => {
+    if (a.role === "admin" && b.role !== "admin") return -1;
+    if (a.role !== "admin" && b.role === "admin") return 1;
+    return 0;
   });
 
   renderUsers();
