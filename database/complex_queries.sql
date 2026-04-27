@@ -280,9 +280,9 @@ SELECT
     pay.payment_id,
     pay.status AS payment_status
 FROM applications a
-JOIN student_posts p ON a.post_id = p.post_id
-JOIN student_profiles sp ON p.student_id = sp.student_id
-JOIN users u ON sp.user_id = u.user_id
+    JOIN student_posts p ON a.post_id = p.post_id
+    JOIN student_profiles sp ON p.student_id = sp.student_id
+    JOIN users u ON sp.user_id = u.user_id
 LEFT JOIN payments pay ON a.app_id = pay.app_id
 WHERE a.tutor_id = 1
   AND a.status = 'accepted'
