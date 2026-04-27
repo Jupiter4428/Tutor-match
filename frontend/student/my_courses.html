@@ -11,76 +11,7 @@
 
   <link rel="stylesheet" href="/assets/student/my_courses.css">
 
-  <style>
-    .review-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
 
-    .review-modal-box {
-      width: min(520px, 92vw);
-      background: white;
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-      font-family: Kanit, sans-serif;
-    }
-
-    .review-modal-box h3 {
-      margin: 0 0 10px;
-      color: #222;
-    }
-
-    .review-modal-box p {
-      margin: 0 0 15px;
-      color: #555;
-    }
-
-    .review-modal-box label {
-      display: block;
-      margin-top: 12px;
-      margin-bottom: 6px;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .review-modal-box select,
-    .review-modal-box textarea {
-      width: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid #ddd;
-      font-family: Kanit, sans-serif;
-      font-size: 15px;
-      box-sizing: border-box;
-    }
-
-    .review-modal-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .review-modal-actions button {
-      flex: 1;
-    }
-
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .rating-text {
-      color: #f39c12;
-      font-weight: 700;
-      margin-top: 8px;
-    }
-  </style>
 </head>
 
 <body>
@@ -99,8 +30,8 @@
       </div>
 
       <div class="nav-actions">
-        <button class="btn btn-secondary" onclick="goToStuHome()">🏠 Home </button>
-        <button class="btn btn-secondary" onclick="goToStuWallet()">💳 Wallet </button>
+        <button class="btn btn-secondary" id="homeBtn">🏠 Home </button>
+        <button class="btn btn-secondary" id="walletBtn">💳 Wallet </button>
         <button class="btn btn-primary" id="refreshBtn">🔄 Refresh</button>
       </div>
     </nav>
@@ -175,6 +106,10 @@
       <h3>เขียนรีวิวติวเตอร์</h3>
       <p id="reviewCourseTitle"></p>
 
+      <div id="reviewAlreadySubmitted">
+        ⚠️ คุณได้ส่งรีวิวนี้ไปแล้ว ไม่สามารถส่งรีวิวซ้ำได้
+      </div>
+
       <label for="reviewRating">ให้คะแนน</label>
       <select id="reviewRating">
         <option value="5">⭐⭐⭐⭐⭐ 5 ดาว</option>
@@ -188,8 +123,8 @@
       <textarea id="reviewComment" rows="5" placeholder="เขียนรีวิวของคุณ..."></textarea>
 
       <div class="review-modal-actions">
-        <button class="btn btn-primary" onclick="submitReview()">บันทึกรีวิว</button>
-        <button class="btn btn-secondary" onclick="closeReviewModal()">ยกเลิก</button>
+        <button class="btn btn-primary" id="submitReviewBtn">บันทึกรีวิว</button>
+        <button class="btn btn-secondary" id="cancelReviewBtn">ยกเลิก</button>
       </div>
     </div>
   </div>

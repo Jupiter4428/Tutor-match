@@ -186,7 +186,7 @@ function renderCourses() {
         ` : ""}
         <button class="btn review-btn" onclick="reviewCourse(${course.id})"
           ${course.status !== "completed" ? "disabled" : ""}>
-          ${course.review ? "✏️ แก้ไขรีวิว" : "⭐ Review"}
+          ${course.review ? "ดูรีวิวที่คุณเขียนไป" : "⭐ Review"}
         </button>
         <button class="btn detail-btn" onclick="viewDetail(${course.id})">ดูรายละเอียด</button>
       </div>
@@ -216,12 +216,19 @@ function reviewCourse(id) {
   document.getElementById("reviewCourseTitle").textContent = `${course.subject} - ${course.tutor.name}`;
   document.getElementById("reviewRating").value = course.rating || "5";
   document.getElementById("reviewComment").value = course.review || "";
+
+  const alreadySubmitted = !!course.review;
+  document.getElementById("reviewAlreadySubmitted").style.display = alreadySubmitted ? "block" : "none";
+  document.getElementById("submitReviewBtn").disabled = alreadySubmitted;
+
   document.getElementById("reviewModal").style.display = "flex";
 }
 
 function closeReviewModal() {
   selectedReviewCourseId = null;
   document.getElementById("reviewModal").style.display = "none";
+  document.getElementById("reviewAlreadySubmitted").style.display = "none";
+  document.getElementById("submitReviewBtn").disabled = false;
 }
 
 async function submitReview() {
@@ -331,4 +338,8 @@ async function payCourse(id) {
 searchInput.addEventListener("input", renderCourses);
 statusFilter.addEventListener("change", renderCourses);
 refreshBtn.addEventListener("click", loadCoursesFromDB);
+document.getElementById("homeBtn").addEventListener("click", goToStuHome);
+document.getElementById("walletBtn").addEventListener("click", goToStuWallet);
+document.getElementById("submitReviewBtn").addEventListener("click", submitReview);
+document.getElementById("cancelReviewBtn").addEventListener("click", closeReviewModal);
 document.addEventListener("DOMContentLoaded", loadCoursesFromDB);
