@@ -214,7 +214,55 @@ ORDER BY a.applied_at DESC;
 
 
 -- --------------------------------------------------------------
--- 14. ดึงตารางสอนของติวเตอร์ (applications ที่ accepted แล้ว)
+-- 14. ดึงรายชื่อ tutor ที่รอการอนุมัติ เรียงเก่าสุดก่อน
+-- Logic: กรองเฉพาะ verification_status = 'pending'
+--        JOIN users เพื่อได้ชื่อและอีเมล
+--        ORDER BY verification_submitted_at ASC เพื่อให้อนุมัติตามลำดับ
+-- --------------------------------------------------------------
+SELECT
+    tp.tutor_id,
+    tp.verification_status,
+    tp.bio,
+    tp.hourly_rate,
+    tp.profile_picture_url,
+    tp.verification_submitted_at,
+    tp.reject_reason,
+    u.user_id,
+    u.name,
+    u.email,
+    u.created_at
+FROM tutor_profiles tp
+JOIN users u ON tp.user_id = u.user_id
+WHERE tp.verification_status = 'pending'
+ORDER BY tp.verification_submitted_at ASC, u.created_at ASC;
+
+
+-- --------------------------------------------------------------
+-- 15. ตรวจสอบว่า tutor มีอยู่ในระบบ (lookup ด้วย user_id)
+-- Logic: tutor_profiles.tutor_id เป็น AUTO_INCREMENT PK (ไม่ใช่ user_id)
+--        ระบบจัดการ tutor ด้วย user_id จึงต้อง lookup ผ่าน user_id เสมอ
+-- --------------------------------------------------------------
+SELECT tutor_id
+FROM tutor_profiles
+WHERE user_id = 1;
+
+
+-- --------------------------------------------------------------
+-- 16. อนุมัติหรือปฏิเสธ tutor พร้อมบันทึก admin ที่ดำเนินการ
+-- Logic: UPDATE ด้วย user_id (ไม่ใช่ tutor_id ซึ่งเป็น PK ภายใน)
+--        verified_by เก็บ user_id ของ admin ที่กด approve/reject
+--        reject_reason เป็น NULL เมื่อ action = 'verified'
+-- --------------------------------------------------------------
+UPDATE tutor_profiles
+SET verification_status = 'verified',
+    verified_by         = 1,       -- admin user_id
+    verified_at         = NOW(),
+    reject_reason       = NULL
+WHERE user_id = 2;                 -- tutor user_id
+
+
+-- --------------------------------------------------------------
+-- 17. ดึงตารางสอนของติวเตอร์ (applications ที่ accepted แล้ว)
 -- Logic: LEFT JOIN payments เพราะบางงานยังไม่มีการชำระเงิน
 --        ถ้า JOIN ปกติ งานที่ยังไม่จ่ายจะหายไปจากผลลัพธ์
 -- --------------------------------------------------------------
@@ -250,7 +298,7 @@ ORDER BY a.applied_at DESC;
 
 
 -- --------------------------------------------------------------
--- 15. สรุป rating แยกตามจำนวนดาว (1-5) พร้อม avg และ total
+-- 18. สรุป rating แยกตามจำนวนดาว (1-5) พร้อม avg และ total
 -- Logic: CASE WHEN ทำหน้าที่เป็น pivot — แต่ละเงื่อนไข
 --        นับเฉพาะรีวิวที่ตรงกับดาวนั้นๆ (conditional COUNT)
 --        ใช้ SUM(CASE...) แทน COUNT(CASE...) เพื่อให้ได้ 0 แทน NULL
@@ -271,7 +319,7 @@ WHERE r.is_hidden = FALSE
 
 
 -- --------------------------------------------------------------
--- 16. ดึงรายการสมัครทั้งหมดพร้อมสถานะชำระเงินแบบอ่านง่าย
+-- 19. ดึงรายการสมัครทั้งหมดพร้อมสถานะชำระเงินแบบอ่านง่าย
 -- Logic: CASE WHEN แปลง payment status code → ข้อความภาษาไทย
 --        LEFT JOIN payments เพราะบางงานอาจยังไม่มีการจ่ายเงิน
 --        ใช้ alias ซ้อนกันหลายตัวเพื่อ JOIN ตาราง users 2 ครั้ง
@@ -301,7 +349,7 @@ ORDER BY a.applied_at DESC;
 
 
 -- --------------------------------------------------------------
--- 17. ติวเตอร์ที่มี rating เฉลี่ย >= 4 ดาว (verified แล้ว)
+-- 20. ติวเตอร์ที่มี rating เฉลี่ย >= 4 ดาว (verified แล้ว)
 -- Logic: GROUP BY รวมรีวิวทุกอันของติวเตอร์คนเดียวกัน
 --        HAVING กรองหลัง aggregate (ต่างจาก WHERE ที่กรองก่อน)
 --        ใส่ทั้ง tutor_id และ u.name ใน GROUP BY เพื่อให้ query ถูกต้อง
@@ -323,7 +371,7 @@ ORDER BY avg_rating DESC;
 
 
 -- --------------------------------------------------------------
--- 18. ติวเตอร์ที่มีใบสมัครค้าง (pending) มากกว่า 1 งาน
+-- 21. ติวเตอร์ที่มีใบสมัครค้าง (pending) มากกว่า 1 งาน
 -- Logic: GROUP BY รวมใบสมัครแต่ละคน
 --        HAVING COUNT > 1 กรองเฉพาะคนที่มีงานค้างหลายงาน
 -- --------------------------------------------------------------
@@ -341,7 +389,7 @@ HAVING pending_applications > 1;
 
 
 -- --------------------------------------------------------------
--- 19. รายได้รวมของแพลตฟอร์ม แยกตามติวเตอร์
+-- 22. รายได้รวมของแพลตฟอร์ม แยกตามติวเตอร์
 -- Logic: SUM หลายคอลัมน์พร้อมกัน
 --        tutor_net_earnings คำนวณในตัว query (ไม่ต้องคำนวณใน Python)
 --        กรองเฉพาะ payment ที่ completed เท่านั้น
@@ -370,7 +418,7 @@ ORDER BY total_billed DESC;
 
 
 -- --------------------------------------------------------------
--- 20. Wallet ของทุก user พร้อมยอดเงิน (user ที่ไม่มี wallet ได้ 0)
+-- 23. Wallet ของทุก user พร้อมยอดเงิน (user ที่ไม่มี wallet ได้ 0)
 -- Logic: LEFT JOIN เพราะ user ใหม่อาจยังไม่มี wallet
 --        COALESCE(w.balance, 0.00) แปลง NULL → 0
 --        ถ้าใช้ JOIN ปกติ user ที่ไม่มี wallet จะหายไป
@@ -388,7 +436,7 @@ ORDER BY u.role, u.user_id;
 
 
 -- --------------------------------------------------------------
--- 21. นักเรียนที่ตั้งงบสูงกว่าค่าเฉลี่ยของระบบ
+-- 24. นักเรียนที่ตั้งงบสูงกว่าค่าเฉลี่ยของระบบ
 -- Logic: Subquery ใน WHERE คำนวณ AVG(budget) ทั้งตารางก่อน
 --        แล้วนำมาเปรียบเทียบกับแต่ละโพสต์
 --        Subquery แบบนี้รันครั้งเดียว ไม่ใช่ Correlated
@@ -408,7 +456,7 @@ ORDER BY p.budget DESC;
 
 
 -- --------------------------------------------------------------
--- 22. สรุปยอดรับ-จ่ายของแต่ละ user จาก transaction_logs
+-- 25. สรุปยอดรับ-จ่ายของแต่ละ user จาก transaction_logs
 -- Logic: CASE WHEN แยก transaction เป็น "รับเข้า" (amount > 0)
 --        และ "จ่ายออก" (amount < 0) แล้ว SUM แต่ละฝั่ง
 --        GROUP BY ทุก column ที่ไม่ได้ aggregate ต้องใส่หมด
@@ -428,7 +476,7 @@ ORDER BY total_transactions DESC;
 
 
 -- --------------------------------------------------------------
--- 23. นักเรียนที่เคยเขียนรีวิวอย่างน้อย 1 ครั้ง
+-- 26. นักเรียนที่เคยเขียนรีวิวอย่างน้อย 1 ครั้ง
 -- Logic: Subquery แบบ IN — ติดตาม FK chain ยาว 4 ตาราง
 --        student_profiles → student_posts → applications → reviews
 --        IN (subquery) อ่านง่ายกว่า EXISTS ในกรณีนี้
@@ -450,7 +498,7 @@ WHERE u.user_id IN (
 
 
 -- --------------------------------------------------------------
--- 24. ดึงรีวิวทั้งหมดพร้อม filter แบบ dynamic (5 JOINs)
+-- 27. ดึงรีวิวทั้งหมดพร้อม filter แบบ dynamic (5 JOINs)
 -- Logic: JOIN 5 ตารางเพื่อดึง: ชื่อนักเรียน, ชื่อติวเตอร์, วิชา
 --        ผ่านเส้นทาง reviews → applications → tutor_profiles → users
 --        และ applications → student_posts → student_profiles → users
@@ -485,7 +533,7 @@ ORDER BY r.created_at DESC;
 
 
 -- --------------------------------------------------------------
--- 25. สถิติภาพรวมของระบบสำหรับ Admin Dashboard (7 ตัวชี้วัด)
+-- 28. สถิติภาพรวมของระบบสำหรับ Admin Dashboard (7 ตัวชี้วัด)
 -- Logic: SELECT ตัวเดียวใช้ Scalar Subquery 7 ตัว
 --        แต่ละ Subquery นับ COUNT ตามเงื่อนไขต่างกัน
 --        ทำให้ได้ผลใน 1 row ไม่ต้องรัน query แยก 7 ครั้ง
@@ -501,7 +549,7 @@ SELECT
 
 
 -- --------------------------------------------------------------
--- 26. Dashboard ของติวเตอร์ (4 ตัวชี้วัดใน 1 query)
+-- 29. Dashboard ของติวเตอร์ (4 ตัวชี้วัดใน 1 query)
 -- Logic: Correlated Subquery แต่ละตัวรับ tutor_id จาก outer query
 --        monthly_income ใช้ MONTH() + YEAR() กรองเฉพาะเดือนปัจจุบัน
 --        COALESCE กันกรณีที่ยังไม่มีรีวิวเลย (AVG จะ return NULL)
@@ -527,7 +575,7 @@ SELECT
 
 
 -- --------------------------------------------------------------
--- 27. ติวเตอร์ verified ทั้งหมดพร้อม avg_rating และ review_count
+-- 30. ติวเตอร์ verified ทั้งหมดพร้อม avg_rating และ review_count
 -- Logic: GROUP BY tp.tutor_id รวมรีวิวทั้งหมดของแต่ละคน
 --        LEFT JOIN reviews เพราะติวเตอร์ใหม่อาจยังไม่มีรีวิว
 --        AND r.is_hidden = FALSE อยู่ใน JOIN condition (ไม่ใช่ WHERE)
@@ -552,7 +600,7 @@ ORDER BY avg_rating DESC, review_count DESC;
 
 
 -- --------------------------------------------------------------
--- 28. ดึงคอร์สทั้งหมดของนักเรียน (query ที่ซับซ้อนที่สุดในระบบ)
+-- 31. ดึงคอร์สทั้งหมดของนักเรียน (query ที่ซับซ้อนที่สุดในระบบ)
 -- Logic: JOIN 6 ตารางหลัก + LEFT JOIN 2 ตาราง
 --        ใช้ Correlated Scalar Subquery 3 ตัวใน SELECT clause:
 --          - GROUP_CONCAT subjects ของแต่ละ tutor
@@ -625,7 +673,7 @@ ORDER BY a.app_id DESC;
 
 
 -- --------------------------------------------------------------
--- 29. ยกเลิกการจองและคืนโพสต์เป็น open ด้วย Subquery ใน UPDATE
+-- 32. ยกเลิกการจองและคืนโพสต์เป็น open ด้วย Subquery ใน UPDATE
 -- Logic: UPDATE student_posts ต้องรู้ post_id
 --        แต่เรารู้แค่ app_id จึงใช้ Subquery ใน WHERE clause
 --        SELECT post_id FROM applications WHERE app_id = ?
@@ -641,7 +689,7 @@ WHERE post_id = (
 
 
 -- --------------------------------------------------------------
--- 30. Audit Log — ประวัติการกระทำของ Admin
+-- 33. Audit Log — ประวัติการกระทำของ Admin
 -- Logic: LEFT JOIN u_target เพราะ target อาจเป็น object ไม่ใช่ user
 --        (เช่น target_type = 'post' จะไม่มี user_id ตรงๆ)
 --        JOIN u_admin ใช้ INNER JOIN เพราะต้องมี admin ที่ทำรายการเสมอ
