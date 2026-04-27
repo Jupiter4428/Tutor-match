@@ -410,13 +410,13 @@ git push origin Final
 <td align="center">6710535029</td>
 </tr>
 <tr>
-<td align="center"><b>Database</b></td>
+<td align="center"><b>Database & Backend Architec</b></td>
 <td align="center">นายภูวรัตน์ นาคจันทึก</td>
 <td align="center">6710615201</td>
 </tr>
 <tr>
 <td align="center"><b>Frontend & UI/UX Design</b></td>
-<td align="center">[ชื่อของคุณ]</td>
+<td align="center">นายธนกฤต โพธิมาศ</td>
 <td align="center">6710625010</td>
 </tr>
 </table>
