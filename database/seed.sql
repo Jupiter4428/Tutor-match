@@ -557,4 +557,46 @@ INSERT INTO user_action_logs (user_id, action_type, target_type, target_id, reas
 (7,  'account_banned',    'user',          7, 'ละเมิดข้อกำหนดการใช้งานซ้ำหลายครั้ง',              1),
 (8,  'account_suspended', 'user',          8, 'รายงานพฤติกรรมไม่เหมาะสม พักบัญชีระหว่างตรวจสอบ', 1);
 
+-- ============================================================
+-- EXTRA 4: ครบทุก status สำหรับทุก student
+-- เพิ่ม pending_payment (not_started) และ active (ongoing)
+-- ที่ยังขาดอยู่ให้ครบทุกคน
+-- ============================================================
+
+-- Posts (44–51)
+INSERT INTO student_posts (post_id, student_id, subject, grade_level, learning_format, location, preferred_time, description, budget, status) VALUES
+-- สมชาย: ขาด pending_payment
+(44, 1, 'วิทยาศาสตร์',  'ม.4', 'online',  'ออนไลน์',          'จันทร์ พุธ 17:00-19:00',    'ติววิทยาศาสตร์พื้นฐาน เคมีและฟิสิกส์ เตรียมสอบกลางภาค',   900.00,  'closed'),
+-- สมหญิง: ขาด active + pending_payment
+(45, 2, 'สังคมศึกษา',   'ม.6', 'online',  'ออนไลน์',          'อังคาร พฤหัส 18:00-19:30',  'ติวประวัติศาสตร์ ภูมิศาสตร์ เตรียมสอบ A-Level สังคม',      700.00,  'closed'),
+(46, 2, 'เคมี',          'ม.6', 'online',  'ออนไลน์',          'เสาร์ 09:00-11:00',         'ติว A-Level เคมี สมดุล กรด-เบส ปฏิกิริยาออกซิเดชัน',        1500.00, 'closed'),
+-- มะลิ: ขาด active + pending_payment
+(47, 3, 'ภาษาไทย',      'ม.3', 'onsite',  'รามคำแหง กรุงเทพฯ','เสาร์ 10:00-12:00',         'ฝึกเขียนเรียงความ อ่านจับใจความ เตรียมสอบปลายปี',          800.00,  'closed'),
+(48, 3, 'สถิติ',          'ม.3', 'online',  'ออนไลน์',          'อาทิตย์ 10:00-12:00',       'ความน่าจะเป็นพื้นฐาน การแจกแจง ค่าเฉลี่ย เตรียมขึ้น ม.4',  600.00,  'closed'),
+-- ปราณี: ขาด active
+(49, 4, 'ฟิสิกส์',       'ม.5', 'online',  'ออนไลน์',          'พุธ ศุกร์ 18:00-20:00',     'ไฟฟ้าสถิต ไฟฟ้ากระแส แม่เหล็ก เตรียมสอบ A-Level',          1500.00, 'closed'),
+-- ธนภัทร: ขาด active + pending_payment
+(50, 5, 'ภาษาอังกฤษ',   'ม.6', 'online',  'ออนไลน์',          'จันทร์-ศุกร์ 07:00-08:00',  'ติว IELTS Speaking Part 2-3 เน้น fluency และ vocabulary',    1800.00, 'closed'),
+(51, 5, 'คณิตศาสตร์',   'ม.6', 'online',  'ออนไลน์',          'เสาร์ 10:00-12:00',         'ตะลุยโจทย์แคลคูลัส limit derivative integral สอบเข้า ม.ปลาย', 1200.00, 'closed');
+
+-- Applications (31–38)
+-- ไม่มี payment = pending_payment (not_started), มี payment pending = active (ongoing)
+INSERT INTO applications (app_id, post_id, tutor_id, status, applied_at, teaching_status) VALUES
+(31, 44, 3, 'accepted', '2026-04-01 09:00:00', 'not_started'),  -- สมชาย + อาร์ท วิทย์ (pending_payment)
+(32, 45, 6, 'accepted', '2026-04-02 10:00:00', 'ongoing'),      -- สมหญิง + ประสิทธิ์ สังคม (active)
+(33, 46, 3, 'accepted', '2026-04-03 09:00:00', 'not_started'),  -- สมหญิง + อาร์ท เคมี (pending_payment)
+(34, 47, 1, 'accepted', '2026-04-04 10:00:00', 'ongoing'),      -- มะลิ + มานี ภาษาไทย (active)
+(35, 48, 2, 'accepted', '2026-04-05 09:00:00', 'not_started'),  -- มะลิ + ชูใจ สถิติ (pending_payment)
+(36, 49, 3, 'accepted', '2026-04-06 10:00:00', 'ongoing'),      -- ปราณี + อาร์ท ฟิสิกส์ (active)
+(37, 50, 2, 'accepted', '2026-04-07 07:00:00', 'ongoing'),      -- ธนภัทร + ชูใจ อังกฤษ (active)
+(38, 51, 1, 'accepted', '2026-04-08 10:00:00', 'not_started');  -- ธนภัทร + มานี คณิต (pending_payment)
+
+-- Payments สำหรับ active (ongoing) apps เท่านั้น — escrow hold
+-- apps 31, 33, 35, 38 ไม่มี payment เพราะยังไม่ได้จ่าย (pending_payment)
+INSERT INTO payments (payment_id, app_id, amount, platform_fee, status) VALUES
+(27, 32,  700.00,  70.00, 'pending'),   -- สมหญิง + ประสิทธิ์ สังคม
+(28, 34,  800.00,  80.00, 'pending'),   -- มะลิ + มานี ภาษาไทย
+(29, 36, 1500.00, 150.00, 'pending'),   -- ปราณี + อาร์ท ฟิสิกส์
+(30, 37, 1800.00, 180.00, 'pending');   -- ธนภัทร + ชูใจ อังกฤษ
+
 SET FOREIGN_KEY_CHECKS = 1;
