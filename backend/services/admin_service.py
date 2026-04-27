@@ -155,8 +155,8 @@ def verify_tutor(tutor_id, action, reject_reason, admin_user_id):
     connection = db.get_connection()
     try:
         with connection.cursor() as cursor:
-            # ตรวจสอบว่า tutor มีอยู่ในระบบก่อน
-            cursor.execute("SELECT tutor_id FROM tutor_profiles WHERE tutor_id = %s", (tutor_id,))
+            # ตรวจสอบว่า tutor มีอยู่ในระบบก่อน (tutor_id ที่ส่งมาคือ user_id)
+            cursor.execute("SELECT tutor_id FROM tutor_profiles WHERE user_id = %s", (tutor_id,))
             if not cursor.fetchone():
                 return {"status": "error", "message": "ไม่พบ tutor นี้", "not_found": True}
 
@@ -167,7 +167,7 @@ def verify_tutor(tutor_id, action, reject_reason, admin_user_id):
                     verified_by = %s,
                     verified_at = NOW(),
                     reject_reason = %s
-                WHERE tutor_id = %s
+                WHERE user_id = %s
             """, (action, admin_user_id, reject_reason if action == "rejected" else None, tutor_id))
 
         connection.commit()

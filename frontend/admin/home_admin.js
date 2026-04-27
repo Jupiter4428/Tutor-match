@@ -93,11 +93,20 @@ async function approveUser(id) {
   if (!user) return;
 
   try {
-    const response = await fetch("/admin/users/status", {
-      method: "POST",
-      headers: apiHeaders,
-      body: JSON.stringify({ user_id: id, status: "active" }),
-    });
+    let response;
+    if (user.role === "tutor") {
+      response = await fetch("/admin/tutors/verify", {
+        method: "POST",
+        headers: apiHeaders,
+        body: JSON.stringify({ tutor_id: id, action: "verified" }),
+      });
+    } else {
+      response = await fetch("/admin/users/status", {
+        method: "POST",
+        headers: apiHeaders,
+        body: JSON.stringify({ user_id: id, status: "active" }),
+      });
+    }
     const result = await response.json();
     if (result.status === "success") {
       showToast(`อนุมัติผู้ใช้ ${user.name} เรียบร้อยแล้ว`, 'success');
