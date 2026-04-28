@@ -421,4 +421,5 @@ git push origin Final
 </tr>
 </table>
 
-<p align="right"><i>Project Version 2.0
+<p align="right"><i>Project Version BETA
+<p align="right"><i>โปรเจคนี้เป็นเพียงโปรเจคในคอร์สเรียน CN230 Database Design เท่านั้น ยังคงมีบางฟังก์ชั่นที่ไม่ได้ทำการ Implement แต่ขอรับประกันได้เลยว่า ทุกฟังก์ชั่นเป็นการดึงข้อมูลมาจาก Database แน่นอนครับ!!
